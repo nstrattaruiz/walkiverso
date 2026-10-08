@@ -21,14 +21,14 @@ import { contacto, legal } from './paginas/contacto.js';
 import { cuenta } from './paginas/cuenta.js';
 
 // ---------------------------------------------------------------- carga inicial
-// El telón de raíces se abre cuando la primera página ya está dibujada (y pasó el tiempo mínimo para que se llegue a ver).
+// La carga se cierra cuando la primera página ya está dibujada (y pasó el tiempo mínimo para que el logo termine de llenarse).
 const sinCarga = document.documentElement.classList.contains('wk-sin-carga');
 function abrirTelon() {
   const carga = $('#carga');
   if (!carga) return;
   try { sessionStorage.setItem('wk-visto', '1'); } catch { /* sin almacenamiento */ }
   carga.classList.add('is-abriendo');
-  setTimeout(() => carga.remove(), sinCarga ? 0 : 1900);
+  setTimeout(() => carga.remove(), sinCarga ? 0 : 1500);
 }
 
 async function arrancar() {
@@ -66,7 +66,7 @@ async function arrancar() {
   // Cambios de # dentro de la misma página (anclas) no vuelven a dibujar
   window.addEventListener('popstate', () => { if (location.pathname + location.search !== rutaActual) ruta(); });
   window.addEventListener('wk:ruta', ruta);
-  await Promise.all([ruta(), new Promise((r) => setTimeout(r, sinCarga ? 0 : 2400))]);
+  await Promise.all([ruta(), new Promise((r) => setTimeout(r, sinCarga ? 0 : 2100))]);
   abrirTelon();
 }
 

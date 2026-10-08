@@ -799,35 +799,25 @@ body:is([data-pagina='checkout'], [data-pagina='pedido'], [data-pagina='cuenta']
 .wk-acceso__enlace:hover { color: var(--fg); }
 
 /* =========================================================
-   Carga inicial: oscuridad, las raíces crecen desde los bordes, aparece el nombre
-   y el telón de raíces se abre dejando ver la web. Una vez por visita.
+   Carga inicial: fondo oscuro (como el pie), el logo se llena de luz desde abajo,
+   un destello lo cruza y la web aparece. Una vez por visita.
    ========================================================= */
-.wk-carga { position: fixed; inset: 0; z-index: 200; display: grid; place-items: center; overflow: hidden; background: radial-gradient(70% 60% at 50% 50%, var(--blue-dark), var(--blue-night) 70%, #02040C); transition: opacity 1s ease 0.7s, visibility 0s linear 1.8s; }
+.wk-carga { position: fixed; inset: 0; z-index: 200; display: grid; place-items: center; background: radial-gradient(60% 40% at 50% 52%, rgb(150 175 225 / 0.1), transparent 70%), linear-gradient(180deg, #050C1F, #02040C 60%); transition: opacity 0.9s ease 0.45s, visibility 0s linear 1.4s; }
 html.wk-sin-carga .wk-carga { display: none; }
-/* Si algo fallara y nadie abre el telón, se va solo a los 9 segundos */
+/* Si algo fallara y nadie la cierra, se va sola a los 9 segundos */
 .wk-carga { animation: wk-carga-salida 0.8s ease 9s forwards; }
 @keyframes wk-carga-salida { to { opacity: 0; visibility: hidden; } }
-.wk-carga__rama { position: absolute; top: -6%; height: 112%; aspect-ratio: 227 / 491; background: linear-gradient(180deg, var(--blue-glow), var(--blue-mid) 60%, var(--blue)); -webkit-mask: url('../img/ramas.svg') left top / contain no-repeat; mask: url('../img/ramas.svg') left top / contain no-repeat; opacity: 0.55; clip-path: inset(0 100% 0 0); animation: wk-carga-crece 2s cubic-bezier(0.3, 0, 0.2, 1) 0.15s forwards; transition: translate 1.5s cubic-bezier(0.6, 0, 0.2, 1), rotate 1.5s cubic-bezier(0.6, 0, 0.2, 1), scale 1.5s cubic-bezier(0.6, 0, 0.2, 1), opacity 1.2s ease; }
-.wk-carga__rama--izq { left: -2%; transform-origin: 0 50%; }
-.wk-carga__rama--der { right: -2%; scale: -1 1; transform-origin: 50% 50%; }
-/* Segunda capa, más grande y tenue: da profundidad al telón */
-.wk-carga__rama--fondo { top: -30%; height: 160%; opacity: 0.2; animation-delay: 0s; animation-duration: 2.4s; }
-@keyframes wk-carga-crece { to { clip-path: inset(0 -4% 0 0); } }
-.wk-carga__centro { position: relative; display: grid; justify-items: center; gap: 18px; padding: 24px; transition: opacity 0.7s ease, scale 0.9s cubic-bezier(0.6, 0, 0.2, 1); }
-.wk-carga__centro::before { content: ''; position: absolute; left: 50%; top: 40%; width: min(90vw, 720px); aspect-ratio: 2 / 1; translate: -50% -50%; border-radius: 50%; background: radial-gradient(closest-side, rgb(143 197 255 / 0.3), transparent); animation: wk-respirar 4s ease-in-out infinite; }
-.wk-carga__centro img { position: relative; width: min(72vw, 420px); height: auto; filter: drop-shadow(0 0 30px rgb(143 197 255 / 0.5)); animation: wk-carga-logo 1.6s cubic-bezier(0.22, 1, 0.36, 1) 0.5s both; }
-@keyframes wk-carga-logo { from { opacity: 0; scale: 0.9; filter: drop-shadow(0 0 0 transparent) blur(8px); } }
-.wk-carga__centro p { position: relative; margin: 0; font-family: var(--wk-serif); font-style: italic; font-size: clamp(1.05rem, 2.4vw, 1.4rem); color: var(--blue-glow); animation: wk-carga-lema 1.6s ease 1.1s both; }
-@keyframes wk-carga-lema { from { opacity: 0; letter-spacing: 0.5em; } to { opacity: 1; letter-spacing: 0.04em; } }
-.wk-carga__barra { position: relative; width: 120px; height: 2px; margin-top: 6px; overflow: hidden; border-radius: 2px; background: rgb(143 197 255 / 0.2); }
-.wk-carga__barra i { position: absolute; inset: 0; background: var(--white); transform-origin: 0 50%; animation: wk-carga-barra 2.3s cubic-bezier(0.4, 0, 0.2, 1) 0.3s both; }
-@keyframes wk-carga-barra { from { scale: 0 1; } }
-/* Se abre el telón */
+.wk-carga__logo { position: relative; width: min(70vw, 420px); transition: scale 1.1s cubic-bezier(0.5, 0, 0.2, 1), opacity 0.7s ease 0.3s, filter 1.1s ease; }
+.wk-carga__logo img { display: block; width: 100%; height: auto; }
+/* Debajo, el logo apagado; encima, el mismo logo encendido que sube desde abajo */
+.wk-carga__logo img:first-child { opacity: 0.14; }
+.wk-carga__logo img:last-child { position: absolute; inset: 0; clip-path: inset(100% 0 0 0); filter: drop-shadow(0 0 22px rgb(143 197 255 / 0.55)); animation: wk-carga-llenar 1.7s cubic-bezier(0.45, 0, 0.2, 1) 0.2s forwards; }
+@keyframes wk-carga-llenar { to { clip-path: inset(-20% 0 0 0); } }
+/* El destello: una luz que recorre las letras (recortada a la forma del logo) cuando termina de llenarse */
+.wk-carga__logo::after { content: ''; position: absolute; inset: 0; background: linear-gradient(105deg, transparent 40%, #fff 50%, transparent 60%) no-repeat; background-size: 250% 100%; background-position: 150% 0; -webkit-mask: url('../img/logo-walkiverso.svg') center / contain no-repeat; mask: url('../img/logo-walkiverso.svg') center / contain no-repeat; filter: drop-shadow(0 0 14px #fff); opacity: 0; pointer-events: none; }
+.wk-carga.is-abriendo .wk-carga__logo::after { animation: wk-carga-destello 0.75s ease-out forwards; }
+@keyframes wk-carga-destello { 0% { background-position: 150% 0; opacity: 1; } 100% { background-position: -50% 0; opacity: 1; } }
+/* Y se va: el logo se enciende, se agranda apenas y se disuelve con el fondo */
 .wk-carga.is-abriendo { opacity: 0; visibility: hidden; pointer-events: none; }
-.wk-carga.is-abriendo .wk-carga__centro { opacity: 0; scale: 1.08; }
-.wk-carga.is-abriendo .wk-carga__rama--izq { translate: -130% 0; rotate: -8deg; }
-.wk-carga.is-abriendo .wk-carga__rama--der { translate: 130% 0; rotate: 8deg; }
-.wk-carga.is-abriendo .wk-carga__rama--fondo { scale: 1.4; }
-.wk-carga.is-abriendo .wk-carga__rama--der.wk-carga__rama--fondo { scale: -1.4 1.4; }
-@media (max-width: 749px) { .wk-carga__rama { height: 80%; top: 10%; } .wk-carga__rama--fondo { height: 110%; top: -5%; } }
-@media (prefers-reduced-motion: reduce) { .wk-carga__rama { clip-path: none; } }
+.wk-carga.is-abriendo .wk-carga__logo { scale: 1.12; opacity: 0; filter: brightness(1.6) blur(6px); }
+@media (prefers-reduced-motion: reduce) { .wk-carga__logo img:last-child { clip-path: none; } }
