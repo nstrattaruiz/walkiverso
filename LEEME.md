@@ -119,3 +119,14 @@ cargan en el panel (producto); las demás van en `img/` y su ruta se escribe en 
   "reducir movimiento"; en celular hay menos partículas y no hay efectos de mouse.
 - De la plantilla del Kit no se portaron (no aplican a esta tienda): pedido rápido por código, página de reseñas,
   asistente de compras y comprobantes de ERP.
+
+## Verla desde cualquier compu (GitHub Pages)
+
+- Repositorio: https://github.com/nstrattaruiz/walkiverso (público)
+- Web: https://nstrattaruiz.github.io/walkiverso/ — corre en modo demostración (datos de ejemplo, no cobra) y lleva `noindex` para que no la tomen los buscadores.
+- Para actualizarla: `git add -A`, `git commit -m "…"`, `git push`. Se publica sola en uno o dos minutos.
+- La web funciona igual en la raíz (plataforma) y en una subcarpeta (Pages): `index.html` fija la carpeta base con `<base>` y `404.html` recupera las rutas internas en Pages. En el código, las rutas de la web pasan por `rutaWeb()` y `url()` de `js/ui/util.js`.
+
+## Carga inicial
+
+Telón de raíces con el logo, una vez por visita (`sessionStorage`). El marcado está al principio de `index.html` (`#carga`) y se abre desde `js/app.js` (`abrirTelon`) cuando la primera página ya está dibujada, con un mínimo de 2,4 s. Si algo fallara, se va solo a los 9 s.
