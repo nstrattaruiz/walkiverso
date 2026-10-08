@@ -834,3 +834,8 @@ html.wk-sin-carga .wk-carga { display: none; }
 .wk-carga.is-abriendo .wk-carga__logo { opacity: 0; scale: 1.1; filter: blur(10px); }
 @media (prefers-reduced-motion: reduce) { .wk-carga { transition: opacity 0.4s ease; } }
 .wk-carga__motas { position: absolute; inset: 0; }
+
+/* Entrada, versión con magia: una chispa escribe el logo de izquierda a derecha (la mueve el guion de index.html) */
+@property --wk-p { syntax: '<percentage>'; inherits: false; initial-value: 118%; }
+.wk-carga__polvo { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.wk-carga__logo { animation: none; -webkit-mask-image: linear-gradient(90deg, #000 calc(var(--wk-p) - 16%), transparent var(--wk-p)); mask-image: linear-gradient(90deg, #000 calc(var(--wk-p) - 16%), transparent var(--wk-p)); }

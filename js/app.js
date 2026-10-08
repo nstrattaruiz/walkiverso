@@ -66,7 +66,7 @@ async function arrancar() {
   // Cambios de # dentro de la misma página (anclas) no vuelven a dibujar
   window.addEventListener('popstate', () => { if (location.pathname + location.search !== rutaActual) ruta(); });
   window.addEventListener('wk:ruta', ruta);
-  await Promise.all([ruta(), new Promise((r) => setTimeout(r, sinCarga ? 0 : 2300))]);
+  await Promise.all([ruta(), new Promise((r) => setTimeout(r, sinCarga ? 0 : 2600))]);
   abrirTelon();
 }
 

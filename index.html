@@ -32,12 +32,59 @@
   <link rel="stylesheet" href="css/wk-forma.css">
 </head>
 <body class="wk-blanco">
-  <!-- ============ Entrada: el logo emerge de la bruma y la oscuridad se disipa como niebla ============ -->
+  <!-- ============ Entrada: una chispa escribe el logo con polvo de luz y la oscuridad se disipa como niebla ============ -->
   <div class="wk-carga" id="carga" aria-hidden="true">
     <span class="wk-carga__bruma"></span>
-    <span class="wk-carga__motas"><i style="--x:22%;--y:62%;--s:4px;--t:3.2s;--d:0s;--dx:14px"></i><i style="--x:34%;--y:40%;--s:3px;--t:3.8s;--d:-1.1s;--dx:-10px"></i><i style="--x:46%;--y:70%;--s:5px;--t:3s;--d:-0.4s;--dx:8px"></i><i style="--x:58%;--y:34%;--s:3px;--t:4.2s;--d:-2s;--dx:12px"></i><i style="--x:66%;--y:66%;--s:4px;--t:3.4s;--d:-0.9s;--dx:-14px"></i><i style="--x:76%;--y:46%;--s:3px;--t:3.9s;--d:-1.6s;--dx:6px"></i><i style="--x:40%;--y:56%;--s:3px;--t:4.4s;--d:-2.6s;--dx:-6px"></i><i style="--x:54%;--y:60%;--s:4px;--t:3.6s;--d:-3s;--dx:16px"></i></span>
+    <canvas class="wk-carga__polvo"></canvas>
     <img class="wk-carga__logo" src="img/logo-walkiverso.svg" alt="" width="420" height="112">
   </div>
+  <script>
+    // Entrada: una chispa "escribe" el logo de izquierda a derecha dejando polvo de luz, y al terminar el logo estalla en destellos.
+    // Va acá (y no en js/) para que empiece apenas se ve la pantalla, sin esperar al resto de la web.
+    (function () {
+      var c = document.getElementById('carga');
+      if (!c || getComputedStyle(c).display === 'none' || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      var logo = c.querySelector('.wk-carga__logo'), cv = c.querySelector('canvas'), x = cv.getContext('2d');
+      var d = Math.min(devicePixelRatio || 1, 1.5), P = [], t0 = performance.now(), antes = t0, estallo = false;
+      function medir() { cv.width = innerWidth * d; cv.height = innerHeight * d; x.setTransform(d, 0, 0, d, 0, 0); }
+      function chispa(px, py, fuerza) {
+        var a = Math.random() * 6.28, v = fuerza * (8 + Math.random() * 46);
+        P.push({ x: px, y: py, vx: Math.cos(a) * v, vy: Math.sin(a) * v - 10, l: 0, d: 0.5 + Math.random() * 1.2, r: 0.8 + Math.random() * 2.4, f: Math.random() * 6.28 });
+      }
+      medir(); addEventListener('resize', medir);
+      logo.style.setProperty('--wk-p', '0%');
+      requestAnimationFrame(function cuadro(ahora) {
+        if (!c.isConnected) return;
+        var dt = Math.min(0.05, (ahora - antes) / 1000); antes = ahora;
+        var t = Math.max(0, Math.min(1, (ahora - t0 - 350) / 1500)), e = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+        var r = logo.getBoundingClientRect(), px = r.left + r.width * e, py = r.top + r.height * (0.5 + 0.3 * Math.sin(e * 9)), i;
+        logo.style.setProperty('--wk-p', (e * 118) + '%');
+        x.clearRect(0, 0, innerWidth, innerHeight);
+        x.globalCompositeOperation = 'lighter';
+        if (t > 0 && t < 1) {
+          for (i = 0; i < 5; i++) chispa(px, py, 1.25);
+          // La punta de la chispa: un resplandor con un destello en cruz
+          var g = x.createRadialGradient(px, py, 0, px, py, 26);
+          g.addColorStop(0, 'rgba(255,255,255,1)'); g.addColorStop(0.25, 'rgba(170,215,255,0.55)'); g.addColorStop(1, 'rgba(143,197,255,0)');
+          x.globalAlpha = 1; x.fillStyle = g; x.fillRect(px - 26, py - 26, 52, 52);
+          x.fillStyle = '#fff'; x.fillRect(px - 20, py - 0.6, 40, 1.2); x.fillRect(px - 0.6, py - 20, 1.2, 40);
+        } else if (t >= 1 && !estallo) {
+          estallo = true;
+          for (i = 0; i < 150; i++) chispa(r.left + Math.random() * r.width, r.top + Math.random() * r.height, 3.4);
+        }
+        P = P.filter(function (p) { return (p.l += dt) < p.d; });
+        for (i = 0; i < P.length; i++) {
+          var p = P[i], k = 1 - p.l / p.d;
+          p.vy += 34 * dt; p.vx *= 0.985; p.x += p.vx * dt; p.y += p.vy * dt;
+          x.globalAlpha = k * (0.55 + 0.45 * Math.sin(p.l * 20 + p.f));
+          x.fillStyle = i % 3 ? '#CFE6FF' : '#fff';
+          x.beginPath(); x.arc(p.x, p.y, p.r * (0.5 + k * 0.6), 0, 6.28); x.fill();
+        }
+        x.globalAlpha = 1;
+        requestAnimationFrame(cuadro);
+      });
+    })();
+  </script>
   <!-- Walkiverso · web para la plataforma (Kit NS). Los datos salen de la tienda con el SDK: ver js/app.js y LEEME.md -->
 
   <!-- Iconos reutilizables -->
