@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Walkiverso</title>
+  <script>
+    // GitHub Pages no conoce las rutas de la web (/tienda, /producto/…): se guarda la que se pidió y se vuelve al inicio,
+    // donde index.html la retoma. En la plataforma esto no hace falta (las rutas ya devuelven index.html).
+    if (/\.github\.io$/.test(location.hostname)) {
+      try { sessionStorage.setItem('wk-ruta', location.pathname + location.search + location.hash); } catch (e) { /* sin almacenamiento */ }
+      location.replace('/' + location.pathname.split('/')[1] + '/');
+    }
+  </script>
+  <style>
+    body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: #040F26; color: #F4F8FC; font-family: system-ui, sans-serif; text-align: center; }
+    a { color: #8FC5FF; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Esta página se perdió en la niebla</h1>
+    <p><a href="/">Volver al inicio</a></p>
+  </main>
+</body>
+</html>
