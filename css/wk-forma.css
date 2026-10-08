@@ -799,25 +799,38 @@ body:is([data-pagina='checkout'], [data-pagina='pedido'], [data-pagina='cuenta']
 .wk-acceso__enlace:hover { color: var(--fg); }
 
 /* =========================================================
-   Carga inicial: fondo oscuro (como el pie), el logo se llena de luz desde abajo,
-   un destello lo cruza y la web aparece. Una vez por visita.
+   Entrada: sobre un fondo oscuro (como el pie) el logo emerge de la bruma, con unas motas de luz
+   que suben; después la oscuridad se disipa como niebla, en manchas, y deja ver la web.
+   Nada "carga": no hay barras ni rellenos. Una vez por visita.
    ========================================================= */
-.wk-carga { position: fixed; inset: 0; z-index: 200; display: grid; place-items: center; background: radial-gradient(60% 40% at 50% 52%, rgb(150 175 225 / 0.1), transparent 70%), linear-gradient(180deg, #050C1F, #02040C 60%); transition: opacity 0.9s ease 0.45s, visibility 0s linear 1.4s; }
+@property --wk-n1 { syntax: '<length>'; inherits: false; initial-value: 0px; }
+@property --wk-n2 { syntax: '<length>'; inherits: false; initial-value: 0px; }
+@property --wk-n3 { syntax: '<length>'; inherits: false; initial-value: 0px; }
+@property --wk-n4 { syntax: '<length>'; inherits: false; initial-value: 0px; }
+.wk-carga {
+  position: fixed; inset: 0; z-index: 200; display: grid; place-items: center; overflow: hidden;
+  background: linear-gradient(180deg, #050C1F, #02040C 60%);
+  /* Cuatro claros de bordes difusos que crecen a destiempo: juntos abren la niebla de forma irregular */
+  -webkit-mask-image: radial-gradient(circle at 50% 54%, transparent calc(var(--wk-n1) * 0.45), #000 var(--wk-n1)), radial-gradient(circle at 30% 38%, transparent calc(var(--wk-n2) * 0.4), #000 var(--wk-n2)), radial-gradient(circle at 72% 64%, transparent calc(var(--wk-n3) * 0.4), #000 var(--wk-n3)), radial-gradient(circle at 64% 26%, transparent calc(var(--wk-n4) * 0.4), #000 var(--wk-n4));
+  mask-image: radial-gradient(circle at 50% 54%, transparent calc(var(--wk-n1) * 0.45), #000 var(--wk-n1)), radial-gradient(circle at 30% 38%, transparent calc(var(--wk-n2) * 0.4), #000 var(--wk-n2)), radial-gradient(circle at 72% 64%, transparent calc(var(--wk-n3) * 0.4), #000 var(--wk-n3)), radial-gradient(circle at 64% 26%, transparent calc(var(--wk-n4) * 0.4), #000 var(--wk-n4));
+  -webkit-mask-composite: source-in; mask-composite: intersect;
+  transition: --wk-n1 1.5s cubic-bezier(0.5, 0, 0.6, 1), --wk-n2 1.5s cubic-bezier(0.5, 0, 0.6, 1) 0.12s, --wk-n3 1.5s cubic-bezier(0.5, 0, 0.6, 1) 0.2s, --wk-n4 1.5s cubic-bezier(0.5, 0, 0.6, 1) 0.06s, opacity 0.5s ease 1.2s, visibility 0s linear 1.7s;
+  /* Si algo fallara y nadie la cierra, se va sola a los 9 segundos */
+  animation: wk-carga-salida 0.8s ease 9s forwards;
+}
 html.wk-sin-carga .wk-carga { display: none; }
-/* Si algo fallara y nadie la cierra, se va sola a los 9 segundos */
-.wk-carga { animation: wk-carga-salida 0.8s ease 9s forwards; }
 @keyframes wk-carga-salida { to { opacity: 0; visibility: hidden; } }
-.wk-carga__logo { position: relative; width: min(70vw, 420px); transition: scale 1.1s cubic-bezier(0.5, 0, 0.2, 1), opacity 0.7s ease 0.3s, filter 1.1s ease; }
-.wk-carga__logo img { display: block; width: 100%; height: auto; }
-/* Debajo, el logo apagado; encima, el mismo logo encendido que sube desde abajo */
-.wk-carga__logo img:first-child { opacity: 0.14; }
-.wk-carga__logo img:last-child { position: absolute; inset: 0; clip-path: inset(100% 0 0 0); filter: drop-shadow(0 0 22px rgb(143 197 255 / 0.55)); animation: wk-carga-llenar 1.7s cubic-bezier(0.45, 0, 0.2, 1) 0.2s forwards; }
-@keyframes wk-carga-llenar { to { clip-path: inset(-20% 0 0 0); } }
-/* El destello: una luz que recorre las letras (recortada a la forma del logo) cuando termina de llenarse */
-.wk-carga__logo::after { content: ''; position: absolute; inset: 0; background: linear-gradient(105deg, transparent 40%, #fff 50%, transparent 60%) no-repeat; background-size: 250% 100%; background-position: 150% 0; -webkit-mask: url('../img/logo-walkiverso.svg') center / contain no-repeat; mask: url('../img/logo-walkiverso.svg') center / contain no-repeat; filter: drop-shadow(0 0 14px #fff); opacity: 0; pointer-events: none; }
-.wk-carga.is-abriendo .wk-carga__logo::after { animation: wk-carga-destello 0.75s ease-out forwards; }
-@keyframes wk-carga-destello { 0% { background-position: 150% 0; opacity: 1; } 100% { background-position: -50% 0; opacity: 1; } }
-/* Y se va: el logo se enciende, se agranda apenas y se disuelve con el fondo */
-.wk-carga.is-abriendo { opacity: 0; visibility: hidden; pointer-events: none; }
-.wk-carga.is-abriendo .wk-carga__logo { scale: 1.12; opacity: 0; filter: brightness(1.6) blur(6px); }
-@media (prefers-reduced-motion: reduce) { .wk-carga__logo img:last-child { clip-path: none; } }
+/* La bruma: un resplandor que respira detrás del logo */
+.wk-carga__bruma { position: absolute; left: 50%; top: 50%; width: min(120vw, 900px); aspect-ratio: 1.7; translate: -50% -50%; border-radius: 50%; background: radial-gradient(closest-side, rgb(120 170 235 / 0.3), rgb(60 100 180 / 0.1) 55%, transparent); animation: wk-carga-bruma 2.6s ease-out both, wk-respirar 5s ease-in-out 2.6s infinite; }
+@keyframes wk-carga-bruma { from { opacity: 0; scale: 0.5; } }
+/* El logo sale de la bruma: desenfocado y más abajo, hasta quedar nítido */
+.wk-carga__logo { position: relative; width: min(70vw, 420px); height: auto; filter: drop-shadow(0 0 26px rgb(143 197 255 / 0.5)); animation: wk-carga-emerge 1.9s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both; transition: opacity 0.7s ease, scale 1.3s cubic-bezier(0.4, 0, 0.2, 1), filter 0.9s ease; }
+@keyframes wk-carga-emerge { from { opacity: 0; translate: 0 26px; scale: 0.94; filter: blur(16px) drop-shadow(0 0 0 transparent); } }
+/* Motas de luz que suben despacio alrededor */
+.wk-carga__motas i { position: absolute; left: var(--x); top: var(--y); width: var(--s, 4px); height: var(--s, 4px); border-radius: 50%; background: #E3F4FF; box-shadow: 0 0 10px 3px rgb(120 200 255 / 0.5); opacity: 0; animation: wk-carga-mota var(--t, 3s) ease-in-out var(--d, 0s) infinite; }
+@keyframes wk-carga-mota { 0% { opacity: 0; transform: translate(0, 20px); } 30% { opacity: 0.9; } 100% { opacity: 0; transform: translate(var(--dx, 10px), -60px); } }
+/* La niebla se disipa */
+.wk-carga.is-abriendo { --wk-n1: 150vmax; --wk-n2: 150vmax; --wk-n3: 150vmax; --wk-n4: 150vmax; opacity: 0; visibility: hidden; pointer-events: none; }
+.wk-carga.is-abriendo .wk-carga__logo { opacity: 0; scale: 1.1; filter: blur(10px); }
+@media (prefers-reduced-motion: reduce) { .wk-carga { transition: opacity 0.4s ease; } }
+.wk-carga__motas { position: absolute; inset: 0; }

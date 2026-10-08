@@ -129,4 +129,4 @@ cargan en el panel (producto); las demás van en `img/` y su ruta se escribe en 
 
 ## Carga inicial
 
-Fondo oscuro como el pie: el logo se llena de luz desde abajo, lo cruza un destello y la web aparece. Una vez por visita (`sessionStorage`). El marcado está al principio de `index.html` (`#carga`) y se cierra desde `js/app.js` (`abrirTelon`) cuando la primera página ya está dibujada, con un mínimo de 2,1 s. Si algo fallara, se va sola a los 9 s.
+Fondo oscuro como el pie: el logo emerge de la bruma con unas motas de luz y la oscuridad se disipa como niebla, en manchas, dejando ver la web. Una vez por visita (`sessionStorage`). El marcado está al principio de `index.html` (`#carga`) y se cierra desde `js/app.js` (`abrirTelon`) cuando la primera página ya está dibujada, con un mínimo de 2,3 s. Si algo fallara, se va sola a los 9 s.
