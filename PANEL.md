@@ -142,8 +142,9 @@ y recargar. Para volver: `sessionStorage.removeItem('wk-demo-textos')`.
 
 ## 4. Otras cosas que la plataforma todavía no resuelve
 
-- **Imagen en "Pedile un deseo".** El formulario de contacto solo acepta texto (2.000 caracteres por campo, 64 KB en
-  total). La web ya usa `tienda.archivos.subir(archivo)` si existe; hoy manda solo el nombre del archivo.
+- **Imagen en "Pedile un deseo": resuelto.** La plataforma ya ofrece `tienda.archivos.subir(archivo)` (JPG, PNG o WEBP,
+  hasta 6 MB) y el comerciante ve la imagen en el mail del mensaje. Detalle en `C:\dev\plataforma\SITIOS.md` §3.07.
+  Probado con pruebas automáticas y un almacenamiento de mentira; falta verlo con la plataforma completa levantada.
 - **Etiquetas de producto.** No están en el panel ni en el importador. No son necesarias (ver sección 1).
 - **Lista de deseos.** Los favoritos se guardan en el navegador de cada visitante.
 - **Textos legales, mails y cupones** ya se manejan en el panel y la web no los toca.

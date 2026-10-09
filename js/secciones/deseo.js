@@ -77,9 +77,9 @@ function paso(nombre, d) {
       ${pie('Continuar')}`,
     imagen: () => `${cab('¿Tenés una imagen que ayude?', 'Un dibujo, una foto o una referencia. Es opcional.')}
       <label class="wk-deseo__archivo${d.imagen ? ' is-cargada' : ''}">
-        <input type="file" name="imagen" accept="image/*" class="wk-sr">
+        <input type="file" name="imagen" accept="image/jpeg,image/png,image/webp" class="wk-sr">
         <span class="wk-deseo__vista-previa">${d.vista ? `<img src="${d.vista}" alt="Vista previa de tu imagen">` : icono('i-sello')}</span>
-        <span><strong>${d.imagen ? esc(d.imagen.name) : 'Elegir una imagen de tu compu'}</strong><small>${d.imagen ? 'Tocá para cambiarla' : 'JPG o PNG, hasta 8 MB'}</small></span>
+        <span><strong>${d.imagen ? esc(d.imagen.name) : 'Elegir una imagen de tu compu'}</strong><small>${d.imagen ? 'Tocá para cambiarla' : 'JPG, PNG o WEBP, hasta 6 MB'}</small></span>
       </label>
       ${pie(d.imagen ? 'Continuar' : 'Seguir sin imagen')}`,
     datos: () => `${cab('¿A nombre de quién va el deseo?')}
@@ -120,7 +120,8 @@ export function activarDeseo() {
   async function enviar(boton) {
     boton.disabled = true;
     try {
-      // La imagen viaja solo si la plataforma ofrece subida de archivos; si no, se avisa en el mensaje que la persona tiene una
+      // La imagen se sube primero (tienda.archivos.subir devuelve su dirección) y viaja como un campo más del mensaje:
+      // el comerciante la ve en el mail. En una plataforma sin subida de archivos, se avisa que la persona tiene una.
       let imagen = '';
       if (d.imagen) imagen = tienda.archivos?.subir ? (await tienda.archivos.subir(d.imagen)).url : `${d.imagen.name} (no adjunta: pedirla por mail)`;
       await tienda.contacto({ name: d.nombre, email: d.email, message: d.idea, tipo: d.tipo, imagen, asunto: 'Deseo al Walkiverso' });
@@ -143,7 +144,8 @@ export function activarDeseo() {
     if (e.target.name !== 'imagen') return;
     const archivo = e.target.files[0];
     if (!archivo) return;
-    if (!archivo.type.startsWith('image/') || archivo.size > 8 * 1024 * 1024) { aviso('Elegí una imagen de hasta 8 MB.'); return; }
+    // Mismos límites que la plataforma (tienda.archivos.subir): así el aviso llega antes de subir nada
+    if (!/^image\/(jpeg|png|webp)$/.test(archivo.type) || archivo.size > 6 * 1024 * 1024) { aviso('Elegí una imagen JPG, PNG o WEBP de hasta 6 MB.'); return; }
     if (d.vista) URL.revokeObjectURL(d.vista);
     d.imagen = archivo;
     d.vista = URL.createObjectURL(archivo);

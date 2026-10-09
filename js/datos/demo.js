@@ -168,6 +168,8 @@ export const tienda = {
     };
   })(),
   async contacto() { await espera(400); return { ok: true }; },
+  // En la demostración la imagen no se sube a ningún lado: devuelve una dirección local, como haría la plataforma
+  archivos: { async subir(archivo) { await espera(500); return { url: URL.createObjectURL(archivo) }; } },
   async legal() { throw fallo('Sin páginas legales en la demostración.'); },
   formatear(centesimos, moneda = INFO.currency) {
     const n = (centesimos / 100).toLocaleString('es-UY', { minimumFractionDigits: centesimos % 100 ? 2 : 0, maximumFractionDigits: 2 });
