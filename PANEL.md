@@ -3,8 +3,9 @@
 Registro de lo que el panel de la plataforma tiene que ofrecer **para esta tienda**, y de cómo lo lee la web.
 Está escrito para quien conecte Walkiverso a la plataforma. Lo general de la web está en `LEEME.md`.
 
-Estado al 2026-10-09: la web corre con la tienda de demostración. Todo lo de la sección 1 y 2 ya funciona con lo que
-el panel tiene hoy (categorías y características). La sección 3 necesita una función nueva en la plataforma.
+Estado al 2026-10-09: la web corre con la tienda de demostración. Las secciones 1 y 2 funcionan con lo que el panel ya
+tenía (categorías y características). La sección 3 (textos editables) ya está desarrollada en la plataforma, con sus
+pruebas automáticas, pero **todavía no se probó con la web conectada a una tienda real**.
 
 ## 1. Dónde aparece cada producto
 
@@ -69,12 +70,22 @@ carrito, checkout (pagos y envíos), cuentas de clientes y cursos. Detalle en el
 
 A propósito **no** se toman: los colores (para no romper la identidad azul y blanca) y el menú de pie (el pie no lleva enlaces).
 
-## 3. Textos de la web editables desde el panel (falta en la plataforma)
+## 3. Textos de la web editables desde el panel
 
 **Qué se pide:** una pantalla del panel, solo para Walkiverso, donde se puedan cambiar los textos de la web: títulos,
 bajadas, botones, frases de la cinta, pasos del proceso, testimonios, preguntas frecuentes (agregar, quitar, ordenar), etc.
 
-**Del lado de la web ya está hecho y probado.** Falta la pantalla y dónde guardarlo.
+**Está hecho de los dos lados.** En la plataforma es la pantalla **Textos de la web** (grupo "Contenido de la web"),
+que aparece solo en las tiendas cuya web trae una lista de campos.
+
+### Ponerlo en marcha en la tienda de Walkiverso
+
+1. Aplicar la migración nueva de la plataforma: `npm run db:migrate` (en `C:devplataforma`).
+2. Entrar al panel de la tienda como administrador → **Textos de la web** → "Cargar lista de campos" y elegir
+   `panel/textos-walkiverso.json` de esta carpeta.
+3. Listo: el cliente ve los 14 grupos, cambia lo que quiera y toca "Publicar textos". Cada campo cambiado tiene
+   "Volver al texto original".
+4. Si la web suma o quita textos: `node .dev/esquema.mjs` y volver a cargar el archivo. Lo ya escrito se conserva.
 
 ### El contrato
 
@@ -111,11 +122,13 @@ Se genera desde `js/contenido.js`, no se escribe a mano. Al agregar o quitar un 
 Grupos: Portada (Hero, Cinta, Las creaciones, Secciones de la tienda, Duendes, Así nacen las criaturas, Reels, Voces) ·
 Walkiver · Pedile un deseo · Academia y cursos · Ficha de producto · Pie (Dudas frecuentes, Lema).
 
-### Sugerencia para la plataforma
+### Cómo quedó en la plataforma
 
-- Guardar un JSON por tienda (`{ clave: valor }`) y devolverlo en `info.content.texts`.
-- Que la pantalla exista solo para las tiendas que tengan una lista de campos cargada, así sirve para otras webs propias.
-- Botón "Volver al texto original" por campo: alcanza con borrar la clave.
+- Guarda por tienda la lista de campos y lo que el cliente cambió; a la web le manda solo lo cambiado.
+- Valida cada texto contra su tipo (largos, una línea, rutas seguras, listas fijas) y descarta lo que ya no corresponde a un campo.
+- Sirve para cualquier web propia que traiga su lista de campos, no solo para Walkiverso.
+- La sección se habilita por tienda en "Lo que ve el cliente", como las demás.
+- Documentado en `C:devplataformaSITIOS.md` (§3.06) y en el Kit NS.
 
 ### Probarlo hoy, sin plataforma
 
