@@ -1,5 +1,5 @@
 // Product Detail · la ficha de una pieza: se entra como a la ficha de una criatura.
-import { $, $$, app, esc, estado, flecha, icono, ir, titular } from '../ui/util.js';
+import { $, $$, app, esc, estado, flecha, icono, ir, reducido, titular } from '../ui/util.js';
 import { tienda } from '../datos/tienda.js';
 import { pieza, obras, NOMBRE, porDisponibilidad } from '../datos/modelo.js';
 import { arte, insignia, fila } from '../ui/tarjeta.js';
@@ -119,7 +119,12 @@ export async function ficha(handle) {
   $$('[data-foto]').forEach((b) => b.addEventListener('click', () => {
     $('#principal').innerHTML = arte(pz, { img: fotos[Number(b.dataset.foto)], ancho: 1024, sizes: '(max-width: 900px) 100vw, 50vw', perezosa: false });
     $$('[data-foto]').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+    // En el carrusel de miniaturas, la elegida queda a la vista
+    b.scrollIntoView({ block: 'nearest', inline: 'center', behavior: reducido() ? 'auto' : 'smooth' });
   }));
+  // Si las miniaturas no entran en un renglón, se deslizan: se marca para desvanecer los bordes
+  const tira = $('.wk-ficha__miniaturas');
+  if (tira) tira.classList.toggle('is-desliza', tira.scrollWidth > tira.clientWidth + 2);
   $('[data-video]')?.addEventListener('click', () => $('#video')?.scrollIntoView({ block: 'center' }));
 
   // ---- compra

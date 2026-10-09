@@ -904,3 +904,10 @@ html.wk-sin-carga .wk-carga { display: none; }
 .wk-ficha__accion:not(:has(.wk-fav)) { grid-template-columns: minmax(0, 1fr); }
 /* La fila del certificado lleva fondo propio: si no, la raíz del borde se ve a través y ensucia el "Ver" */
 .wk-ficha__cert { background: var(--white); }
+
+/* Miniaturas de la ficha: siempre en un solo renglón. Si no entran, se deslizan (carrusel) en vez de bajar a otra fila. */
+.wk-ficha__miniaturas { flex-wrap: nowrap; justify-content: safe center; gap: 10px; overflow-x: auto; padding: 4px 2px 8px; scroll-snap-type: x proximity; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+.wk-ficha__miniaturas::-webkit-scrollbar { display: none; }
+.wk-ficha__miniaturas button { flex: none; scroll-snap-align: center; }
+/* Cuando hay más para ver, los bordes se desvanecen para avisarlo */
+.wk-ficha__miniaturas.is-desliza { -webkit-mask: linear-gradient(90deg, transparent, #000 28px, #000 calc(100% - 28px), transparent); mask: linear-gradient(90deg, transparent, #000 28px, #000 calc(100% - 28px), transparent); padding-inline: 20px; }
