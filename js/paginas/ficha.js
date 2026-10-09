@@ -7,7 +7,7 @@ import { corazon } from '../ui/favoritos.js';
 import { abrirCarrito } from '../ui/carrito.js';
 import { abrirModal, faq, raices } from '../ui/piezas.js';
 import { aparecer } from '../anim/efectos.js';
-import { CUIDADOS } from '../contenido.js';
+import { FICHA } from '../contenido.js';
 
 const certificado = (pz) => abrirModal(`
   <div class="wk-certificado">
@@ -95,7 +95,7 @@ export async function ficha(handle) {
       ${raices()}
       <div class="wk-cont wk-historia__grilla">
         ${pz.story ? `<div data-ver><span class="wk-sobre">Su historia</span><p class="wk-historia__texto wk-display">${esc(pz.story)}</p></div>` : ''}
-        ${esObra ? `<aside class="wk-historia__cuidados" data-ver style="--d:1"><h2 class="wk-titulo wk-titulo--s">Cómo cuidarla</h2><p>${esc(CUIDADOS)}</p><a class="wk-enlace" href="/#dudas" data-link>Más dudas frecuentes ${flecha}</a></aside>` : ''}
+        ${esObra ? `<aside class="wk-historia__cuidados" data-ver style="--d:1"><h2 class="wk-titulo wk-titulo--s">${esc(FICHA.cuidadosTitulo)}</h2><p>${esc(FICHA.cuidados)}</p><a class="wk-enlace" href="/#dudas" data-link>Más dudas frecuentes ${flecha}</a></aside>` : ''}
       </div>
     </section>` : ''}
 

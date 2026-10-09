@@ -1,0 +1,993 @@
+{
+ "tienda": "Walkiverso",
+ "descripcion": "Textos de la web editables desde el panel. La web los lee de info.content.texts ({ clave: valor }); lo que falte usa el valor de fábrica.",
+ "tipos": {
+  "texto": "Una línea de texto.",
+  "texto-largo": "Texto de varias líneas.",
+  "titulo": "Una línea. *palabra* la pone en cursiva de acento.",
+  "parrafos": "Varios párrafos (renglón en blanco entre ellos). **negrita**, *cursiva* y renglones que empiezan con \"- \" para listas.",
+  "ruta": "Dirección de una imagen o video, o un enlace.",
+  "lista-texto": "Lista de textos cortos.",
+  "lista-ruta": "Lista de imágenes.",
+  "lista": "Lista de elementos con sus propios campos. Con \"fija\": true se editan pero no se agregan ni se quitan."
+ },
+ "grupos": [
+  {
+   "nombre": "Portada · Hero",
+   "campos": [
+    {
+     "sub": null,
+     "clave": "HERO.titulo",
+     "etiqueta": "Título",
+     "tipo": "titulo",
+     "valor": "Arte, Magia *y* Folklore"
+    },
+    {
+     "sub": null,
+     "clave": "HERO.texto",
+     "etiqueta": "Texto",
+     "tipo": "texto-largo",
+     "valor": "Criaturas y artefactos de fantasía oscura, nacidos del folklore, la mitología y la ficción."
+    },
+    {
+     "sub": null,
+     "clave": "HERO.cta",
+     "etiqueta": "Texto del botón",
+     "tipo": "texto",
+     "valor": "Explorar tienda"
+    },
+    {
+     "sub": null,
+     "clave": "HERO.pista",
+     "etiqueta": "Pista bajo el hero",
+     "tipo": "texto",
+     "valor": "Mové la luz: hay cosas escondidas"
+    },
+    {
+     "sub": null,
+     "clave": "HERO.imagenes",
+     "etiqueta": "Fotos de fondo",
+     "tipo": "lista-ruta",
+     "valor": [
+      "img/criaturas-portada-mandragora-mandrake-harrypotter-halloween.webp",
+      "img/objetos-portada-bitacora-diario-journal-halloween.webp",
+      "img/criaturas-portada-minidragora-mandrake-harrypotter-halloween.webp"
+     ]
+    }
+   ]
+  },
+  {
+   "nombre": "Portada · Cinta en movimiento",
+   "campos": [
+    {
+     "sub": null,
+     "clave": "CINTA",
+     "etiqueta": "Frases",
+     "tipo": "lista-texto",
+     "valor": [
+      "Arte",
+      "Magia",
+      "Folklore",
+      "Criaturas con nombre",
+      "Artefactos con carácter",
+      "Piezas únicas",
+      "Certificado de autenticidad"
+     ]
+    }
+   ]
+  },
+  {
+   "nombre": "Portada · Las creaciones",
+   "campos": [
+    {
+     "sub": null,
+     "clave": "CREACIONES.sobre",
+     "etiqueta": "Etiqueta sobre el título",
+     "tipo": "texto",
+     "valor": "Walkiverso"
+    },
+    {
+     "sub": null,
+     "clave": "CREACIONES.titulo",
+     "etiqueta": "Título",
+     "tipo": "titulo",
+     "valor": "Las creaciones"
+    },
+    {
+     "sub": null,
+     "clave": "CREACIONES.texto",
+     "etiqueta": "Texto",
+     "tipo": "texto-largo",
+     "valor": "Todo nace de una historia, con materiales combinados y técnicas mixtas. Explorá el universo de Walkiver."
+    },
+    {
+     "sub": "Criaturas",
+     "clave": "CREACIONES.criaturas.titulo",
+     "etiqueta": "Título",
+     "tipo": "titulo",
+     "valor": "Criaturas"
+    },
+    {
+     "sub": "Criaturas",
+     "clave": "CREACIONES.criaturas.texto",
+     "etiqueta": "Texto",
+     "tipo": "texto",
+     "valor": "Seres con nombre, historia y personalidad."
+    },
+    {
+     "sub": "Criaturas",
+     "clave": "CREACIONES.criaturas.cta",
+     "etiqueta": "Texto del botón",
+     "tipo": "texto",
+     "valor": "Ver criaturas disponibles"
+    },
+    {
+     "sub": "Criaturas",
+     "clave": "CREACIONES.criaturas.imagen",
+     "etiqueta": "Imagen",
+     "tipo": "ruta",
+     "valor": "img/fondo criaturas.webp"
+    },
+    {
+     "sub": "Artefactos",
+     "clave": "CREACIONES.artefactos.titulo",
+     "etiqueta": "Título",
+     "tipo": "titulo",
+     "valor": "Artefactos"
+    },
+    {
+     "sub": "Artefactos",
+     "clave": "CREACIONES.artefactos.texto",
+     "etiqueta": "Texto",
+     "tipo": "texto",
+     "valor": "Artefactos misteriosos con mucho carácter."
+    },
+    {
+     "sub": "Artefactos",
+     "clave": "CREACIONES.artefactos.cta",
+     "etiqueta": "Texto del botón",
+     "tipo": "texto",
+     "valor": "Ver artefactos disponibles"
+    },
+    {
+     "sub": "Artefactos",
+     "clave": "CREACIONES.artefactos.imagen",
+     "etiqueta": "Imagen",
+     "tipo": "ruta",
+     "valor": "img/fondo artefactos.webp"
+    }
+   ]
+  },
+  {
+   "nombre": "Portada · Secciones de la tienda",
+   "campos": [
+    {
+     "sub": "Criaturas",
+     "clave": "SECCIONES.criaturas.sobre",
+     "etiqueta": "Etiqueta sobre el título",
+     "tipo": "texto",
+     "valor": "Tienda"
+    },
+    {
+     "sub": "Criaturas",
+     "clave": "SECCIONES.criaturas.titulo",
+     "etiqueta": "Título",
+     "tipo": "titulo",
+     "valor": "Criaturas"
+    },
+    {
+     "sub": "Criaturas",
+     "clave": "SECCIONES.criaturas.texto",
+     "etiqueta": "Texto",
+     "tipo": "texto",
+     "valor": "Seres con nombre, historia y personalidad."
+    },
+    {
+     "sub": "Criaturas",
+     "clave": "SECCIONES.criaturas.cta",
+     "etiqueta": "Texto del botón",
+     "tipo": "texto",
+     "valor": "Ver todas las criaturas"
+    },
+    {
+     "sub": "Artefactos",
+     "clave": "SECCIONES.artefactos.sobre",
+     "etiqueta": "Etiqueta sobre el título",
+     "tipo": "texto",
+     "valor": "Tienda"
+    },
+    {
+     "sub": "Artefactos",
+     "clave": "SECCIONES.artefactos.titulo",
+     "etiqueta": "Título",
+     "tipo": "titulo",
+     "valor": "Artefactos"
+    },
+    {
+     "sub": "Artefactos",
+     "clave": "SECCIONES.artefactos.texto",
+     "etiqueta": "Texto",
+     "tipo": "texto-largo",
+     "valor": "Objetos mágicos, decorativos y/o funcionales, nacidos de historias que todavía no terminamos de contar."
+    },
+    {
+     "sub": "Artefactos",
+     "clave": "SECCIONES.artefactos.cta",
+     "etiqueta": "Texto del botón",
+     "tipo": "texto",
+     "valor": "Ver todos los artefactos"
+    },
+    {
+     "sub": "No las dejes escapar",
+     "clave": "SECCIONES.destacadas.sobre",
+     "etiqueta": "Etiqueta sobre el título",
+     "tipo": "texto",
+     "valor": "Disponibles hoy"
+    },
+    {
+     "sub": "No las dejes escapar",
+     "clave": "SECCIONES.destacadas.titulo",
+     "etiqueta": "Título",
+     "tipo": "titulo",
+     "valor": "No las dejes *escapar*"
+    },
+    {
+     "sub": "No las dejes escapar",
+     "clave": "SECCIONES.destacadas.texto",
+     "etiqueta": "Texto",
+     "tipo": "texto-largo",
+     "valor": "Cada obra es única en su momento. No trabajamos por encargos, así que si te gusta, no la dejes escapar: no sabemos cuándo volverá a estar disponible."
+    },
+    {
+     "sub": "Los más buscados",
+     "clave": "SECCIONES.buscadas.sobre",
+     "etiqueta": "Etiqueta sobre el título",
+     "tipo": "texto",
+     "valor": "Los que más piden"
+    },
+    {
+     "sub": "Los más buscados",
+     "clave": "SECCIONES.buscadas.titulo",
+     "etiqueta": "Título",
+     "tipo": "titulo",
+     "valor": "Los más buscados"
+    },
+    {
+     "sub": "Los más buscados",
+     "clave": "SECCIONES.buscadas.cta",
+     "etiqueta": "Texto del botón",
+     "tipo": "texto",
+     "valor": "Ver toda la tienda"
+    },
+    {
+     "sub": "Las últimas en llegar",
+     "clave": "SECCIONES.ultimas.sobre",
+     "etiqueta": "Etiqueta sobre el título",
+     "tipo": "texto",
+     "valor": "Recién llegadas"
+    },
+    {
+     "sub": "Las últimas en llegar",
+     "clave": "SECCIONES.ultimas.titulo",
+     "etiqueta": "Título",
+     "tipo": "titulo",
+     "valor": "Las últimas en llegar"
+    },
+    {
+     "sub": "Las últimas en llegar",
+     "clave": "SECCIONES.ultimas.cta",
+     "etiqueta": "Texto del botón",
+     "tipo": "texto",
+     "valor": "Ver toda la tienda"
+    },
+    {
+     "sub": "Dónde las criaturas cobran vida",
+     "clave": "SECCIONES.universo.sobre",
+     "etiqueta": "Etiqueta sobre el título",
+     "tipo": "texto",
+     "valor": "El universo"
+    },
+    {
+     "sub": "Dónde las criaturas cobran vida",
+     "clave": "SECCIONES.universo.pronto",
+     "etiqueta": "pronto",
+     "tipo": "texto",
+     "valor": "Un territorio en desarrollo"
+    },
+    {
+     "sub": "Dónde las criaturas cobran vida",
+     "clave": "SECCIONES.universo.titulo",
+     "etiqueta": "Título",
+     "tipo": "titulo",
+     "valor": "Dónde las criaturas *cobran vida*"
+    },
+    {
+     "sub": "Dónde las criaturas cobran vida",
+     "clave": "SECCIONES.universo.texto",
+     "etiqueta": "Texto",
+     "tipo": "texto",
+     "valor": "Un universo que crece con cada criatura, cada historia y cada nueva creación."
+    },
+    {
+     "sub": null,
+     "clave": "SECCIONES.diferencia",
+     "etiqueta": "Una criatura / Un artefacto",
+     "tipo": "lista",
+     "fija": true,
+     "campos": [
+      {
+       "clave": "titulo",
+       "etiqueta": "Título",
+       "tipo": "titulo"
+      },
+      {
+       "clave": "texto",
+       "etiqueta": "Texto",
+       "tipo": "texto"
+      },
+      {
+       "clave": "cta",
+       "etiqueta": "Texto del botón",
+       "tipo": "texto"
+      }
+     ],
+     "valor": [
+      {
+       "titulo": "Una criatura",
+       "texto": "Un ser con nombre, historia y personalidad.",
+       "cta": "Ver criaturas"
+      },
+      {
+       "titulo": "Un artefacto",
+       "texto": "Un objeto mágico decorativo y/o funcional.",
+       "cta": "Ver artefactos"
+      }
+     ]
+    },
+    {
+     "sub": "Página de tienda",
+     "clave": "SECCIONES.tienda.sobre",
+     "etiqueta": "Etiqueta sobre el título",
+     "tipo": "texto",
+     "valor": "Tienda"
+    },
+    {
+     "sub": "Página de tienda",
+     "clave": "SECCIONES.tienda.titulo",
+     "etiqueta": "Título",
+     "tipo": "titulo",
+     "valor": "Todas las criaturas y artefactos disponibles"
+    }
+   ]
+  },
+  {
+   "nombre": "Portada · Duendes",
+   "campos": [
+    {
+     "sub": null,
+     "clave": "DUENDES.sobre",
+     "etiqueta": "Etiqueta sobre el título",
+     "tipo": "texto",
+     "valor": "Buscan hogar"
+    },
+    {
+     "sub": null,
+     "clave": "DUENDES.titulo",
+     "etiqueta": "Título",
+     "tipo": "titulo",
+     "valor": "Duendes"
+    },
+    {
+     "sub": null,
+     "clave": "DUENDES.quedan",
+     "etiqueta": "Texto del contador (plural)",
+     "tipo": "texto",
+     "valor": "duendes disponibles"
+    },
+    {
+     "sub": null,
+     "clave": "DUENDES.queda",
+     "etiqueta": "Texto del contador (singular)",
+     "tipo": "texto",
+     "valor": "duende disponible"
+    },
+    {
+     "sub": null,
+     "clave": "DUENDES.texto",
+     "etiqueta": "Texto",
+     "tipo": "texto",
+     "valor": "Dicen que no elegís a tu duende: es él quien te elige. ¿Te animás a probar?"
+    },
+    {
+     "sub": null,
+     "clave": "DUENDES.azar",
+     "etiqueta": "Botón del sorteo",
+     "tipo": "texto",
+     "valor": "Que un duende me elija"
+    },
+    {
+     "sub": null,
+     "clave": "DUENDES.otraVez",
+     "etiqueta": "Botón para repetir",
+     "tipo": "texto",
+     "valor": "Probar otra vez"
+    },
+    {
+     "sub": null,
+     "clave": "DUENDES.eligio",
+     "etiqueta": "Texto del elegido",
+     "tipo": "texto",
+     "valor": "Te eligió"
+    },
+    {
+     "sub": null,
+     "clave": "DUENDES.verTodos",
+     "etiqueta": "Botón \"ver todos\"",
+     "tipo": "texto",
+     "valor": "Ver todos los duendes"
+    }
+   ]
+  },
+  {
+   "nombre": "Portada · Así nacen las criaturas",
+   "campos": [
+    {
+     "sub": null,
+     "clave": "PROCESO.sobre",
+     "etiqueta": "Etiqueta sobre el título",
+     "tipo": "texto",
+     "valor": "El taller"
+    },
+    {
+     "sub": null,
+     "clave": "PROCESO.titulo",
+     "etiqueta": "Título",
+     "tipo": "titulo",
+     "valor": "Así nacen las criaturas"
+    },
+    {
+     "sub": null,
+     "clave": "PROCESO.texto",
+     "etiqueta": "Texto",
+     "tipo": "texto",
+     "valor": "De materiales inertes a una primera mirada."
+    },
+    {
+     "sub": null,
+     "clave": "PROCESO.orbe",
+     "etiqueta": "Texto junto al orbe",
+     "tipo": "texto",
+     "valor": "Cómo se ve, qué características tiene, qué la hace especial."
+    },
+    {
+     "sub": null,
+     "clave": "PROCESO.despierta",
+     "etiqueta": "Texto al completar",
+     "tipo": "texto",
+     "valor": "Primera mirada."
+    },
+    {
+     "sub": null,
+     "clave": "PROCESO.pasos",
+     "etiqueta": "Pasos",
+     "tipo": "lista",
+     "fija": false,
+     "campos": [
+      {
+       "clave": "nombre",
+       "etiqueta": "Nombre",
+       "tipo": "texto"
+      },
+      {
+       "clave": "texto",
+       "etiqueta": "Texto",
+       "tipo": "texto"
+      },
+      {
+       "clave": "imagen",
+       "etiqueta": "Imagen",
+       "tipo": "ruta"
+      }
+     ],
+     "valor": [
+      {
+       "nombre": "Idea",
+       "texto": "Todo empieza con una historia que pide un cuerpo.",
+       "imagen": ""
+      },
+      {
+       "nombre": "Escultura",
+       "texto": "La forma aparece a mano, volumen por volumen.",
+       "imagen": ""
+      },
+      {
+       "nombre": "Diseño",
+       "texto": "Se define cómo se ve y qué la vuelve reconocible.",
+       "imagen": ""
+      },
+      {
+       "nombre": "Materiales",
+       "texto": "Cartón, telas, alambre, hilos y materiales recuperados.",
+       "imagen": ""
+      },
+      {
+       "nombre": "Detalles",
+       "texto": "Texturas, color y pequeñas marcas que cuentan su pasado.",
+       "imagen": ""
+      },
+      {
+       "nombre": "Personalidad",
+       "texto": "Un gesto, una postura: ahí deja de ser un objeto.",
+       "imagen": ""
+      },
+      {
+       "nombre": "Criatura",
+       "texto": "Abre los ojos. Ya tiene nombre.",
+       "imagen": ""
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "nombre": "Portada · Magia en movimiento (reels)",
+   "campos": [
+    {
+     "sub": null,
+     "clave": "REELS.sobre",
+     "etiqueta": "Etiqueta sobre el título",
+     "tipo": "texto",
+     "valor": "Desde el taller"
+    },
+    {
+     "sub": null,
+     "clave": "REELS.titulo",
+     "etiqueta": "Título",
+     "tipo": "titulo",
+     "valor": "Magia en movimiento"
+    },
+    {
+     "sub": null,
+     "clave": "REELS.texto",
+     "etiqueta": "Texto",
+     "tipo": "texto",
+     "valor": "Así nacen las criaturas: del cartón reciclado a su primera mirada."
+    },
+    {
+     "sub": null,
+     "clave": "REELS.items",
+     "etiqueta": "Elementos",
+     "tipo": "lista",
+     "fija": false,
+     "campos": [
+      {
+       "clave": "titulo",
+       "etiqueta": "Título",
+       "tipo": "titulo"
+      },
+      {
+       "clave": "etiqueta",
+       "etiqueta": "Etiqueta",
+       "tipo": "texto"
+      },
+      {
+       "clave": "video",
+       "etiqueta": "Video (archivo .mp4)",
+       "tipo": "ruta"
+      },
+      {
+       "clave": "enlace",
+       "etiqueta": "Enlace al reel",
+       "tipo": "ruta"
+      },
+      {
+       "clave": "poster",
+       "etiqueta": "Portada del reel",
+       "tipo": "ruta"
+      }
+     ],
+     "valor": [
+      {
+       "titulo": "Nace una mandrágora",
+       "etiqueta": "Asomate al espejo",
+       "video": "",
+       "enlace": "",
+       "poster": ""
+      },
+      {
+       "titulo": "Pintando a Sadybud",
+       "etiqueta": "",
+       "video": "",
+       "enlace": "",
+       "poster": ""
+      },
+      {
+       "titulo": "Bitácora Corpus Vacuum",
+       "etiqueta": "",
+       "video": "",
+       "enlace": "",
+       "poster": ""
+      },
+      {
+       "titulo": "Próximo reel",
+       "etiqueta": "",
+       "video": "",
+       "enlace": "",
+       "poster": ""
+      },
+      {
+       "titulo": "Próximo reel",
+       "etiqueta": "",
+       "video": "",
+       "enlace": "",
+       "poster": ""
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "nombre": "Portada · Voces del Walkiverso",
+   "campos": [
+    {
+     "sub": null,
+     "clave": "VOCES.sobre",
+     "etiqueta": "Etiqueta sobre el título",
+     "tipo": "texto",
+     "valor": "Quienes ya adoptaron"
+    },
+    {
+     "sub": null,
+     "clave": "VOCES.cta",
+     "etiqueta": "Texto del botón",
+     "tipo": "texto",
+     "valor": "Dejar mi comentario"
+    },
+    {
+     "sub": null,
+     "clave": "VOCES.titulo",
+     "etiqueta": "Título",
+     "tipo": "titulo",
+     "valor": "Voces del Walkiverso"
+    },
+    {
+     "sub": null,
+     "clave": "VOCES.texto",
+     "etiqueta": "Texto",
+     "tipo": "texto",
+     "valor": "Contanos qué te pareció."
+    },
+    {
+     "sub": null,
+     "clave": "VOCES.items",
+     "etiqueta": "Elementos",
+     "tipo": "lista",
+     "fija": false,
+     "campos": [
+      {
+       "clave": "nombre",
+       "etiqueta": "Nombre",
+       "tipo": "texto"
+      },
+      {
+       "clave": "pais",
+       "etiqueta": "País",
+       "tipo": "texto"
+      },
+      {
+       "clave": "pieza",
+       "etiqueta": "Pieza adquirida",
+       "tipo": "texto"
+      },
+      {
+       "clave": "comentario",
+       "etiqueta": "Comentario",
+       "tipo": "texto"
+      },
+      {
+       "clave": "imagen",
+       "etiqueta": "Imagen",
+       "tipo": "ruta"
+      }
+     ],
+     "valor": [
+      {
+       "nombre": "Nombre",
+       "pais": "Uruguay",
+       "pieza": "Groompyroot",
+       "comentario": "Acá va el comentario de quien adquirió la pieza: qué sintió al recibirla y dónde vive ahora.",
+       "imagen": ""
+      },
+      {
+       "nombre": "Nombre",
+       "pais": "Argentina",
+       "pieza": "Curso de la Academia",
+       "comentario": "Acá va un segundo comentario, idealmente sobre un curso o un e-book.",
+       "imagen": ""
+      },
+      {
+       "nombre": "Nombre",
+       "pais": "Uruguay",
+       "pieza": "Bjorn",
+       "comentario": "Acá va un tercer comentario, corto y concreto.",
+       "imagen": ""
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "nombre": "Walkiver",
+   "campos": [
+    {
+     "sub": null,
+     "clave": "WALKIVER.sobre",
+     "etiqueta": "Etiqueta sobre el título",
+     "tipo": "texto",
+     "valor": "Walkiver"
+    },
+    {
+     "sub": null,
+     "clave": "WALKIVER.cta",
+     "etiqueta": "Texto del botón",
+     "tipo": "texto",
+     "valor": "Conocer a Walkiver"
+    },
+    {
+     "sub": null,
+     "clave": "WALKIVER.titulo",
+     "etiqueta": "Título",
+     "tipo": "titulo",
+     "valor": "Detrás de este universo creativo hay *un artista*"
+    },
+    {
+     "sub": null,
+     "clave": "WALKIVER.texto",
+     "etiqueta": "Texto",
+     "tipo": "texto-largo",
+     "valor": "Conocé a Walkiver, explorá sus videos mitológicos y adquirí su ebook “Somos Mitos” para comenzar a entender estas historias."
+    },
+    {
+     "sub": null,
+     "clave": "WALKIVER.imagen",
+     "etiqueta": "Imagen",
+     "tipo": "ruta",
+     "valor": ""
+    },
+    {
+     "sub": null,
+     "clave": "WALKIVER.bio",
+     "etiqueta": "Biografía (párrafos)",
+     "tipo": "lista-texto",
+     "valor": [
+      "Walkiver es el artista detrás del Walkiverso: imagina, esculpe y da nombre a cada criatura y a cada artefacto.",
+      "Este espacio está reservado para su historia, contada por él."
+     ]
+    },
+    {
+     "sub": null,
+     "clave": "WALKIVER.videos",
+     "etiqueta": "Videos",
+     "tipo": "lista-texto",
+     "valor": []
+    }
+   ]
+  },
+  {
+   "nombre": "Pedile un deseo",
+   "campos": [
+    {
+     "sub": null,
+     "clave": "DESEO.sobre",
+     "etiqueta": "Etiqueta sobre el título",
+     "tipo": "texto",
+     "valor": "Solicitudes"
+    },
+    {
+     "sub": null,
+     "clave": "DESEO.titulo",
+     "etiqueta": "Título",
+     "tipo": "titulo",
+     "valor": "Pedile un deseo al Walkiverso"
+    },
+    {
+     "sub": null,
+     "clave": "DESEO.texto",
+     "etiqueta": "Texto",
+     "tipo": "texto",
+     "valor": "Tus ideas pueden inspirar a las próximas criaturas y objetos del taller."
+    },
+    {
+     "sub": null,
+     "clave": "DESEO.cta",
+     "etiqueta": "Texto del botón",
+     "tipo": "texto",
+     "valor": "Solicitar una creación"
+    },
+    {
+     "sub": null,
+     "clave": "DESEO.items",
+     "etiqueta": "Elementos",
+     "tipo": "lista",
+     "fija": false,
+     "campos": [
+      {
+       "clave": "q",
+       "etiqueta": "Pregunta",
+       "tipo": "texto"
+      },
+      {
+       "clave": "a",
+       "etiqueta": "Respuesta",
+       "tipo": "parrafos"
+      }
+     ],
+     "valor": [
+      {
+       "q": "¿Cómo funcionan las solicitudes?",
+       "a": "A través de este formulario podés enviarnos una solicitud para futuras creaciones del Walkiverso.\n\nCada creación es única: las criaturas se desarrollan por **personajes** y los objetos por **diseños**. Por ese motivo no realizamos encargos personalizados ni aceptamos pagos anticipados.\n\nEstos aportes nos ayudan a entender qué creaciones despiertan más interés dentro de la comunidad."
+      },
+      {
+       "q": "¿Qué pasa con las solicitudes?",
+       "a": "Las leemos todas. No se responden una por una ni garantizan que la pieza se realice, pero las ideas que más se repiten suelen inspirar futuras creaciones."
+      },
+      {
+       "q": "¿Cómo enterarte si llega una nueva pieza?",
+       "a": "Las nuevas piezas se anuncian en la tienda y en nuestras redes."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "nombre": "Academia y cursos",
+   "campos": [
+    {
+     "sub": null,
+     "clave": "ACADEMIA.sobre",
+     "etiqueta": "Etiqueta sobre el título",
+     "tipo": "texto",
+     "valor": "Cursos"
+    },
+    {
+     "sub": null,
+     "clave": "ACADEMIA.cta",
+     "etiqueta": "Texto del botón",
+     "tipo": "texto",
+     "valor": "Ir a la Academia"
+    },
+    {
+     "sub": null,
+     "clave": "ACADEMIA.titulo",
+     "etiqueta": "Título",
+     "tipo": "titulo",
+     "valor": "Academia Walkiverso"
+    },
+    {
+     "sub": null,
+     "clave": "ACADEMIA.subtitulo",
+     "etiqueta": "Subtítulo",
+     "tipo": "texto",
+     "valor": "El lugar donde nacen los monstruos."
+    },
+    {
+     "sub": null,
+     "clave": "ACADEMIA.texto",
+     "etiqueta": "Texto",
+     "tipo": "texto",
+     "valor": "Aprendé en el taller de Walkiver."
+    }
+   ]
+  },
+  {
+   "nombre": "Ficha de producto",
+   "campos": [
+    {
+     "sub": null,
+     "clave": "FICHA.cuidadosTitulo",
+     "etiqueta": "Título de cuidados",
+     "tipo": "texto",
+     "valor": "Cómo cuidarla"
+    },
+    {
+     "sub": null,
+     "clave": "FICHA.cuidados",
+     "etiqueta": "Cuidados",
+     "tipo": "texto-largo",
+     "valor": "Mantenela alejada de la humedad y del sol directo. Para limpiarla, alcanza con un pincel suave y seco. No la mojes ni utilices productos de limpieza sobre ella."
+    }
+   ]
+  },
+  {
+   "nombre": "Pie · Dudas frecuentes",
+   "campos": [
+    {
+     "sub": null,
+     "clave": "FAQ.sobre",
+     "etiqueta": "Etiqueta sobre el título",
+     "tipo": "texto",
+     "valor": "Antes de adoptar"
+    },
+    {
+     "sub": null,
+     "clave": "FAQ.titulo",
+     "etiqueta": "Título",
+     "tipo": "titulo",
+     "valor": "Las dudas más frecuentes"
+    },
+    {
+     "sub": null,
+     "clave": "FAQ.texto",
+     "etiqueta": "Texto",
+     "tipo": "texto",
+     "valor": "Lo que más nos preguntan antes de adoptar una criatura."
+    },
+    {
+     "sub": null,
+     "clave": "FAQ.items",
+     "etiqueta": "Elementos",
+     "tipo": "lista",
+     "fija": false,
+     "campos": [
+      {
+       "clave": "q",
+       "etiqueta": "Pregunta",
+       "tipo": "texto"
+      },
+      {
+       "clave": "a",
+       "etiqueta": "Respuesta",
+       "tipo": "parrafos"
+      }
+     ],
+     "valor": [
+      {
+       "q": "¿Qué medios de pago aceptan?",
+       "a": "En Uruguay aceptamos **Mercado Pago, tarjetas de crédito y débito, Abitab y Redpagos**, con opciones de pago en cuotas.\n\nDesde el exterior, los **cursos y e-books** pueden adquirirse mediante **PayPal**."
+      },
+      {
+       "q": "¿Hacen encargos personalizados?",
+       "a": "No realizamos encargos personalizados ni aceptamos pagos por solicitudes.\n\nPero si soñás con una criatura o artefacto fantástico, podés pedirle un deseo al Walkiverso: tus ideas pueden inspirar futuras creaciones."
+      },
+      {
+       "q": "¿Con qué materiales están hechas?",
+       "a": "Utilizamos una amplia variedad de materiales, como cartón, telas, alambre, PLA, acrílicos, hilos, cuerdas y diversos materiales reciclados, como ropa, accesorios y otros elementos.\n\nLos materiales utilizados dependen del tipo de pieza —pieza Walkiverso o pieza única— y de las características de cada diseño.\n\nCada obra incluye una descripción de los materiales empleados, que también quedan registrados en su certificado de autenticidad."
+      },
+      {
+       "q": "¿Cómo cuido a mi criatura?",
+       "a": "Mantenela alejada de la humedad y del sol directo.\n\nPara limpiarla, alcanza con un pincel suave y seco.\n\nNo la mojes ni utilices productos de limpieza sobre ella."
+      },
+      {
+       "q": "¿Qué diferencia hay entre una pieza Walkiverso y una pieza única (OOAK)?",
+       "a": "Las **piezas Walkiverso** representan personajes y artefactos que tienen una historia y un lugar dentro de Walkurio.\n\nTienen un nombre y un trasfondo propio que se mantiene vivo y continúa desarrollándose.\n\nCada cierto tiempo toman forma física en el taller mediante una combinación de impresión 3D y trabajo artesanal detallado.\n\nLas **piezas únicas (OOAK)** son diseños nuevos y espontáneos de criaturas, artefactos u otras ideas que no forman parte de Walkurio.\n\nSon oportunidades especiales para adquirir una obra única creada mediante técnicas tradicionales de escultura y desarrollada a lo largo de un proceso artesanal más extenso."
+      },
+      {
+       "q": "¿Cómo se realizan las piezas del Walkiverso?",
+       "a": "Se crean mediante una combinación de tecnología y trabajo artesanal.\n\nSu estructura base se reproduce mediante impresión 3D, utilizando el escaneado de la escultura física original, hecha a mano, y una posterior etapa de esculpido digital.\n\nDespués, cada pieza se trabaja artesanalmente realizando detalles, texturas y colores, utilizando materiales diversos como porcelana, telas, hilos y materiales reciclados, hasta conformar una obra fiel al diseño de la primera pieza que Walkiver creó con sus propias manos."
+      },
+      {
+       "q": "¿Las piezas traen certificado?",
+       "a": "Sí.\n\nCada pieza incluye un certificado de autenticidad con:\n\n- Nombre\n- Número de obra\n- Materiales utilizados\n- Sello de Walkiverso\n- Firma de Walkiver"
+      },
+      {
+       "q": "¿Hacen envíos?",
+       "a": "Sí, realizamos envíos a todo Uruguay.\n\nPor el momento, las piezas físicas no están disponibles para envío internacional, pero estamos trabajando para hacerlo posible.\n\nLos cursos y e-books, en cambio, sí pueden adquirirse desde cualquier parte del mundo."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "nombre": "Pie",
+   "campos": [
+    {
+     "sub": null,
+     "clave": "PIE.lema",
+     "etiqueta": "Lema",
+     "tipo": "texto",
+     "valor": "Arte, Magia y Folklore."
+    }
+   ]
+  }
+ ]
+}

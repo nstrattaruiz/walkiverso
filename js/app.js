@@ -11,6 +11,7 @@ import { iniciarFavoritos, favoritos } from './ui/favoritos.js';
 import { abrirAcceso } from './ui/acceso.js';
 import { iniciarTarjetas } from './anim/efectos.js';
 import { polvoDeHadas } from './anim/polvo.js';
+import { aplicarTextos } from './datos/textos.js';
 import { inicio } from './paginas/inicio.js';
 import { catalogoPagina } from './paginas/tienda.js';
 import { ficha } from './paginas/ficha.js';
@@ -33,6 +34,8 @@ function abrirTelon() {
 
 async function arrancar() {
   const info = estado.info = await tienda.info();
+  // Textos cargados en el panel (si la tienda los trae): reemplazan a los de fábrica antes de dibujar nada
+  aplicarTextos(info.content?.texts);
   document.documentElement.classList.toggle('wk-demo', esDemo);
   // La demostración (fuera de la plataforma) no se ofrece a los buscadores
   if (esDemo) document.head.insertAdjacentHTML('beforeend', '<meta name="robots" content="noindex, nofollow">');

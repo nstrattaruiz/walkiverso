@@ -75,7 +75,7 @@ export async function catalogoPagina(categoria = '') {
     <section class="wk-tienda-cab wk-noche wk-pagina">
       <span class="wk-ramas wk-tienda-cab__rama" aria-hidden="true"></span>
       <div class="wk-cont">
-        <span class="wk-sobre">Tienda</span>
+        <span class="wk-sobre">${esc(SECCIONES.tienda.sobre)}</span>
         <h1 class="wk-titulo wk-titulo--m">${esc(SECCIONES.tienda.titulo)}</h1>
         <nav class="wk-chips wk-chips--fila" aria-label="Categorías" id="categorias"></nav>
       </div>

@@ -3,6 +3,8 @@
 Tienda online de Walkiverso: **Arte, Magia y Folklore.** HTML, CSS y JS sin dependencias, con la firma NS,
 lista para la plataforma (los datos salen de la tienda con el SDK).
 
+> **Panel:** qué necesita esta tienda del panel, dónde aparece cada producto y cómo se editan los textos está en `PANEL.md`.
+
 ## Verla
 
 **Sin la plataforma (demostración, datos de ejemplo):**
@@ -29,7 +31,9 @@ La web detecta sola el SDK (`/api/v1/sdk.js`): si está, usa la tienda; si no, l
 |---|---|
 | `index.html` | Estructura: firma NS, contenedor de páginas, buscador, carrito, modal, pie |
 | `js/config.js` | **Interruptores**: Walkurio publicado o no, nombres de las características y etiquetas del panel, menú y pie por defecto |
-| `js/contenido.js` | **Textos editoriales**: hero, secciones, proceso, testimonios, Walkiver, FAQ |
+| `js/contenido.js` | **Textos de fábrica**: hero, secciones, proceso, testimonios, Walkiver, FAQ. El panel puede reemplazarlos (`js/datos/textos.js`) |
+| `js/secciones/reglas.js` | **Qué piezas van en cada sección** de la portada y con qué respaldo |
+| `panel/textos-walkiverso.json` | Lista de textos editables para el panel (generada con `node .dev/esquema.mjs`) |
 | `js/app.js` | Arranque y rutas |
 | `js/datos/tienda.js` | SDK de la plataforma o tienda de demostración |
 | `js/datos/modelo.js` | De producto de la plataforma a "pieza" (única / Walkiverso, especie, técnica…), catálogo y búsqueda |
@@ -53,13 +57,13 @@ La web lee todo del producto. Nada está fijo en el diseño.
 | Característica **Especie** | `Duende`, `Mandrágora`, `Minidrágora`, `Troll`… | Línea bajo el nombre, categorías y filtro de especie |
 | Característica **Variedad** (opcional) | `Duende del Dinero`, `Duende de Protección`… | Se muestra en la tarjeta y la ficha en lugar de la especie; la especie sigue agrupando y filtrando |
 | Característica **Clase** (artefactos) | `Bitácora`, `Decorativo`, `Funcional`… | Lo mismo, para artefactos |
-| Etiqueta **`pieza-unica`** (o `ooak`) | — | Badge PIEZA ÚNICA, tope de 1 en el carrito, filtro. Sin la etiqueta es **pieza Walkiverso** |
+| Categoría **`Piezas únicas`** o característica **`Pieza única: Sí`** | — | Badge PIEZA ÚNICA, tope de 1 en el carrito, filtro. Sin la marca es **pieza Walkiverso** |
 | Característica **Técnica** | `Técnica mixta` · `Técnica tradicional` | Metadata discreta. Si falta: tradicional para únicas, mixta para el resto |
 | Característica **Materiales** | separados por coma | Ficha y certificado |
 | Característica **Número de obra** | `012` | Certificado |
 | Característica **Historia** | texto | Sección "Su historia" de la ficha |
-| Etiqueta **`destacado`** | — | "No las dejes escapar" |
-| Etiqueta **`mas-buscado`** | — | "Los más buscados" |
+| Categoría **`No las dejes escapar`** o característica **`Destacado: Sí`** | — | Sección "No las dejes escapar" |
+| Categoría **`Los más buscados`** o característica **`Más buscado: Sí`** | — | Sección "Los más buscados" |
 | Características **Nivel** y **Duración** (producto del curso) | `Inicial`, `8 horas` | Tarjeta del curso |
 | Stock en 0 | — | "Esta criatura ya encontró hogar." + "Ver otras criaturas →" |
 

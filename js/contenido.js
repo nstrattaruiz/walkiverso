@@ -1,5 +1,6 @@
-// Walkiverso · textos editoriales de la web (los que no salen del panel).
-// Para cambiar un texto de la portada, la FAQ o el proceso, se edita acá: el diseño no se toca.
+// Walkiverso · textos de fábrica de la web.
+// Si la tienda trae textos propios desde el panel, reemplazan a estos (ver js/datos/textos.js y PANEL.md).
+// Para cambiar un texto a mano se edita acá: el diseño no se toca.
 // Lo marcado como PROVISORIO es texto de relleno para reemplazar.
 
 export const HERO = {
@@ -19,6 +20,7 @@ export const HERO = {
 export const CINTA = ['Arte', 'Magia', 'Folklore', 'Criaturas con nombre', 'Artefactos con carácter', 'Piezas únicas', 'Certificado de autenticidad'];
 
 export const CREACIONES = {
+  sobre: 'Walkiverso',
   titulo: 'Las creaciones',
   texto: 'Todo nace de una historia, con materiales combinados y técnicas mixtas. Explorá el universo de Walkiver.',
   // `imagen`: foto de fondo de cada puerta. Sin imagen, el fondo va rotando entre las piezas.
@@ -54,14 +56,19 @@ export const DESEO = {
 };
 
 export const SECCIONES = {
-  criaturas: { titulo: 'Criaturas', texto: 'Seres con nombre, historia y personalidad.' },
-  artefactos: { titulo: 'Artefactos', texto: 'Objetos mágicos, decorativos y/o funcionales, nacidos de historias que todavía no terminamos de contar.' },
+  criaturas: { sobre: 'Tienda', titulo: 'Criaturas', texto: 'Seres con nombre, historia y personalidad.', cta: 'Ver todas las criaturas' },
+  artefactos: { sobre: 'Tienda', titulo: 'Artefactos', texto: 'Objetos mágicos, decorativos y/o funcionales, nacidos de historias que todavía no terminamos de contar.', cta: 'Ver todos los artefactos' },
   destacadas: {
+    sobre: 'Disponibles hoy',
     titulo: 'No las dejes <em>escapar</em>',
     texto: 'Cada obra es única en su momento. No trabajamos por encargos, así que si te gusta, no la dejes escapar: no sabemos cuándo volverá a estar disponible.',
   },
-  buscadas: { titulo: 'Los más buscados' },
+  buscadas: { sobre: 'Los que más piden', titulo: 'Los más buscados', cta: 'Ver toda la tienda' },
+  // Se muestra en lugar de "Los más buscados" cuando ninguna pieza está marcada como más buscada
+  ultimas: { sobre: 'Recién llegadas', titulo: 'Las últimas en llegar', cta: 'Ver toda la tienda' },
   universo: {
+    sobre: 'El universo',
+    pronto: 'Un territorio en desarrollo',
     titulo: 'Dónde las criaturas <em>cobran vida</em>',
     texto: 'Un universo que crece con cada criatura, cada historia y cada nueva creación.',
   },
@@ -69,11 +76,12 @@ export const SECCIONES = {
     { titulo: 'Una criatura', texto: 'Un ser con nombre, historia y personalidad.', icono: 'i-ojo', cta: 'Ver criaturas', href: '/tienda?tipo=criatura' },
     { titulo: 'Un artefacto', texto: 'Un objeto mágico decorativo y/o funcional.', icono: 'i-sello', cta: 'Ver artefactos', href: '/tienda?tipo=artefacto' },
   ],
-  tienda: { titulo: 'Todas las criaturas y artefactos disponibles' },
+  tienda: { sobre: 'Tienda', titulo: 'Todas las criaturas y artefactos disponibles' },
 };
 
 /** Así nacen las criaturas. Para sumar un paso o un video alcanza con agregar un elemento: la sección crece sola. */
 export const PROCESO = {
+  sobre: 'El taller',
   titulo: 'Así nacen las criaturas',
   texto: 'De materiales inertes a una primera mirada.',
   orbe: 'Cómo se ve, qué características tiene, qué la hace especial.',
@@ -107,6 +115,8 @@ export const REELS = {
 
 /** Voces del Walkiverso. Los que tienen `ejemplo: true` son de muestra: reemplazarlos por testimonios reales antes de publicar. */
 export const VOCES = {
+  sobre: 'Quienes ya adoptaron',
+  cta: 'Dejar mi comentario',
   titulo: 'Voces del Walkiverso',
   texto: 'Contanos qué te pareció.',
   items: [
@@ -117,6 +127,8 @@ export const VOCES = {
 };
 
 export const WALKIVER = {
+  sobre: 'Walkiver',
+  cta: 'Conocer a Walkiver',
   titulo: 'Detrás de este universo creativo hay <em>un artista</em>',
   texto: 'Conocé a Walkiver, explorá sus videos mitológicos y adquirí su ebook “Somos Mitos” para comenzar a entender estas historias.',
   ebookHandle: 'somos-mitos',   // handle del producto del e-book en el panel
@@ -130,12 +142,17 @@ export const WALKIVER = {
 };
 
 export const ACADEMIA = {
+  sobre: 'Cursos',
+  cta: 'Ir a la Academia',
   titulo: 'Academia Walkiverso',
   subtitulo: 'El lugar donde nacen los monstruos.',
   texto: 'Aprendé en el taller de Walkiver.',
 };
 
-export const CUIDADOS = 'Mantenela alejada de la humedad y del sol directo. Para limpiarla, alcanza con un pincel suave y seco. No la mojes ni utilices productos de limpieza sobre ella.';
+export const FICHA = {
+  cuidadosTitulo: 'Cómo cuidarla',
+  cuidados: 'Mantenela alejada de la humedad y del sol directo. Para limpiarla, alcanza con un pincel suave y seco. No la mojes ni utilices productos de limpieza sobre ella.',
+};
 
 export const FAQ = {
   sobre: 'Antes de adoptar',

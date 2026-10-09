@@ -2,7 +2,7 @@
 // Todo lo que la web muestra de una pieza (única o Walkiverso, especie, técnica, disponibilidad, historia…)
 // sale de acá, y acá sale de los datos del producto: ningún componente lo tiene fijo.
 import { tienda } from './tienda.js';
-import { CAMPOS, ETIQUETAS, TIPOS } from '../config.js';
+import { CAMPOS, MARCAS, TIPOS } from '../config.js';
 import { plano } from '../ui/util.js';
 
 const attr = (p, nombre) => {
@@ -10,7 +10,10 @@ const attr = (p, nombre) => {
   const k = Object.keys(p.attributes ?? {}).find((x) => plano(x) === buscado);
   return k ? String(p.attributes[k]).trim() : '';
 };
-const conEtiqueta = (p, lista) => (p.tags ?? []).some((t) => lista.includes(plano(t).replace(/\s+/g, '-')));
+const guiones = (t) => plano(t).replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+/** ¿El producto lleva esta marca? Vale por categoría, por característica ("Sí") o por etiqueta. */
+const conMarca = (p, { nombres, caracteristica }) => [...(p.categories ?? []), ...(p.tags ?? [])].some((t) => nombres.includes(guiones(t)))
+  || /^(si|x|1|true|verdadero)$/.test(plano(attr(p, caracteristica)));
 
 function tipoDe(p) {
   const dicho = plano(attr(p, CAMPOS.tipo) || p.type);
@@ -26,8 +29,8 @@ function tipoDe(p) {
 export function pieza(p) {
   const tipo = tipoDe(p);
   const esObra = tipo === 'criatura' || tipo === 'artefacto';
-  // Pieza única: la etiqueta del panel. Una criatura o artefacto sin esa etiqueta es pieza Walkiverso.
-  const isUnique = esObra && conEtiqueta(p, ETIQUETAS.unica);
+  // Pieza única (OOAK): la marca del panel. Una criatura o artefacto sin esa marca es pieza Walkiverso.
+  const isUnique = esObra && conMarca(p, MARCAS.unica);
   const isWalkiverso = esObra && !isUnique;
   const variante = p.variants?.find((v) => v.available) ?? p.variants?.[0] ?? null;
   const stock = variante?.stock ?? null;
@@ -60,8 +63,8 @@ export function pieza(p) {
     variantId: variante?.id ?? null,
     stock,
     maxCantidad: isUnique ? 1 : stock,
-    destacada: conEtiqueta(p, ETIQUETAS.destacada),
-    buscada: conEtiqueta(p, ETIQUETAS.buscada),
+    destacada: conMarca(p, MARCAS.destacada),
+    buscada: conMarca(p, MARCAS.buscada),
     categories: p.categories ?? [],
     createdAt: p.createdAt ?? null,
     crudo: p,

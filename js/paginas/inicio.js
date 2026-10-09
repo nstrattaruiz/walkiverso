@@ -15,6 +15,7 @@ import { particulas } from '../anim/particulas.js';
 import { escena, aparecer } from '../anim/efectos.js';
 import { tarjetaCurso } from './academia.js';
 import * as T from '../contenido.js';
+import { secciones } from '../secciones/reglas.js';
 
 /**
  * Lo escondido del hero: criaturas dibujadas a línea que solo se ven cuando la luz del cursor pasa por encima.
@@ -148,7 +149,7 @@ const proceso = () => `
   <section class="wk-seccion wk-papel wk-proceso wk-con-raices" id="proceso">
     ${raices()}
     <div class="wk-cont">
-      ${cabecera({ sobre: 'El taller', titulo: esc(T.PROCESO.titulo), texto: T.PROCESO.texto })}
+      ${cabecera({ sobre: T.PROCESO.sobre, titulo: esc(T.PROCESO.titulo), texto: T.PROCESO.texto })}
       <div class="wk-proceso__cuerpo">
         <div class="wk-orbe" data-ver style="--luz:0">
           <div class="wk-orbe__esfera" aria-hidden="true">
@@ -244,10 +245,10 @@ const universo = () => `
     ${raices()}
     <div class="wk-cont wk-universo__grilla">
       <div class="wk-cab" data-ver>
-        <span class="wk-sobre">El universo</span>
+        <span class="wk-sobre">${esc(T.SECCIONES.universo.sobre)}</span>
         <h2 class="wk-titulo">${T.SECCIONES.universo.titulo}</h2>
         <p class="wk-bajada">${esc(T.SECCIONES.universo.texto)}</p>
-        <p class="wk-universo__pronto">Un territorio en desarrollo</p>
+        <p class="wk-universo__pronto">${esc(T.SECCIONES.universo.pronto)}</p>
       </div>
       <div class="wk-universo__mapa" data-ver style="--d:1">${territorio()}</div>
     </div>
@@ -270,11 +271,11 @@ const voces = () => {
   return `
   <section class="wk-seccion wk-papel wk-con-raices" id="voces">
     ${raices()}
-    <div class="wk-cont">${cabecera({ sobre: 'Quienes ya adoptaron', titulo: esc(T.VOCES.titulo), texto: T.VOCES.texto })}</div>
+    <div class="wk-cont">${cabecera({ sobre: T.VOCES.sobre, titulo: esc(T.VOCES.titulo), texto: T.VOCES.texto })}</div>
     <div class="wk-voces" data-ver tabindex="0" role="group" aria-label="Comentarios de quienes ya adoptaron">
       <div class="wk-voces__tira" style="--n:${base.length}">${base.map((v, i) => voz(v, i >= T.VOCES.items.length)).join('')}${base.map((v) => voz(v, true)).join('')}</div>
     </div>
-    <p class="wk-voces__cta" data-ver><button type="button" class="wk-btn wk-btn--linea" id="dejar-voz">Dejar mi comentario ${flecha}</button></p>
+    <p class="wk-voces__cta" data-ver><button type="button" class="wk-btn wk-btn--linea" id="dejar-voz">${esc(T.VOCES.cta)} ${flecha}</button></p>
   </section>`;
 };
 
@@ -399,15 +400,9 @@ export async function inicio() {
   ]);
   if (!$('#resto')) return () => detener.forEach((f) => f());   // el visitante ya se fue a otra página
 
-  const criaturas = todo.filter((x) => x.tipo === 'criatura').sort(porDisponibilidad);
-  const losDuendes = criaturas.filter((x) => plano(x.species) === plano(T.DUENDES.especie));
-  const artefactos = todo.filter((x) => x.tipo === 'artefacto').sort(porDisponibilidad);
-  const obras = [...criaturas, ...artefactos];
-  const disponibles = obras.filter((x) => x.available);
-  // Destacadas y más buscadas: las elige el panel con etiquetas. Si todavía no hay ninguna, se muestran piezas disponibles.
-  const elegir = (marca, respaldo) => { const m = disponibles.filter((x) => x[marca]); return (m.length ? m : respaldo).slice(0, 4); };
-  const destacadas = elegir('destacada', disponibles.filter((x) => x.isUnique).concat(disponibles));
-  const buscadas = elegir('buscada', disponibles.slice().reverse());
+  // Qué va en cada sección y con qué respaldo: js/secciones/reglas.js
+  const { criaturas, artefactos, duendes: losDuendes, filaCriaturas, filaArtefactos, destacadas, buscadas, sonUltimas } = secciones(todo);
+  const B = sonUltimas ? T.SECCIONES.ultimas : T.SECCIONES.buscadas;
   const ebook = todo.find((x) => x.handle === T.WALKIVER.ebookHandle) ?? todo.find((x) => x.tipo === 'ebook');
   const S = T.SECCIONES;
 
@@ -415,15 +410,15 @@ export async function inicio() {
     ${cinta()}
     <section class="wk-seccion wk-blanco wk-creaciones" id="creaciones">
       <div class="wk-cont">
-        ${cabecera({ sobre: 'Walkiverso', titulo: esc(T.CREACIONES.titulo), texto: T.CREACIONES.texto })}
+        ${cabecera({ sobre: T.CREACIONES.sobre, titulo: esc(T.CREACIONES.titulo), texto: T.CREACIONES.texto })}
       </div>
       <div class="wk-cont wk-cont--ancho">${puertas(criaturas, artefactos)}</div>
     </section>
 
-    ${vitrina({ id: 'criaturas', tema: 'wk-cielo', raiz: true, piezas: criaturas.slice(0, 4), sobre: 'Tienda', titulo: esc(S.criaturas.titulo), texto: S.criaturas.texto, enlace: { href: '/tienda?tipo=criatura', texto: 'Ver todas las criaturas' } })}
-    ${vitrina({ id: 'artefactos', tema: 'wk-blanco', raiz: true, piezas: artefactos.slice(0, 4), sobre: 'Tienda', titulo: esc(S.artefactos.titulo), texto: S.artefactos.texto, enlace: { href: '/tienda?tipo=artefacto', texto: 'Ver todos los artefactos' } })}
+    ${vitrina({ id: 'criaturas', tema: 'wk-cielo', raiz: true, piezas: filaCriaturas, sobre: S.criaturas.sobre, titulo: esc(S.criaturas.titulo), texto: S.criaturas.texto, enlace: { href: '/tienda?tipo=criatura', texto: S.criaturas.cta } })}
+    ${vitrina({ id: 'artefactos', tema: 'wk-blanco', raiz: true, piezas: filaArtefactos, sobre: S.artefactos.sobre, titulo: esc(S.artefactos.titulo), texto: S.artefactos.texto, enlace: { href: '/tienda?tipo=artefacto', texto: S.artefactos.cta } })}
     ${duendes(losDuendes)}
-    ${vitrina({ id: 'destacadas', tema: 'wk-noche wk-isla', clase: 'wk-destacadas', raiz: true, piezas: destacadas, sobre: 'Disponibles hoy', titulo: S.destacadas.titulo, texto: S.destacadas.texto })}
+    ${vitrina({ id: 'destacadas', tema: 'wk-noche wk-isla', clase: 'wk-destacadas', raiz: true, piezas: destacadas, sobre: S.destacadas.sobre, titulo: S.destacadas.titulo, texto: S.destacadas.texto })}
 
     <section class="wk-seccion wk-papel wk-con-raices" id="diferencia" aria-label="Qué es una criatura y qué es un artefacto">
       ${raices()}
@@ -437,7 +432,7 @@ export async function inicio() {
     </section>
 
     ${proceso()}
-    ${vitrina({ id: 'buscados', tema: 'wk-blanco', raiz: true, clase: 'wk-buscados', piezas: buscadas, sobre: 'Los que más piden', titulo: esc(S.buscadas.titulo), enlace: { href: '/tienda', texto: 'Ver toda la tienda' } })}
+    ${vitrina({ id: 'buscados', tema: 'wk-blanco', raiz: true, clase: sonUltimas ? '' : 'wk-buscados', piezas: buscadas, sobre: B.sobre, titulo: esc(B.titulo), enlace: { href: '/tienda', texto: B.cta } })}
     ${reels()}
     ${universo()}
     ${voces()}
@@ -449,11 +444,11 @@ export async function inicio() {
           ? `<img src="${esc(T.WALKIVER.imagen)}" alt="Walkiver en su taller" loading="lazy">`
           : '<span class="wk-arte wk-arte--espera" style="--t:0.62" role="img" aria-label="Retrato de Walkiver: imagen pendiente"><span class="wk-arte__glifo"></span></span>'}</div>
         <div class="wk-cab" data-ver style="--d:1">
-          <span class="wk-sobre">Walkiver</span>
+          <span class="wk-sobre">${esc(T.WALKIVER.sobre)}</span>
           <h2 class="wk-titulo wk-titulo--m">${T.WALKIVER.titulo}</h2>
           <p class="wk-bajada">${esc(T.WALKIVER.texto)}</p>
           <div class="wk-botones">
-            <a class="wk-btn wk-btn--tinta" href="/walkiver" data-link>Conocer a Walkiver</a>
+            <a class="wk-btn wk-btn--tinta" href="/walkiver" data-link>${esc(T.WALKIVER.cta)}</a>
             ${ebook ? `<a class="wk-btn wk-btn--linea" href="/producto/${esc(ebook.handle)}" data-link>Leer ebook</a>` : ''}
           </div>
         </div>
@@ -465,9 +460,9 @@ export async function inicio() {
     <section class="wk-seccion wk-papel wk-academia-franja wk-con-raices" id="academia">
       ${raices()}
       <div class="wk-cont">
-        ${cabecera({ sobre: 'Cursos', titulo: esc(T.ACADEMIA.titulo), texto: `${T.ACADEMIA.subtitulo} ${T.ACADEMIA.texto}` })}
+        ${cabecera({ sobre: T.ACADEMIA.sobre, titulo: esc(T.ACADEMIA.titulo), texto: `${T.ACADEMIA.subtitulo} ${T.ACADEMIA.texto}` })}
         ${cursos.length ? `<div class="wk-cursos">${cursos.slice(0, 3).map((c, i) => tarjetaCurso(c, todo, i)).join('')}</div>` : ''}
-        ${verMas({ href: '/cursos', texto: 'Ir a la Academia' })}
+        ${verMas({ href: '/cursos', texto: T.ACADEMIA.cta })}
       </div>
     </section>
 `;

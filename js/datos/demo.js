@@ -65,7 +65,8 @@ function totales({ metodoPago, envio, cupon }) {
 }
 
 export const tienda = {
-  async info() { return INFO; },
+  // Para probar textos "del panel" sin plataforma: sessionStorage.setItem('wk-demo-textos', JSON.stringify({ 'HERO.cta': 'Entrar' }))
+  async info() { return { ...INFO, content: { texts: memoria.leer('textos', null) } }; },
   async categorias() {
     const cuenta = {};
     productos().forEach((p) => p.categories.forEach((c) => { cuenta[c] = (cuenta[c] ?? 0) + 1; }));

@@ -7,7 +7,7 @@ export const WALKURIO_PUBLICADO = false;
 /**
  * Cómo lee la web cada pieza desde el panel de la plataforma.
  * - Características del producto (Producto → Características): Tipo, Especie, Clase, Técnica, Materiales, Número de obra, Historia.
- * - Etiquetas del producto: marcan pieza única, pieza Walkiverso, destacados y más buscados.
+ * - Marcas (ver MARCAS, más abajo): pieza única, destacado y más buscado.
  * Si en el panel se cargan con otro nombre, alcanza con cambiarlo acá.
  */
 export const CAMPOS = {
@@ -22,10 +22,17 @@ export const CAMPOS = {
   nivel: 'Nivel',             // cursos
   duracion: 'Duración',       // cursos
 };
-export const ETIQUETAS = {
-  unica: ['pieza-unica', 'ooak'],   // sin esta etiqueta, una criatura o artefacto es pieza Walkiverso
-  destacada: ['destacado'],       // sección "No las dejes escapar"
-  buscada: ['mas-buscado'],       // sección "Los más buscados"
+/**
+ * Marcas de un producto. Cada una se puede poner en el panel de tres formas (alcanza con una):
+ *   1. Categoría: el producto se suma a una categoría con ese nombre ("Piezas únicas", "No las dejes escapar"…).
+ *   2. Característica: "Pieza única: Sí", "Destacado: Sí", "Más buscado: Sí".
+ *   3. Etiqueta, si el panel las ofrece.
+ * Acá va cada nombre aceptado, en minúsculas, sin acentos y con guiones.
+ */
+export const MARCAS = {
+  unica: { nombres: ['pieza-unica', 'piezas-unicas', 'ooak', 'pieza-unica-ooak', 'piezas-unicas-ooak'], caracteristica: 'Pieza única' },
+  destacada: { nombres: ['destacado', 'destacados', 'no-las-dejes-escapar'], caracteristica: 'Destacado' },         // sección "No las dejes escapar"
+  buscada: { nombres: ['mas-buscado', 'mas-buscados', 'los-mas-buscados'], caracteristica: 'Más buscado' },         // sección "Los más buscados"
 };
 
 export const TIPOS = { criatura: 'Criatura', artefacto: 'Artefacto', ebook: 'E-book', curso: 'Curso' };
