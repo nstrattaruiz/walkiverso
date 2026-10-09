@@ -874,3 +874,7 @@ html.wk-sin-carga .wk-carga { display: none; }
 /* En tablet y celular la fila se desliza: con pocas piezas, cada una ocupa su parte para que no quede hueco */
 @media (min-width: 750px) and (max-width: 1099px) { .wk-grilla--carril:is([data-n='1'], [data-n='2'], [data-n='3']) > * { flex: 1 1 0; } .wk-grilla--carril[data-n='1'] > * { max-width: 420px; margin-inline: auto; } }
 @media (max-width: 749px) { .wk-grilla--carril[data-n='1'] > * { flex-basis: 100%; } }
+
+/* El hero y la cinta llenan juntos la primera pantalla (antes el hero tenía tope de 780 px y en pantallas altas sobraba blanco) */
+.wk-hero { min-height: clamp(520px, calc(100svh - 76px), 1200px); }
+@media (max-width: 749px) { .wk-hero { min-height: clamp(520px, calc(100svh - 72px), 900px); } }
