@@ -3,9 +3,14 @@
 // Uso (después de agregar o quitar textos en contenido.js):  node .dev/esquema.mjs
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { esquema, GRUPOS } from '../js/datos/textos.js';
+import { GRUPOS_WALKIVER } from '../walkiver/campos.js';
 
 const campos = esquema();
-const grupos = Object.values(GRUPOS).map((nombre) => ({ nombre, campos: campos.filter((c) => c.grupo === nombre).map(({ grupo, ...c }) => c) })).filter((g) => g.campos.length);
+const grupos = [
+  ...Object.values(GRUPOS).map((nombre) => ({ nombre, campos: campos.filter((c) => c.grupo === nombre).map(({ grupo, ...c }) => c) })).filter((g) => g.campos.length),
+  // Al final, la página de Walkiver (walkiver/campos.js, generado con node .dev/walkiver-campos.mjs)
+  ...GRUPOS_WALKIVER.map((g) => ({ nombre: g.nombre, campos: g.campos.map(({ clave, etiqueta, tipo, sub, valor }) => ({ clave, etiqueta, tipo, sub, valor })) })),
+];
 mkdirSync(new URL('../panel/', import.meta.url), { recursive: true });
 writeFileSync(new URL('../panel/textos-walkiverso.json', import.meta.url), `${JSON.stringify({
   tienda: 'Walkiverso',
@@ -22,5 +27,5 @@ writeFileSync(new URL('../panel/textos-walkiverso.json', import.meta.url), `${JS
   },
   grupos,
 }, null, 1)}\n`);
-console.log(`${campos.length} campos en ${grupos.length} grupos`);
+console.log(`${grupos.reduce((n, g) => n + g.campos.length, 0)} campos en ${grupos.length} grupos`);
 console.log(grupos.map((g) => `  ${g.nombre}: ${g.campos.length}`).join('\n'));

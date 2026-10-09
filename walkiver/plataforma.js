@@ -7,6 +7,29 @@ try { ({ tienda } = await import('/api/v1/sdk.js')); } catch { ({ tienda } = awa
 
 const EBOOK = 'somos-mitos-ebook';
 
+// Textos e imágenes cambiados en el panel ("Textos de la web", grupos "Walkiver · …"): reemplazan a los de la página.
+// Dónde está cada uno, en campos.js. Lo que no se cambió queda como está en la copia.
+const { GRUPOS_WALKIVER } = await import('./campos.js');
+const { aHtml } = await import('../js/datos/textos.js');
+function aplicarTextos(textos) {
+  if (!textos) return;
+  for (const c of GRUPOS_WALKIVER.flatMap((g) => g.campos)) {
+    const v = textos[c.clave];
+    if (typeof v !== 'string' || !v.trim()) continue;
+    const todos = [...document.querySelectorAll(c.sel)];
+    for (const el of c.todos ? todos : [todos[c.n]].filter(Boolean)) {
+      if (c.tipo === 'ruta') { el.src = v.trim(); el.removeAttribute('srcset'); }
+      else if (c.tipo === 'titulo' || c.tipo === 'parrafos') el.innerHTML = aHtml[c.tipo](v);
+      else {
+        // Solo el texto: los íconos y los números que acompañan (flechas, puntos) quedan como están
+        const nodo = [...el.childNodes].find((x) => x.nodeType === 3 && x.textContent.trim());
+        if (nodo) nodo.textContent = nodo.textContent.replace(/\S(?:[\s\S]*\S)?/, v.trim()); else el.prepend(v.trim());
+      }
+    }
+  }
+}
+tienda.info().then((i) => aplicarTextos(i.content?.texts)).catch(() => {});
+
 // En GitHub Pages la web vive en una subcarpeta (/repo): los enlaces absolutos (/tienda, /walkiver/…) se ajustan
 const BASE = /\.github\.io$/.test(location.hostname) ? `/${location.pathname.split('/')[1]}` : '';
 if (BASE) {

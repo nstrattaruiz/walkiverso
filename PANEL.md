@@ -83,7 +83,7 @@ que aparece solo en las tiendas cuya web trae una lista de campos.
 1. Aplicar la migración nueva de la plataforma: `npm run db:migrate` (en `C:devplataforma`).
 2. Entrar al panel de la tienda como administrador → **Textos de la web** → "Cargar lista de campos" y elegir
    `panel/textos-walkiverso.json` de esta carpeta.
-3. Listo: el cliente ve los 14 grupos, cambia lo que quiera y toca "Publicar textos". Cada campo cambiado tiene
+3. Listo: el cliente ve los 22 grupos (los 8 de la página de Walkiver van al final y se llaman "Walkiver · …"), cambia lo que quiera y toca "Publicar textos". Cada campo cambiado tiene
    "Volver al texto original".
 4. Si la web suma o quita textos: `node .dev/esquema.mjs` y volver a cargar el archivo. Lo ya escrito se conserva.
 
@@ -103,11 +103,18 @@ info.content = { texts: { 'HERO.titulo': 'Arte, Magia *y* Folklore', 'FAQ.items'
 
 ### La lista de campos
 
-`panel/textos-walkiverso.json` trae **todos** los campos (hoy 89, en 14 grupos), ya ordenados como aparecen en la web,
+`panel/textos-walkiverso.json` trae **todos** los campos (hoy 186, en 22 grupos: 93 de la web y 93 de la página de Walkiver), ya ordenados como aparecen en la web,
 con clave, nombre legible, tipo y valor de fábrica. La pantalla del panel se puede dibujar sola a partir de ese archivo:
 un bloque por grupo, un campo por texto.
 
 Se genera desde `js/contenido.js`, no se escribe a mano. Al agregar o quitar un texto: `node .dev/esquema.mjs`.
+
+**Página de Walkiver** (`walkiver/`, copiada tal cual de walkiverso-web): sus textos e imágenes van en los grupos
+"Walkiver · …", con claves `WKV.*`. La lista sale de `walkiver/campos.js`, que genera
+`node .dev/walkiver-campos.mjs` leyendo la página en el navegador (con `node .dev/servir.mjs` levantado). Si se toca
+`walkiver/index.html`: correr ese y después `node .dev/esquema.mjs`. `walkiver/plataforma.js` aplica los cambios al
+cargar. Limitaciones: los enlaces dentro de las respuestas de "Sobre mí" (como "Tienda") quedan como texto común si
+se edita esa respuesta, y el texto original puede verse un instante antes de que llegue el del panel.
 
 | Tipo | Qué es | Control sugerido |
 |---|---|---|

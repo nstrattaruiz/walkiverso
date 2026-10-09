@@ -33,7 +33,7 @@ La web detecta sola el SDK (`/api/v1/sdk.js`): si está, usa la tienda; si no, l
 | `js/config.js` | **Interruptores**: Walkurio publicado o no, nombres de las características y etiquetas del panel, menú y pie por defecto |
 | `js/contenido.js` | **Textos de fábrica**: hero, secciones, proceso, testimonios, Walkiver, FAQ. El panel puede reemplazarlos (`js/datos/textos.js`) |
 | `js/secciones/reglas.js` | **Qué piezas van en cada sección** de la portada y con qué respaldo |
-| `panel/textos-walkiverso.json` | Lista de textos editables para el panel (generada con `node .dev/esquema.mjs`) |
+| `panel/textos-walkiverso.json` | Lista de textos editables para el panel (generada con `node .dev/esquema.mjs`; los grupos de Walkiver salen de `walkiver/campos.js`, generado con `node .dev/walkiver-campos.mjs`) |
 | `js/app.js` | Arranque y rutas |
 | `js/datos/tienda.js` | SDK de la plataforma o tienda de demostración |
 | `js/datos/modelo.js` | De producto de la plataforma a "pieza" (única / Walkiverso, especie, técnica…), catálogo y búsqueda |
