@@ -29,6 +29,18 @@ export function insignia(pz, { conWalkiverso = false } = {}) {
   return '';
 }
 
+/** Primeras líneas de la descripción, en texto plano (para las tarjetas grandes). Salta el encabezado "Sobre …:". */
+function resumen(pz, largo = 190) {
+  const t = pz.description.replace(/<\/(p|li|h\d)>|<br>/gi, '\n').replace(/<[^>]+>/g, '').split('\n').map((x) => x.trim()).filter((x) => x && !/^sobre\b.{0,40}:$/i.test(x)).join(' ');
+  return t.length > largo ? `${t.slice(0, t.lastIndexOf(' ', largo))}…` : t;
+}
+
+/**
+ * Fila de tarjetas que se adapta a la cantidad: con 4 o más, la grilla de siempre; con 3, tres columnas más grandes;
+ * con 1 o 2, tarjetas anchas (foto a un lado y texto al otro) que llenan el renglón.
+ */
+export const fila = (piezas, clase = 'wk-grilla--carril') => `<div class="wk-grilla ${clase}"${piezas.length < 4 ? ` data-n="${piezas.length}"` : ''}>${piezas.map(tarjeta).join('')}</div>`;
+
 export function tarjeta(pz, i = 0) {
   const n = NOMBRE[pz.tipo];
   const meta = [pz.especieTexto, pz.technique].filter(Boolean).map(esc).join('<i aria-hidden="true"> · </i>');
@@ -43,6 +55,7 @@ export function tarjeta(pz, i = 0) {
       <div class="wk-card__info">
         <h3 class="wk-card__nombre">${esc(pz.name)}</h3>
         ${meta ? `<p class="wk-card__meta">${meta}</p>` : ''}
+        ${pz.description ? `<p class="wk-card__resumen">${esc(resumen(pz))}</p>` : ''}
         <div class="wk-card__pie">
           <span class="wk-card__precio">${pz.available ? precio(pz) : '—'}</span>
           <span class="wk-card__cta">${n.ver} ${flecha}</span>

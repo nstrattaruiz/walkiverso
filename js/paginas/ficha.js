@@ -2,7 +2,7 @@
 import { $, $$, app, esc, estado, flecha, icono, ir, titular } from '../ui/util.js';
 import { tienda } from '../datos/tienda.js';
 import { pieza, obras, NOMBRE, porDisponibilidad } from '../datos/modelo.js';
-import { arte, insignia, tarjeta } from '../ui/tarjeta.js';
+import { arte, insignia, fila } from '../ui/tarjeta.js';
 import { corazon } from '../ui/favoritos.js';
 import { abrirCarrito } from '../ui/carrito.js';
 import { abrirModal, faq, raices } from '../ui/piezas.js';
@@ -160,7 +160,7 @@ export async function ficha(handle) {
     if (caja && relacionadas.length) {
       caja.innerHTML = `<section class="wk-seccion wk-blanco"><div class="wk-cont">
         <header class="wk-cab wk-cab--fila" data-ver><h2 class="wk-titulo wk-titulo--m">${pz.tipo === 'criatura' ? 'Otras criaturas' : 'Otros artefactos'}</h2><a class="wk-enlace" href="${volver}" data-link>Ver ${pz.tipo === 'criatura' ? 'todas' : 'todos'} ${flecha}</a></header>
-        <div class="wk-grilla wk-grilla--carril">${relacionadas.slice(0, 4).map(tarjeta).join('')}</div></div></section>`;
+        ${fila(relacionadas.slice(0, 4))}</div></section>`;
       aparecer(caja);
     }
   }

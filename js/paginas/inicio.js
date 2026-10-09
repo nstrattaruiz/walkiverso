@@ -5,7 +5,7 @@
 import { $, $$, app, esc, estado, flecha, icono, plano, reducido, titular } from '../ui/util.js';
 import { tienda } from '../datos/tienda.js';
 import { catalogo, porDisponibilidad } from '../datos/modelo.js';
-import { arte, insignia, tarjeta } from '../ui/tarjeta.js';
+import { arte, insignia, tarjeta, fila } from '../ui/tarjeta.js';
 import { abrirModal, cerrarModal, raices } from '../ui/piezas.js';
 import { NOMBRE, precio } from '../datos/modelo.js';
 import { puertas, activarPuertas } from '../secciones/puertas.js';
@@ -138,7 +138,7 @@ const vitrina = ({ id, tema, piezas, clase = '', enlace, raiz, ...cab }) => (pie
     ${raiz ? raices() : ''}
     <div class="wk-cont">
       ${cabecera(cab)}
-      <div class="wk-grilla wk-grilla--carril">${piezas.map(tarjeta).join('')}</div>
+      ${fila(piezas)}
       ${verMas(enlace)}
     </div>
   </section>` : '');
