@@ -80,10 +80,12 @@ export async function ficha(handle) {
             </div>`}
             ${esObra ? `<ul class="wk-ficha__garantias">
               <li>${icono('i-pin')}<span>${esc(FICHA.envios)}</span></li>
-              <li><button type="button" id="certificado">${icono('i-sello')}<span>${esc(FICHA.certificado)}</span></button></li>
+              <li>${icono('i-bag')}<span>${esc(FICHA.pagos)}</span></li>
               <li>${icono('i-ojo')}<span>${esc(FICHA.taller)}</span></li>
             </ul>` : ''}
           </div>
+
+          ${pz.certificate ? `<button type="button" class="wk-ficha__cert" id="certificado">${icono('i-sello')}<span>${esc(FICHA.certificado)}</span><b>Ver ${flecha}</b></button>` : ''}
 
           <div class="wk-prosa wk-ficha__descripcion">${pz.description}</div>
 

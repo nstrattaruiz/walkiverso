@@ -902,3 +902,5 @@ html.wk-sin-carga .wk-carga { display: none; }
 /* En celular las raíces de las páginas interiores son chicas y tenues (si no, las dos se encuentran en el medio y tapan) */
 @media (max-width: 749px) { .wk-tienda > .wk-raiz, .wk-pagina > .wk-raiz { top: 84px; height: 220px; opacity: 0.18; } }
 .wk-ficha__accion:not(:has(.wk-fav)) { grid-template-columns: minmax(0, 1fr); }
+/* La fila del certificado lleva fondo propio: si no, la raíz del borde se ve a través y ensucia el "Ver" */
+.wk-ficha__cert { background: var(--white); }

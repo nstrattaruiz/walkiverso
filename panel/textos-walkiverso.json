@@ -885,21 +885,28 @@
     {
      "sub": null,
      "clave": "FICHA.envios",
-     "etiqueta": "envios",
+     "etiqueta": "Garantía: envíos",
      "tipo": "texto",
      "valor": "Envíos a todo Uruguay"
     },
     {
      "sub": null,
-     "clave": "FICHA.certificado",
-     "etiqueta": "certificado",
+     "clave": "FICHA.pagos",
+     "etiqueta": "Garantía: pagos",
      "tipo": "texto",
-     "valor": "Certificado de autenticidad"
+     "valor": "Pagá en cuotas"
+    },
+    {
+     "sub": null,
+     "clave": "FICHA.certificado",
+     "etiqueta": "Fila del certificado",
+     "tipo": "texto",
+     "valor": "Cada obra incluye certificado de autenticidad."
     },
     {
      "sub": null,
      "clave": "FICHA.taller",
-     "etiqueta": "taller",
+     "etiqueta": "Garantía: taller",
      "tipo": "texto",
      "valor": "Hecha a mano en el taller"
     },

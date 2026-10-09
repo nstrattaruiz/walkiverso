@@ -32,7 +32,7 @@ const ETIQUETAS = {
   quedan: 'Texto del contador (plural)', queda: 'Texto del contador (singular)', azar: 'Botón del sorteo', otraVez: 'Botón para repetir',
   eligio: 'Texto del elegido', verTodos: 'Botón "ver todos"', criaturas: 'Criaturas', artefactos: 'Artefactos', destacadas: 'No las dejes escapar',
   buscadas: 'Los más buscados', ultimas: 'Las últimas en llegar', universo: 'Dónde las criaturas cobran vida', diferencia: 'Una criatura / Un artefacto',
-  tienda: 'Página de tienda', cuidadosTitulo: 'Título de cuidados', cuidados: 'Cuidados', CINTA: 'Frases',
+  tienda: 'Página de tienda', cuidadosTitulo: 'Título de cuidados', envios: 'Garantía: envíos', pagos: 'Garantía: pagos', taller: 'Garantía: taller', certificado: 'Fila del certificado', cuidados: 'Cuidados', CINTA: 'Frases',
 };
 /** Campos que son del código y no se ofrecen en el panel. */
 const TECNICOS = new Set(['icono', 'href', 'especie', 'ebookHandle', 'ejemplo']);

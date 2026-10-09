@@ -152,7 +152,9 @@ export const ACADEMIA = {
 export const FICHA = {
   // Lo que acompaña al botón de compra de una criatura o artefacto
   envios: 'Envíos a todo Uruguay',
-  certificado: 'Certificado de autenticidad',
+  pagos: 'Pagá en cuotas',
+  // La fila del certificado, debajo del bloque de compra (abre el detalle)
+  certificado: 'Cada obra incluye certificado de autenticidad.',
   taller: 'Hecha a mano en el taller',
   cuidadosTitulo: 'Cómo cuidarla',
   cuidados: 'Mantenela alejada de la humedad y del sol directo. Para limpiarla, alcanza con un pincel suave y seco. No la mojes ni utilices productos de limpieza sobre ella.',
