@@ -141,6 +141,10 @@
 .wk-cuenta__item { display: grid; gap: 2px; padding: 16px 20px; border: 1px solid var(--linea); border-radius: 16px; background: var(--white); text-decoration: none; transition: border-color 0.25s; }
 a.wk-cuenta__item:hover { border-color: var(--acento); }
 .wk-cuenta__item span, .wk-cuenta__item small { color: var(--fg-2); }
+/* E-books de la cuenta: cada uno es un boton que abre el lector */
+button.wk-cuenta__item { width: 100%; text-align: left; font: inherit; color: inherit; cursor: pointer; }
+button.wk-cuenta__item:hover:not(:disabled) { border-color: var(--acento); }
+button.wk-cuenta__item:disabled { cursor: default; opacity: 0.7; }
 button.wk-enlace { border: 0; }
 @media (max-width: 749px) { .wk-cuenta__dos { grid-template-columns: 1fr; } }
 

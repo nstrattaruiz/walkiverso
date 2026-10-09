@@ -1,4 +1,5 @@
-// Cuenta del cliente (módulo Cuentas de clientes del panel): ingresar, crear cuenta, mis cursos, mis pedidos y mis datos.
+// Cuenta del cliente (módulo Cuentas de clientes del panel): ingresar, crear cuenta, mis cursos, mis e-books, mis pedidos y mis datos.
+// Los e-books se leen acá con el lector de la plataforma (no se descargan). /cuenta?leer=handle abre uno directo.
 // La sesión es una cookie segura de la plataforma: la web no guarda nada.
 import { $, app, esc, estado, ir, titular, url } from '../ui/util.js';
 import { tienda } from '../datos/tienda.js';
@@ -48,10 +49,15 @@ export async function cuenta() {
   }
 
   const cliente = estado.cliente;
-  const [pedidos, misCursos] = await Promise.all([tienda.cuenta.pedidos(), info.modules?.courses ? tienda.cursos.listar() : []]);
+  const [pedidos, misCursos, misLibros] = await Promise.all([
+    tienda.cuenta.pedidos(), info.modules?.courses ? tienda.cursos.listar() : [], info.modules?.ebooks && tienda.ebooks ? tienda.ebooks.listar().catch(() => []) : [],
+  ]);
   const conAcceso = misCursos.filter((c) => c.access);
   marco(`<h1 class="wk-titulo wk-titulo--m">Hola, ${esc(cliente.name.split(' ')[0])}</h1>
     ${conAcceso.length ? `<h2 class="wk-titulo wk-titulo--s">Mis cursos</h2><div class="wk-cuenta__lista">${conAcceso.map((c) => `<a class="wk-cuenta__item" href="/curso/${esc(c.slug)}" data-link><strong>${esc(c.title)}</strong><span>${c.progress.done} de ${c.progress.total} lecciones</span></a>`).join('')}</div>` : ''}
+    ${misLibros.length ? `<h2 class="wk-titulo wk-titulo--s">Mis e-books</h2><div class="wk-cuenta__lista">${misLibros.map((b) => `
+      <button type="button" class="wk-cuenta__item" data-leer="${esc(b.handle)}"${b.ready ? '' : ' disabled'}><strong>${esc(b.title)}</strong>
+        <span>${!b.ready ? 'Se está preparando: en unos minutos lo vas a poder leer' : b.lastPage ? `Seguir leyendo · página ${b.lastPage + 1} de ${b.pages}` : `Empezar a leer · ${b.pages} páginas`}</span></button>`).join('')}</div>` : ''}
     <h2 class="wk-titulo wk-titulo--s">Mis pedidos</h2>
     ${pedidos.length ? `<div class="wk-cuenta__lista">${pedidos.map((o) => `
       <${o.token ? `a href="/pedido?pedido=${encodeURIComponent(o.token)}" data-link` : 'div'} class="wk-cuenta__item">
@@ -75,6 +81,11 @@ export async function cuenta() {
       <button class="wk-btn wk-btn--tinta">Guardar</button><p class="wk-error" role="alert"></p>
     </form>
     <p><button type="button" class="wk-btn wk-btn--linea" id="salir">Salir de mi cuenta</button></p>`);
+  // E-books: se abren en el lector de la plataforma, ocupando toda la ventana
+  const leer = (handle) => tienda.ebooks.lector(handle, { color: info.colors?.primary, alCerrar: () => cuenta() }).catch((e) => alert(e.message));
+  document.querySelectorAll('[data-leer]').forEach((b) => b.addEventListener('click', () => leer(b.dataset.leer)));
+  const pedido = new URLSearchParams(location.search).get('leer');
+  if (pedido && misLibros.some((b) => b.handle === pedido && b.ready)) { history.replaceState(null, '', url('/cuenta')); leer(pedido); }
   enviar($('#f-datos'), async (d, aviso) => { estado.cliente = await tienda.cuenta.actualizar(d); aviso.textContent = 'Datos guardados.'; });
   $('#salir').addEventListener('click', async () => { await tienda.cuenta.salir(); estado.cliente = null; ir('/'); });   // al salir vuelve a la portada (no reabre la ventana de acceso)
 }

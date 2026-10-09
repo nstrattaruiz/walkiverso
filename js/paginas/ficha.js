@@ -67,6 +67,9 @@ export async function ficha(handle) {
               <button type="button" class="wk-btn wk-btn--luz wk-btn--grande wk-btn--ancho" id="agregar">${esc(n.adquirir)}</button>
               ${esObra ? corazon(pz, 'wk-fav--ficha') : ''}
             </div>
+            ${p.digital ? `<p class="wk-nota" id="digital">${p.digital.delivery === 'reader'
+              ? `Se lee en tu cuenta, desde el celular, la tablet o la computadora${p.digital.pages ? ` · ${p.digital.pages} páginas` : ''}. No se descarga.`
+              : 'Al acreditarse el pago te llega en PDF a tu email.'}</p>` : ''}
             <p class="wk-error" id="error" role="alert"></p>` : `
             <div class="wk-ficha__hogar">
               <p class="wk-display">${esc(n.hogar)}</p>
@@ -128,6 +131,9 @@ export async function ficha(handle) {
   $('[data-video]')?.addEventListener('click', () => $('#video')?.scrollIntoView({ block: 'center' }));
 
   // ---- compra
+  // E-book que se lee en la cuenta: 'tuyo' si ya lo tiene, 'ingresar' si no inició sesión (sin cuenta no se puede comprar)
+  const lector = p.digital?.delivery !== 'reader' ? null : !estado.cliente ? 'ingresar'
+    : (await tienda.ebooks?.listar().catch(() => []) ?? []).some((b) => b.handle === p.handle) ? 'tuyo' : null;
   const actualizar = () => {
     if (!pz.available) return;
     const v = variante();
@@ -137,7 +143,13 @@ export async function ficha(handle) {
     if (p.priceHidden) { boton.disabled = false; boton.textContent = 'Ingresá para ver el precio'; }
     $('#precio').innerHTML = p.priceHidden || v?.price == null ? '' : `${tienda.formatear(v.price, p.currency)}${v.compareAtPrice > v.price ? `<s>${tienda.formatear(v.compareAtPrice, p.currency)}</s>` : ''}`;
     const stock = v?.stock ?? null;
-    $('#estado').textContent = !esObra ? 'Disponible · acceso digital'
+    // E-book para leer en la cuenta: hay que ingresar para comprarlo, y si ya es tuyo se lee directo
+    if (lector === 'tuyo') { boton.disabled = false; boton.textContent = 'Leer ahora'; }
+    else if (lector === 'ingresar') { boton.disabled = false; boton.textContent = 'Ingresá para adquirirlo'; }
+    $('#estado').textContent = lector === 'tuyo' ? 'Ya es tuyo · está en tu cuenta'
+      : p.digital?.delivery === 'reader' ? 'Disponible · se lee en tu cuenta'
+      : p.digital?.delivery === 'email' ? 'Disponible · llega en PDF por mail'
+      : !esObra ? 'Disponible · acceso digital'
       : pz.isUnique ? 'Disponible · existe una sola'
         : stock === 1 ? 'Disponible · queda 1' : stock !== null && stock <= 3 ? `Disponible · quedan ${stock}` : 'Disponible';
     if (v?.imageIndex != null) $(`[data-foto="${v.imageIndex}"]`)?.click();
@@ -151,7 +163,8 @@ export async function ficha(handle) {
   }));
   $('#agregar')?.addEventListener('click', async (e) => {
     const boton = e.currentTarget;
-    if (p.priceHidden) { ir('/cuenta'); return; }
+    if (p.priceHidden || lector === 'ingresar') { ir('/cuenta'); return; }
+    if (lector === 'tuyo') { ir(`/cuenta?leer=${encodeURIComponent(p.handle)}`); return; }
     $('#error').textContent = '';
     boton.disabled = true;
     try { await tienda.carrito.agregar(variante().id, p.multiple > 1 ? p.multiple : 1); abrirCarrito(); }
