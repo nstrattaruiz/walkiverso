@@ -51,7 +51,8 @@ La web lee todo del producto. Nada está fijo en el diseño.
 |---|---|---|
 | Característica **Tipo** | `Criatura` · `Artefacto` · `E-book` · `Curso` | Dónde aparece y el texto del botón ("Adoptar esta criatura" / "Adquirir artefacto") |
 | Característica **Especie** | `Duende`, `Mandrágora`, `Minidrágora`, `Troll`… | Línea bajo el nombre, categorías y filtro de especie |
-| Característica **Clase** (artefactos) | `Decorativo`, `Funcional`… | Lo mismo, para artefactos |
+| Característica **Variedad** (opcional) | `Duende del Dinero`, `Duende de Protección`… | Se muestra en la tarjeta y la ficha en lugar de la especie; la especie sigue agrupando y filtrando |
+| Característica **Clase** (artefactos) | `Bitácora`, `Decorativo`, `Funcional`… | Lo mismo, para artefactos |
 | Etiqueta **`pieza-unica`** (o `ooak`) | — | Badge PIEZA ÚNICA, tope de 1 en el carrito, filtro. Sin la etiqueta es **pieza Walkiverso** |
 | Característica **Técnica** | `Técnica mixta` · `Técnica tradicional` | Metadata discreta. Si falta: tradicional para únicas, mixta para el resto |
 | Característica **Materiales** | separados por coma | Ficha y certificado |
@@ -63,6 +64,21 @@ La web lee todo del producto. Nada está fijo en el diseño.
 | Stock en 0 | — | "Esta criatura ya encontró hogar." + "Ver otras criaturas →" |
 
 Si en el panel conviene otro nombre para alguna característica o etiqueta, se cambia en `js/config.js`.
+
+## Catálogo migrado de la tienda anterior
+
+`js/datos/catalogo.js` trae los **32 productos publicados** en walkiverso.com (WooCommerce), sacados del respaldo de
+Hostinger del 2026-10-06, con sus 142 fotos en `img/productos/<producto>/`. Lo usa solo la tienda de demostración;
+en la plataforma los productos se cargan en el panel.
+
+- 13 duendes, 9 mandrágoras, 6 minidrágoras, 3 pixies y 2 bitácoras. 17 con stock y 15 sin stock.
+- Precios en pesos uruguayos, tal como estaban. Stock, descripción y SKU, también.
+- El título viejo "Mandrágora - Groompyroot" pasó a nombre `Groompyroot` y especie `Mandrágora`.
+- "Duendes Milarko" pasó a especie `Duende`; el tipo de duende quedó en la característica `Variedad`
+  ("Duende del Dinero", "Duende de Protección"…), que se muestra en la tarjeta en lugar de la especie.
+- Las bitácoras pasaron a tipo `Artefacto`, clase `Bitácora`.
+- No se migraron: 43 productos en la papelera y 1 borrador; clientes, pedidos y usuarios.
+- El e-book y los tres cursos de la demostración siguen siendo de relleno.
 
 ## Walkurio (oculta)
 

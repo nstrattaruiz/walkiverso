@@ -13,7 +13,8 @@ export const WALKURIO_PUBLICADO = false;
 export const CAMPOS = {
   tipo: 'Tipo',               // Criatura · Artefacto · E-book · Curso
   especie: 'Especie',         // Duende · Mandrágora · Minidrágora · Troll…
-  clase: 'Clase',             // para artefactos: Decorativo · Funcional…
+  variedad: 'Variedad',       // opcional: Duende del Dinero · Duende de Protección… (se muestra en vez de la especie)
+  clase: 'Clase',             // para artefactos: Bitácora · Decorativo · Funcional…
   tecnica: 'Técnica',         // Técnica mixta · Técnica tradicional
   materiales: 'Materiales',   // separados por coma
   numero: 'Número de obra',

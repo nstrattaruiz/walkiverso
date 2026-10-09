@@ -34,7 +34,7 @@ export async function ficha(handle) {
   const elegido = [...(p.variants.find((v) => v.available)?.options ?? p.variants[0]?.options ?? [])];
   const variante = () => p.variants.find((v) => (v.options ?? []).every((x, i) => x === elegido[i])) ?? null;
   const fotos = pz.images.length ? pz.images : [null];
-  const meta = [pz.species, pz.technique].filter(Boolean);
+  const meta = [pz.especieTexto, pz.technique].filter(Boolean);
   const volver = pz.tipo === 'criatura' || pz.tipo === 'artefacto' ? `/tienda?tipo=${pz.tipo}` : '/cursos';
 
   app.innerHTML = `

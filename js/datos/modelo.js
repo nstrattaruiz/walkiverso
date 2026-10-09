@@ -37,7 +37,9 @@ export function pieza(p) {
     name: p.title,
     tipo,                                   // criatura · artefacto · ebook · curso
     type: TIPOS[tipo],
-    species: attr(p, CAMPOS.especie) || attr(p, CAMPOS.clase),   // especie de la criatura o clase del artefacto
+    species: attr(p, CAMPOS.especie) || attr(p, CAMPOS.clase),   // especie de la criatura o clase del artefacto (agrupa y filtra)
+    // Cómo se nombra en la tarjeta: la variedad si la tiene ("Duende del Dinero"); si no, la especie
+    especieTexto: attr(p, CAMPOS.variedad) || attr(p, CAMPOS.especie) || attr(p, CAMPOS.clase),
     technique: attr(p, CAMPOS.tecnica) || (esObra ? (isUnique ? 'Técnica tradicional' : 'Técnica mixta') : ''),
     isUnique,
     isWalkiverso,
@@ -105,7 +107,7 @@ export function buscar(lista, texto) {
   const palabras = plano(texto).split(/\s+/).filter(Boolean);
   if (!palabras.length) return [];
   return lista.filter((x) => {
-    const donde = plano([x.name, x.species, x.type, x.technique, x.isUnique ? 'pieza unica ooak' : '', x.isWalkiverso ? 'pieza walkiverso' : '', ...x.categories].join(' '));
+    const donde = plano([x.name, x.species, x.especieTexto, x.type, x.technique, x.isUnique ? 'pieza unica ooak' : '', x.isWalkiverso ? 'pieza walkiverso' : '', ...x.categories].join(' '));
     // "criaturas", "trolls", "mandrágoras": el plural también encuentra
     return palabras.every((w) => donde.includes(w) || (w.length > 3 && donde.includes(w.replace(/e?s$/, ''))));
   });

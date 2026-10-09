@@ -31,7 +31,7 @@ function puerta(clave, tipo, piezas, i) {
           ${especies.length ? `<div class="wk-chips">${especies.map((e) => `<a class="wk-chip" href="/tienda?especie=${encodeURIComponent(e)}" data-link>${esc(tipo === 'criatura' ? plural(e) : e)}</a>`).join('')}</div>` : ''}
           ${muestra.length ? `<ul class="wk-puerta__piezas">${muestra.map((pz, k) => `<li><a href="${hrefPieza(pz)}" data-link data-mira="${k}">
             <span class="wk-puerta__mini">${arte(pz, { ancho: 320, sizes: '56px' })}</span>
-            <span><strong>${esc(pz.name)}</strong><small>${esc(pz.species || pz.type)} · ${precio(pz)}</small></span></a></li>`).join('')}</ul>` : ''}
+            <span><strong>${esc(pz.name)}</strong><small>${esc(pz.especieTexto || pz.type)} · ${precio(pz)}</small></span></a></li>`).join('')}</ul>` : ''}
         </div>
       </div>
       <a class="wk-btn wk-btn--luz" href="/tienda?tipo=${tipo}" data-link>${esc(t.cta)} ${flecha}</a>

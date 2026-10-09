@@ -146,7 +146,7 @@ button.wk-enlace { border: 0; }
 
 /* ---- Aviso de demostración (solo fuera de la plataforma) ---- */
 html.wk-demo body::after {
-  content: 'Demostración · datos de ejemplo';
+  content: 'Demostración · no cobra';
   position: fixed;
   left: 14px;
   bottom: 14px;

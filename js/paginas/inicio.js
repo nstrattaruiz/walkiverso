@@ -376,7 +376,7 @@ function activarDuendes(lista) {
         <span class="wk-sobre">${esc(T.DUENDES.eligio)}</span>
         <div class="wk-elegido__arte">${arte(pz, { ancho: 640, sizes: '320px' })}<div class="wk-card__insignias">${insignia(pz)}</div></div>
         <h2 class="wk-titulo wk-titulo--m">${esc(pz.name)}</h2>
-        <p class="wk-card__meta">${[pz.species, pz.technique].filter(Boolean).map(esc).join(' · ')}</p>
+        <p class="wk-card__meta">${[pz.especieTexto, pz.technique].filter(Boolean).map(esc).join(' · ')}</p>
         <p class="wk-elegido__precio">${precio(pz)}</p>
         <div class="wk-botones">
           <a class="wk-btn wk-btn--tinta" href="/producto/${encodeURIComponent(pz.handle)}" data-link data-cerrar>${esc(NOMBRE.criatura.ver)} ${flecha}</a>

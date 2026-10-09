@@ -17,7 +17,7 @@ export function arte(pz, { ancho = 640, sizes = '(max-width: 700px) 50vw, (max-w
   if (img) {
     const src = img.sizes?.[String(ancho)] ?? img.url;
     const srcset = img.sizes ? ` srcset="${Object.entries(img.sizes).map(([w, u]) => `${esc(u)} ${w}w`).join(', ')}" sizes="${sizes}"` : '';
-    return `<img class="wk-arte" src="${esc(src)}"${srcset} alt="${esc(img.alt || `${pz.name}, ${pz.species || pz.type}`)}" width="${img.width ?? 800}" height="${img.height ?? 1000}"${perezosa ? ' loading="lazy" decoding="async"' : ' fetchpriority="high"'}>`;
+    return `<img class="wk-arte" src="${esc(src)}"${srcset} alt="${esc(img.alt || `${pz.name}, ${pz.especieTexto || pz.type}`)}" width="${img.width ?? 800}" height="${img.height ?? 1000}"${perezosa ? ' loading="lazy" decoding="async"' : ' fetchpriority="high"'}>`;
   }
   return `<span class="wk-arte wk-arte--espera" data-tipo="${pz.tipo}" style="--t:${tono(pz.handle ?? pz.name)}" role="img" aria-label="${esc(pz.name)}: imagen pendiente"><span class="wk-arte__glifo"></span></span>`;
 }
@@ -31,7 +31,7 @@ export function insignia(pz, { conWalkiverso = false } = {}) {
 
 export function tarjeta(pz, i = 0) {
   const n = NOMBRE[pz.tipo];
-  const meta = [pz.species, pz.technique].filter(Boolean).map(esc).join('<i aria-hidden="true"> · </i>');
+  const meta = [pz.especieTexto, pz.technique].filter(Boolean).map(esc).join('<i aria-hidden="true"> · </i>');
   return `
   <article class="wk-card${pz.available ? '' : ' wk-card--hogar'}" data-handle="${esc(pz.handle)}" data-ver style="--d:${i % 4}">
     <a class="wk-card__enlace" href="${hrefPieza(pz)}" data-link aria-label="${esc(`${n.ver}: ${pz.name}`)}">

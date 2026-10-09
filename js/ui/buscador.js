@@ -4,7 +4,7 @@ import { catalogo, buscar, precio, porDisponibilidad } from '../datos/modelo.js'
 import { arte, hrefPieza } from './tarjeta.js';
 
 const caja = $('#buscador');
-const SUGERENCIAS = ['Mandrágora', 'Troll', 'Duende', 'Artefacto', 'Pieza única'];
+const SUGERENCIAS = ['Mandrágora', 'Duende', 'Pixie', 'Bitácora', 'Artefacto'];
 let soltarFoco = null;
 let volverA = null;
 
@@ -18,7 +18,7 @@ function resultados(lista, texto) {
     <ul class="wk-buscador__lista">${hallados.slice(0, 6).map((pz) => `
       <li><a href="${hrefPieza(pz)}" data-link>
         <span class="wk-buscador__arte">${arte(pz, { ancho: 320, sizes: '64px' })}</span>
-        <span><strong>${esc(pz.name)}</strong><small>${esc([pz.type, pz.species, pz.isUnique ? 'Pieza única' : ''].filter(Boolean).join(' · '))}</small></span>
+        <span><strong>${esc(pz.name)}</strong><small>${esc([pz.type, pz.especieTexto, pz.isUnique ? 'Pieza única' : ''].filter(Boolean).join(' · '))}</small></span>
         <em>${pz.available ? precio(pz) : 'Ya encontró hogar'}</em>
       </a></li>`).join('')}</ul>
     ${hallados.length > 6 ? `<a class="wk-enlace" href="/tienda?q=${encodeURIComponent(texto)}" data-link>Ver los ${hallados.length} resultados ${flecha}</a>` : ''}`;
