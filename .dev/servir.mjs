@@ -17,7 +17,11 @@ createServer(async (req, res) => {
   if (camino.startsWith('api')) { res.writeHead(404).end(); return; }
   try {
     // Las rutas sin extensión (/tienda, /producto/bjorn) devuelven index.html, igual que en la plataforma
-    const cuerpo = await readFile(join(raiz, ext ? camino : 'index.html'));
+    // Carpeta con su propio index.html (walkiver/): se sirve esa página; si no, la de la web
+    let archivo = ext ? camino : 'index.html';
+    if (!ext && camino) { try { await readFile(join(raiz, camino, 'index.html')); archivo = join(camino, 'index.html'); } catch { /* ruta de la web */ } }
+    if (!ext && camino && archivo !== 'index.html' && !req.url.split('?')[0].endsWith('/')) { res.writeHead(301, { Location: `${req.url.split('?')[0]}/` }).end(); return; }
+    const cuerpo = await readFile(join(raiz, archivo));
     res.writeHead(200, { 'Content-Type': TIPOS[ext || '.html'] ?? 'application/octet-stream', 'Cache-Control': 'no-store' }).end(cuerpo);
   } catch {
     res.writeHead(404).end('No encontrado');

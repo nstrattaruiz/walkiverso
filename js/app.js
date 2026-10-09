@@ -2,10 +2,10 @@
 // Rutas: /  ·  /tienda  ·  /categoria/:handle  ·  /producto/:handle  ·  /cursos  ·  /curso/:slug  ·  /walkiver  ·  /contacto
 //        /favoritos  ·  /checkout  ·  /pedido  ·  /legal/:tipo  ·  /cuenta (módulo Cuentas de clientes)  ·  /walkurio (oculta: ver config.js)
 import { tienda, esDemo } from './datos/tienda.js';
-import { $, app, esc, estado, flecha, titular, rutaWeb, url } from './ui/util.js';
+import { $, app, esc, estado, flecha, ir, titular, rutaWeb, url } from './ui/util.js';
 import { WALKURIO_PUBLICADO } from './config.js';
 import { pintarMenus, pintarHablemos, pintarPie, pintarAviso, pintarCookies, marcarActivo } from './ui/marco.js';
-import { iniciarCarrito } from './ui/carrito.js';
+import { iniciarCarrito, abrirCarrito } from './ui/carrito.js';
 import { iniciarBuscador } from './ui/buscador.js';
 import { iniciarFavoritos, favoritos } from './ui/favoritos.js';
 import { abrirAcceso } from './ui/acceso.js';
@@ -79,6 +79,8 @@ document.addEventListener('click', (e) => {
   if (!a || e.defaultPrevented || e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
   e.preventDefault();
   const href = a.getAttribute('href');
+  // Walkiver (y su e-book) es una página aparte, copiada tal cual en walkiver/: se abre como página nueva
+  if (/^\/walkiver(\/|$|#|\?)/.test(href)) { location.href = url(href === '/walkiver' ? '/walkiver/' : href); return; }
   // Ingresar: ventana emergente, sin salir de la página en la que está el visitante
   if (href === '/cuenta' && estado.info.modules?.accounts && !estado.cliente) { abrirAcceso(); return; }
   const [camino, ancla] = href.split('#');
@@ -95,6 +97,15 @@ document.addEventListener('click', (e) => {
 let rutaActual = '';
 let turno = 0;
 let limpiar = null;
+
+/** /carrito/agregar/somos-mitos-ebook:1 → lleva a la ficha del producto, lo suma al carrito y abre el carrito. */
+async function agregarDesdeEnlace(parte) {
+  const [handle, cant] = decodeURIComponent(parte).split(':');
+  const p = await tienda.productos.uno(handle);
+  ir(`/producto/${encodeURIComponent(p.handle)}`, { reemplazar: true });
+  const variante = p.variants.find((v) => v.available) ?? p.variants[0];
+  try { await tienda.carrito.agregar(variante.id, Math.max(1, Number(cant) || 1)); abrirCarrito(); } catch { /* agotado: queda la ficha, que lo explica */ }
+}
 
 async function ruta() {
   const mio = ++turno;
@@ -116,7 +127,9 @@ async function ruta() {
     else if (seccion === 'producto' && valor) await ficha(valor);
     else if (seccion === 'cursos') await academia();
     else if (seccion === 'curso' && valor) await curso(valor);
-    else if (seccion === 'walkiver') await walkiver();
+    else if (seccion === 'walkiver') { location.replace(url(`/walkiver/${location.hash}`)); return; }
+    // Botón "Comprar" de la página de Walkiver: /carrito/agregar/<producto>:<cantidad> suma al carrito y lo abre
+    else if (seccion === 'carrito' && valor === 'agregar') await agregarDesdeEnlace(rutaWeb().split('/')[3] ?? '');
     else if (seccion === 'walkurio' && WALKURIO_PUBLICADO) walkurio();
     else if (seccion === 'contacto') contacto();
     else if (seccion === 'favoritos') await favoritos();

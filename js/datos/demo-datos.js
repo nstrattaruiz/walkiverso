@@ -31,7 +31,7 @@ function producto(title, { tipo, especie, clase, precio, stock = 1, unica = fals
   };
 }
 
-export const PRODUCTOS = [
+const PRODUCTOS_BASE = [
   ...CATALOGO,
   // ---- E-book y cursos de relleno (digitales: sin stock ni envío). Precios en centésimos de peso uruguayo. ----
   producto('Somos Mitos', { tipo: 'E-book', precio: 59000 }),
@@ -39,6 +39,9 @@ export const PRODUCTOS = [
   producto('Curso 02', { tipo: 'Curso', precio: 360000, extra: { Nivel: 'Intermedio', 'Duración': '10 lecciones' } }),
   producto('Curso 03', { tipo: 'Curso', precio: 480000, extra: { Nivel: 'Avanzado', 'Duración': '14 lecciones' } }),
 ];
+
+// El e-book usa el mismo código que la página de Walkiver (walkiver/plataforma.js)
+export const PRODUCTOS = PRODUCTOS_BASE.map((p) => (p.title === 'Somos Mitos' ? { ...p, handle: 'somos-mitos-ebook' } : p));
 
 const leccion = (i, total) => ({ id: `l${i}`, title: `Lección ${i} · título a definir`, section: i <= total / 2 ? 'Primera parte' : 'Segunda parte', locked: i > 1, preview: i === 1, done: false, embedUrl: null, videoUrl: null, html: i === 1 ? '<p>Esta es la vista previa de la primera lección. El contenido del curso se carga en el panel.</p>' : '', resources: [] });
 export const CURSOS = PRODUCTOS.filter((p) => p.type === 'Curso').map((p, i) => {

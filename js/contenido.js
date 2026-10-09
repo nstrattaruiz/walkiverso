@@ -131,7 +131,7 @@ export const WALKIVER = {
   cta: 'Conocer a Walkiver',
   titulo: 'Detrás de este universo creativo hay <em>un artista</em>',
   texto: 'Conocé a Walkiver, explorá sus videos mitológicos y adquirí su ebook “Somos Mitos” para comenzar a entender estas historias.',
-  ebookHandle: 'somos-mitos',   // handle del producto del e-book en el panel
+  ebookHandle: 'somos-mitos-ebook',   // handle del producto del e-book en el panel
   imagen: '',                   // retrato de Walkiver (ver LEEME.md)
   // Página /walkiver. PROVISORIO: reemplazar por la biografía real.
   bio: [
