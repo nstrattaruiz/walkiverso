@@ -89,7 +89,8 @@ export async function curso(slug, abierta) {
           </div>` : ''}
           <div class="wk-prosa">${c.description ?? ''}</div>
           ${actual ? `<h2 class="wk-titulo wk-titulo--s">${esc(actual.title)}</h2>
-            ${actual.embedUrl ? `<div class="wk-video"><iframe src="${esc(actual.embedUrl)}" title="${esc(actual.title)}" allow="accelerometer; encrypted-media; picture-in-picture; fullscreen" allowfullscreen loading="lazy"></iframe></div>`
+            ${actual.video && tienda.cursos.reproductor ? '<div class="wk-video wk-video--leccion" id="leccion-video"></div>'
+              : actual.embedUrl ? `<div class="wk-video"><iframe src="${esc(actual.embedUrl)}" title="${esc(actual.title)}" allow="accelerometer; encrypted-media; picture-in-picture; fullscreen" allowfullscreen loading="lazy"></iframe></div>`
               : actual.videoUrl ? `<p><a class="wk-btn wk-btn--tinta" href="${esc(actual.videoUrl)}" target="_blank" rel="noopener">Ver el video</a></p>` : ''}
             <div class="wk-prosa">${actual.html || ''}</div>
             ${actual.resources?.length ? `<p class="wk-botones">${actual.resources.map((r) => `<a class="wk-btn wk-btn--linea" href="${esc(r.url)}" target="_blank" rel="noopener">${esc(r.label)}</a>`).join('')}</p>` : ''}
@@ -103,7 +104,9 @@ export async function curso(slug, abierta) {
         </nav>
       </div>
     </section>`;
-  $$('[data-leccion]').forEach((b) => b.addEventListener('click', () => { curso(slug, b.dataset.leccion); window.scrollTo(0, 0); }));
+  // Reproductor protegido de la plataforma: ningún clic lleva a YouTube y al darle play se abre en pantalla grande dentro de la web
+  if (actual?.video && tienda.cursos.reproductor) tienda.cursos.reproductor($('#leccion-video'), actual, { color: estado.info.colors?.primary, grande: true });
+  $('[data-leccion]').forEach((b) => b.addEventListener('click', () => { curso(slug, b.dataset.leccion); window.scrollTo(0, 0); }));
   $('#vista')?.addEventListener('click', async () => {
     await tienda.cursos.avance(slug, actual.id, !actual.done);
     const sig = c.lessons[c.lessons.findIndex((l) => l.id === actual.id) + 1];
