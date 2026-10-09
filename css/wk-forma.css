@@ -878,3 +878,27 @@ html.wk-sin-carga .wk-carga { display: none; }
 /* El hero y la cinta llenan juntos la primera pantalla (antes el hero tenía tope de 780 px y en pantallas altas sobraba blanco) */
 .wk-hero { min-height: clamp(520px, calc(100svh - 76px), 1200px); }
 @media (max-width: 749px) { .wk-hero { min-height: clamp(520px, calc(100svh - 72px), 900px); } }
+
+/* =========================================================
+   Ficha: el bloque de compra (precio, estado, botón, favorito y garantías) agrupado en una tarjeta
+   ========================================================= */
+.wk-ficha__info { gap: 14px; }
+.wk-ficha__info > .wk-titulo { margin-top: 2px; }
+.wk-ficha__compra { display: grid; gap: 16px; margin-block: 10px 6px; padding: clamp(18px, 2.2vw, 30px); border-radius: 26px; background: var(--white-soft); }
+.wk-ficha__cabeza { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 16px; }
+.wk-ficha__precio { font-size: clamp(1.9rem, 3vw, 2.5rem); line-height: 1; }
+.wk-ficha__estado { margin: 0; padding: 8px 14px 8px 12px; border-radius: 999px; background: var(--white); color: var(--fg); font-size: 0.86rem; font-weight: 600; }
+.wk-ficha__accion { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; align-items: center; }
+.wk-fav--ficha { width: 58px; height: 58px; background: var(--white); border-color: transparent; }
+.wk-fav--ficha svg { width: 22px; height: 22px; }
+.wk-ficha__compra .wk-error:empty { display: none; }
+.wk-ficha__compra .wk-ficha__hogar { padding: 0; background: none; }
+.wk-ficha__garantias { list-style: none; margin: 0; padding: 16px 0 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; border-top: 1px solid var(--linea); font-size: 0.84rem; line-height: 1.3; color: var(--fg-2); }
+.wk-ficha__garantias li, .wk-ficha__garantias button { display: flex; align-items: center; gap: 10px; }
+.wk-ficha__garantias button { padding: 0; border: 0; background: none; color: inherit; font: inherit; text-align: left; text-decoration: underline; text-underline-offset: 3px; }
+.wk-ficha__garantias button:hover { color: var(--fg); }
+.wk-ficha__garantias svg { flex: none; width: 22px; height: 22px; color: var(--acento); }
+@media (max-width: 599px) { .wk-ficha__garantias { grid-template-columns: 1fr; } }
+/* En celular las raíces de las páginas interiores son chicas y tenues (si no, las dos se encuentran en el medio y tapan) */
+@media (max-width: 749px) { .wk-tienda > .wk-raiz, .wk-pagina > .wk-raiz { top: 84px; height: 220px; opacity: 0.18; } }
+.wk-ficha__accion:not(:has(.wk-fav)) { grid-template-columns: minmax(0, 1fr); }

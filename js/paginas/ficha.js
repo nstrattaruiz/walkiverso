@@ -52,15 +52,21 @@ export async function ficha(handle) {
         <div class="wk-ficha__info">
           <nav class="wk-migas" aria-label="Estás en"><a href="/tienda" data-link>Tienda</a><span aria-hidden="true">/</span><a href="${volver}" data-link>${esc(pz.tipo === 'criatura' ? 'Criaturas' : pz.tipo === 'artefacto' ? 'Artefactos' : 'Academia')}</a></nav>
           <div class="wk-ficha__insignias">${insignia(pz, { conWalkiverso: true })}</div>
-          <div class="wk-ficha__titulo"><h1 class="wk-titulo">${esc(pz.name)}</h1>${esObra ? corazon(pz, 'wk-fav--ficha') : ''}</div>
+          <h1 class="wk-titulo">${esc(pz.name)}</h1>
           ${meta.length ? `<p class="wk-ficha__meta">${meta.map((m, i) => `<span${i ? ' class="wk-ficha__tecnica"' : ''}>${esc(m)}</span>`).join('')}</p>` : ''}
 
+          <div class="wk-ficha__compra">
           ${pz.available ? `
-            <p class="wk-ficha__precio" id="precio"></p>
-            <p class="wk-ficha__estado"><i aria-hidden="true"></i><span id="estado"></span></p>
+            <div class="wk-ficha__cabeza">
+              <p class="wk-ficha__precio" id="precio"></p>
+              <p class="wk-ficha__estado"><i aria-hidden="true"></i><span id="estado"></span></p>
+            </div>
             ${p.options.map((o, i) => `<div class="wk-opcion"><strong>${esc(o.name)}</strong>
               <div data-opcion="${i}">${o.values.map((v) => `<button type="button" class="wk-chip${o.colors?.[v] ? ' wk-chip--color' : ''}" ${o.colors?.[v] ? `style="--color:${esc(o.colors[v])}" title="${esc(v)}" aria-label="${esc(v)}"` : ''} aria-pressed="${v === elegido[i]}" data-valor="${esc(v)}">${o.colors?.[v] ? '' : esc(v)}</button>`).join('')}</div></div>`).join('')}
-            <button type="button" class="wk-btn wk-btn--luz wk-btn--grande wk-btn--ancho" id="agregar">${esc(n.adquirir)}</button>
+            <div class="wk-ficha__accion">
+              <button type="button" class="wk-btn wk-btn--luz wk-btn--grande wk-btn--ancho" id="agregar">${esc(n.adquirir)}</button>
+              ${esObra ? corazon(pz, 'wk-fav--ficha') : ''}
+            </div>
             <p class="wk-error" id="error" role="alert"></p>` : `
             <div class="wk-ficha__hogar">
               <p class="wk-display">${esc(n.hogar)}</p>
@@ -72,8 +78,12 @@ export async function ficha(handle) {
                 <p role="status" class="wk-ok"></p>
               </form>` : ''}
             </div>`}
-
-          ${pz.certificate ? `<button type="button" class="wk-ficha__cert" id="certificado">${icono('i-sello')}<span>Cada obra incluye certificado de autenticidad.</span><b>Ver ${flecha}</b></button>` : ''}
+            ${esObra ? `<ul class="wk-ficha__garantias">
+              <li>${icono('i-pin')}<span>${esc(FICHA.envios)}</span></li>
+              <li><button type="button" id="certificado">${icono('i-sello')}<span>${esc(FICHA.certificado)}</span></button></li>
+              <li>${icono('i-ojo')}<span>${esc(FICHA.taller)}</span></li>
+            </ul>` : ''}
+          </div>
 
           <div class="wk-prosa wk-ficha__descripcion">${pz.description}</div>
 

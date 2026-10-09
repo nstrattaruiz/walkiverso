@@ -884,6 +884,27 @@
    "campos": [
     {
      "sub": null,
+     "clave": "FICHA.envios",
+     "etiqueta": "envios",
+     "tipo": "texto",
+     "valor": "Envíos a todo Uruguay"
+    },
+    {
+     "sub": null,
+     "clave": "FICHA.certificado",
+     "etiqueta": "certificado",
+     "tipo": "texto",
+     "valor": "Certificado de autenticidad"
+    },
+    {
+     "sub": null,
+     "clave": "FICHA.taller",
+     "etiqueta": "taller",
+     "tipo": "texto",
+     "valor": "Hecha a mano en el taller"
+    },
+    {
+     "sub": null,
      "clave": "FICHA.cuidadosTitulo",
      "etiqueta": "Título de cuidados",
      "tipo": "texto",
