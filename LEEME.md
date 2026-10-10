@@ -135,6 +135,15 @@ de noche el sol queda detrás del planeta: borde de luz, luz de luna, más estre
 El botón del cielo (un sol y una luna que giran alrededor de un planetita, abajo a la derecha) lo cambia a mano; si se
 elige lo mismo que marca la hora, vuelve a seguirla. La hora se revisa cada minuto.
 
+**Paisaje de cerca con fotos reales:** el suelo del último nivel mezcla texturas de Poly Haven y ambientCG (CC0)
+según la pendiente, la altura y el paisaje (pasto, roca, nieve, arena, arenisca, grava, playa, hojas). Están en
+`img/walkurio/texturas/` (1024 px, color + altura en el canal alfa) y se bajan recién al entrar al primer paisaje.
+Los paquetes originales quedan en la carpeta `Texturas/` (fuera del repo: pesan 500 MB). Para regenerarlas:
+extraer de cada .zip la imagen `*_diff_*.jpg` y `*_disp_*.png` a una carpeta y correr
+`node .dev/walkurio-texturas.mjs <carpeta>`. El agua tiene olas, reflejo del cielo y destellos. Abajo, el cielo es
+dibujado: azul con nubes de día y, de noche, estrellas que titilan y una vía láctea. Los cielos HDRI de la carpeta
+(1K) no se usan: ampliados a esa vista se pixelaban; con versiones de 4K u 8K se podrían usar.
+
 **Mientras carga:** polvo de estrellas que gira y cae hacia una semilla de luz, donde va a aparecer el planeta. Está
 hecho solo con CSS (transform y opacity), así no se traba mientras el planeta se prepara.
 

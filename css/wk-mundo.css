@@ -98,15 +98,28 @@ body[data-pagina='walkurio'] #pie { display: none; }
   background: linear-gradient(180deg, #fff, var(--blue-glow));
   -webkit-background-clip: text;
   background-clip: text;
-  text-shadow: 0 0 60px color-mix(in srgb, var(--blue-glow) 30%, transparent);
+}
+/* El resplandor va en una capa aparte (una sombra difusa sobre letras tan grandes era cara de pintar y trababa) */
+.wk-mundo__llegada::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: min(80vw, 900px);
+  height: 220px;
+  translate: -50% -50%;
+  background: radial-gradient(ellipse closest-side, color-mix(in srgb, var(--blue-glow) 16%, transparent), transparent);
+  pointer-events: none;
 }
 .wk-mundo.is-llegando:not(.is-cargando) .wk-mundo__llegada { animation: wk-mundo-llegada 4.4s var(--wk-ease) forwards; }
 .wk-mundo.is-cargando .wk-mundo__saltar { display: none; }
+/* Solo transform y opacity: lo mueve la placa de video sin recalcular nada (cambiar el espaciado de letras o el
+   desenfoque en cada cuadro trababa la llegada) */
 @keyframes wk-mundo-llegada {
-  0% { opacity: 0; letter-spacing: 0.6em; filter: blur(10px); }
-  30% { opacity: 1; letter-spacing: 0.32em; filter: blur(0); }
+  0% { opacity: 0; transform: scale(1.18); }
+  30% { opacity: 1; transform: scale(1); }
   65% { opacity: 1; }
-  100% { opacity: 0; letter-spacing: 0.2em; filter: blur(6px); }
+  100% { opacity: 0; transform: scale(0.94); }
 }
 
 /* ---- Panel ---- */
@@ -187,7 +200,7 @@ body[data-pagina='walkurio'] #pie { display: none; }
 
 /* Durante la llegada solo se ve el viaje */
 .wk-mundo :is(.wk-mundo__panel, .wk-mundo__zoom, .wk-mundo__ayuda, .wk-mundo__marcas) { transition: opacity 0.9s var(--wk-ease), translate 0.9s var(--wk-ease); }
-.wk-mundo.is-llegando :is(.wk-mundo__panel, .wk-mundo__zoom, .wk-mundo__ayuda, .wk-mundo__marcas) { opacity: 0; pointer-events: none; }
+.wk-mundo.is-llegando :is(.wk-mundo__panel, .wk-mundo__zoom, .wk-mundo__ayuda, .wk-mundo__marcas) { opacity: 0.001; pointer-events: none; }
 .wk-mundo.is-llegando .wk-mundo__panel { translate: -16px 0; }
 
 /* Sin 3D (navegador sin WebGL): queda el panel para recorrer las zonas */
@@ -324,7 +337,7 @@ body[data-pagina='walkurio'] #pie { display: none; }
   pointer-events: none;
 }
 .wk-mundo__cielo-nota.is-visible { opacity: 1; translate: 0 -50%; }
-.wk-mundo.is-llegando .wk-mundo__cielo { opacity: 0; pointer-events: none; }
+.wk-mundo.is-llegando .wk-mundo__cielo { opacity: 0.001; pointer-events: none; }
 .wk-mundo__cielo { transition: opacity 0.9s var(--wk-ease); }
 .wk-mundo.sin-3d .wk-mundo__cielo { display: none; }
 @media (max-width: 899px) {
