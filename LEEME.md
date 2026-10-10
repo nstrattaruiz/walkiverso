@@ -30,7 +30,7 @@ La web detecta sola el SDK (`/api/v1/sdk.js`): si está, usa la tienda; si no, l
 | Archivo | Qué es |
 |---|---|
 | `index.html` | Estructura: firma NS, contenedor de páginas, buscador, carrito, modal, pie |
-| `js/config.js` | **Interruptores**: Walkurio publicado o no, nombres de las características y etiquetas del panel, menú y pie por defecto |
+| `js/config.js` | **Interruptores**: Walkurio en el menú o no, nombres de las características y etiquetas del panel, menú y pie por defecto |
 | `js/contenido.js` | **Textos de fábrica**: hero, secciones, proceso, testimonios, Walkiver, FAQ. El panel puede reemplazarlos (`js/datos/textos.js`) |
 | `js/secciones/reglas.js` | **Qué piezas van en cada sección** de la portada y con qué respaldo |
 | `panel/textos-walkiverso.json` | Lista de textos editables para el panel (generada con `node .dev/esquema.mjs`; los grupos de Walkiver salen de `walkiver/campos.js`, generado con `node .dev/walkiver-campos.mjs`) |
@@ -45,7 +45,7 @@ La web detecta sola el SDK (`/api/v1/sdk.js`): si está, usa la tienda; si no, l
 | `img/` | Logo, ícono (con fondo transparente), favicon y ramas. Los tres SVG originales quedaron en la raíz |
 
 Rutas: `/` · `/tienda` · `/categoria/:handle` · `/producto/:handle` · `/cursos` · `/curso/:slug` · `/walkiver` · `/contacto` ·
-`/checkout` · `/pedido` · `/legal/:tipo` · `/cuenta` (módulo Cuentas) · `/walkurio` (fuera del menú hasta publicarla).
+`/checkout` · `/pedido` · `/legal/:tipo` · `/cuenta` (módulo Cuentas) · `/walkurio` (el planeta).
 
 ## Cómo cargar cada pieza en el panel
 
@@ -87,8 +87,8 @@ en la plataforma los productos se cargan en el panel.
 ## Walkurio: el planeta
 
 `/walkurio` es un planeta en 3D para explorar: se llega desde el espacio, se gira arrastrando, se acerca con la rueda
-o pellizcando y se entra por zonas (y dentro de cada zona, a otras). Se ve entrando con la dirección; en el menú y en
-el pie sigue oculta hasta poner `WALKURIO_PUBLICADO = true` en `js/config.js`.
+o pellizcando y se entra por zonas (y dentro de cada zona, a otras). Está en el menú (`WALKURIO_PUBLICADO = true` en
+`js/config.js`; con `false` se saca del menú y solo se entra con la dirección).
 
 | Archivo | Qué hace |
 |---|---|

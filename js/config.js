@@ -1,8 +1,8 @@
 // Walkiverso · configuración de la web.
 // Acá se prende y apaga lo que la web muestra, y se indica cómo están cargados los productos en el panel.
 
-/** Walkurio: la página existe (/walkurio) pero está oculta. Pasar a true cuando el universo esté listo para publicarse. */
-export const WALKURIO_PUBLICADO = false;
+/** Walkurio (el planeta, /walkurio): con false la página sigue andando con la dirección, pero se saca del menú y del pie. */
+export const WALKURIO_PUBLICADO = true;
 
 /**
  * Cómo lee la web cada pieza desde el panel de la plataforma.
