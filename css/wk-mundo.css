@@ -1,0 +1,217 @@
+/* =========================================================
+   Walkurio · el planeta para explorar (js/paginas/walkurio.js + js/anim/planeta3d.js)
+   Pantalla completa, sin pie: es una experiencia, no una página para leer.
+   ========================================================= */
+
+body[data-pagina='walkurio'] #pie { display: none; }
+
+.wk-mundo {
+  position: relative;
+  height: 100svh;
+  min-height: 560px;
+  overflow: hidden;
+  color: var(--white);
+  background:
+    radial-gradient(ellipse 70% 60% at 62% 44%, color-mix(in srgb, var(--blue-dark) 70%, transparent), transparent 70%),
+    radial-gradient(ellipse 50% 40% at 15% 90%, color-mix(in srgb, var(--blue-deep) 80%, transparent), transparent 70%),
+    #01060F;
+}
+
+.wk-mundo__lienzo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  cursor: grab;
+  touch-action: none;
+}
+.wk-mundo__lienzo.is-arrastrando { cursor: grabbing; }
+
+/* ---- Marcas de las zonas sobre el planeta ---- */
+.wk-mundo__marcas { position: absolute; inset: 0; pointer-events: none; transition: opacity 0.5s; }
+.wk-mundo__marcas.is-viajando { opacity: 0; }
+.wk-mundo__marca {
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  translate: -9px -9px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--white);
+  font: 500 0.82rem/1 var(--wk-body);
+  cursor: pointer;
+  pointer-events: auto;
+  will-change: transform, opacity;
+}
+.wk-mundo__marca.is-oculta { pointer-events: none; }
+.wk-mundo__punto {
+  position: relative;
+  width: 18px;
+  height: 18px;
+  flex: none;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff 0 3px, color-mix(in srgb, var(--blue-glow) 55%, transparent) 4px 6px, transparent 7px);
+}
+.wk-mundo__punto::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1px solid var(--blue-glow);
+  animation: wk-mundo-pulso 2.6s ease-out infinite;
+}
+@keyframes wk-mundo-pulso { from { scale: 0.5; opacity: 1; } to { scale: 2.2; opacity: 0; } }
+.wk-mundo__nombre {
+  padding: 7px 12px;
+  border-radius: 999px;
+  white-space: nowrap;
+  background: color-mix(in srgb, var(--blue-night) 62%, transparent);
+  border: 1px solid color-mix(in srgb, var(--blue-glow) 22%, transparent);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  transition: background 0.25s, border-color 0.25s;
+}
+.wk-mundo__marca:hover .wk-mundo__nombre,
+.wk-mundo__marca:focus-visible .wk-mundo__nombre { background: var(--blue-mid); border-color: var(--blue-glow); }
+
+/* ---- Llegada ---- */
+.wk-mundo__llegada {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  margin: 0;
+  pointer-events: none;
+  font: 700 clamp(2.6rem, 9vw, 7.5rem)/1 var(--wk-titulo);
+  letter-spacing: 0.32em;
+  text-indent: 0.32em;
+  text-transform: uppercase;
+  color: transparent;
+  opacity: 0;
+}
+.wk-mundo__llegada span {
+  background: linear-gradient(180deg, #fff, var(--blue-glow));
+  -webkit-background-clip: text;
+  background-clip: text;
+  text-shadow: 0 0 60px color-mix(in srgb, var(--blue-glow) 30%, transparent);
+}
+.wk-mundo.is-llegando .wk-mundo__llegada { animation: wk-mundo-llegada 4.4s var(--wk-ease) forwards; }
+@keyframes wk-mundo-llegada {
+  0% { opacity: 0; letter-spacing: 0.6em; filter: blur(10px); }
+  30% { opacity: 1; letter-spacing: 0.32em; filter: blur(0); }
+  65% { opacity: 1; }
+  100% { opacity: 0; letter-spacing: 0.2em; filter: blur(6px); }
+}
+
+/* ---- Panel ---- */
+.wk-mundo__panel {
+  position: absolute;
+  z-index: 2;
+  left: var(--wk-x);
+  top: 108px;
+  width: min(380px, 32vw);
+  max-height: calc(100% - 132px);
+  overflow: auto;
+  overscroll-behavior: contain;
+  padding: 24px;
+  border-radius: 24px;
+  background: color-mix(in srgb, var(--blue-night) 70%, transparent);
+  border: 1px solid color-mix(in srgb, var(--blue-glow) 16%, transparent);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  scrollbar-width: thin;
+}
+.wk-mundo__migas ol { display: flex; flex-wrap: wrap; gap: 4px 6px; margin: 0 0 14px; padding: 0; list-style: none; font-size: 0.78rem; color: var(--white-muted); }
+.wk-mundo__migas li + li::before { content: '›'; margin-right: 6px; opacity: 0.6; }
+.wk-mundo__migas button { padding: 0; border: 0; background: none; color: var(--blue-glow); font: inherit; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+.wk-mundo__titulo { margin: 0; font: 700 clamp(1.7rem, 2.4vw, 2.3rem)/1.05 var(--wk-titulo); letter-spacing: -0.01em; outline: none; }
+.wk-mundo__datos { display: flex; flex-wrap: wrap; gap: 6px; margin: 12px 0 0; }
+.wk-mundo__datos span { padding: 5px 10px; border-radius: 999px; font-size: 0.75rem; background: color-mix(in srgb, var(--blue-mid) 45%, transparent); }
+.wk-mundo__datos .is-provisorio { background: none; border: 1px dashed color-mix(in srgb, var(--blue-glow) 60%, transparent); color: var(--blue-glow); }
+.wk-mundo__texto { margin: 12px 0 0; color: var(--white-muted); line-height: 1.55; font-size: 0.95rem; }
+.wk-mundo__sub { margin: 22px 0 10px; font: 600 0.72rem/1 var(--wk-body); letter-spacing: 0.14em; text-transform: uppercase; color: var(--blue-glow); }
+.wk-mundo__lista { display: grid; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.wk-mundo__lista button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  padding: 11px 14px;
+  border-radius: 14px;
+  border: 1px solid color-mix(in srgb, var(--blue-glow) 14%, transparent);
+  background: color-mix(in srgb, var(--blue-dark) 50%, transparent);
+  color: var(--white);
+  font: 500 0.92rem/1.2 var(--wk-body);
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+.wk-mundo__lista button:hover { background: var(--blue-mid); border-color: var(--blue-glow); }
+.wk-mundo__lista small { flex: none; font-size: 0.72rem; color: var(--white-muted); }
+.wk-mundo__pronto { margin: 18px 0 0; padding: 12px 14px; border-radius: 14px; border: 1px dashed color-mix(in srgb, var(--blue-glow) 30%, transparent); font-size: 0.86rem; color: var(--white-muted); }
+.wk-mundo__volver { margin-top: 18px; padding: 0; border: 0; background: none; color: var(--blue-glow); font: 500 0.88rem/1.4 var(--wk-body); cursor: pointer; }
+.wk-mundo__volver:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+/* ---- Controles y ayuda ---- */
+.wk-mundo__zoom { position: absolute; z-index: 2; right: var(--wk-x); bottom: 28px; display: grid; gap: 8px; }
+.wk-mundo__zoom button, .wk-mundo__saltar {
+  border: 1px solid color-mix(in srgb, var(--blue-glow) 22%, transparent);
+  background: color-mix(in srgb, var(--blue-night) 60%, transparent);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  color: var(--white);
+  cursor: pointer;
+}
+.wk-mundo__zoom button { width: 46px; height: 46px; border-radius: 50%; font: 400 1.4rem/1 var(--wk-body); }
+.wk-mundo__zoom button:hover, .wk-mundo__saltar:hover { background: var(--blue-mid); }
+.wk-mundo__ayuda {
+  position: absolute;
+  left: calc(min(380px, 32vw) + var(--wk-x));
+  right: 0;
+  bottom: 30px;
+  margin: 0;
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--white-muted);
+  opacity: 0.75;
+  pointer-events: none;
+}
+.wk-mundo__saltar { position: absolute; z-index: 3; right: var(--wk-x); bottom: 28px; padding: 10px 18px; border-radius: 999px; font: 500 0.85rem/1 var(--wk-body); }
+
+/* Durante la llegada solo se ve el viaje */
+.wk-mundo :is(.wk-mundo__panel, .wk-mundo__zoom, .wk-mundo__ayuda, .wk-mundo__marcas) { transition: opacity 0.9s var(--wk-ease), translate 0.9s var(--wk-ease); }
+.wk-mundo.is-llegando :is(.wk-mundo__panel, .wk-mundo__zoom, .wk-mundo__ayuda, .wk-mundo__marcas) { opacity: 0; pointer-events: none; }
+.wk-mundo.is-llegando .wk-mundo__panel { translate: -16px 0; }
+
+/* Sin 3D (navegador sin WebGL): queda el panel para recorrer las zonas */
+.wk-mundo.sin-3d :is(.wk-mundo__lienzo, .wk-mundo__marcas, .wk-mundo__zoom, .wk-mundo__ayuda) { display: none; }
+
+@media (max-width: 899px) {
+  .wk-mundo__panel {
+    left: 12px;
+    right: 12px;
+    top: auto;
+    bottom: 12px;
+    width: auto;
+    height: min(42svh, 360px);
+    max-height: none;
+    padding: 18px;
+    border-radius: 20px;
+  }
+  .wk-mundo.is-llegando .wk-mundo__panel { translate: 0 16px; }
+  .wk-mundo__zoom { bottom: calc(min(42svh, 360px) + 24px); right: 12px; }
+  .wk-mundo__zoom button { width: 40px; height: 40px; }
+  .wk-mundo__ayuda { display: none; }
+  .wk-mundo__saltar { right: 50%; translate: 50% 0; }
+  .wk-mundo__nombre { font-size: 0.75rem; padding: 6px 10px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wk-mundo__punto::after { animation: none; }
+}

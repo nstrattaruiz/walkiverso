@@ -40,12 +40,12 @@ La web detecta sola el SDK (`/api/v1/sdk.js`): si está, usa la tienda; si no, l
 | `js/datos/demo.js`, `demo-datos.js` | Tienda de demostración (solo fuera de la plataforma) |
 | `js/ui/` | `marco` (header, menús, pie, aviso, cookies) · `tarjeta` (product card y grilla) · `carrito` · `buscador` · `piezas` (modal y FAQ) · `util` |
 | `js/anim/` | `particulas` (hero) · `efectos` (apariciones, parallax con inercia, tarjetas que reaccionan) |
-| `js/paginas/` | `inicio` · `tienda` (grilla + filtros) · `ficha` · `checkout` (3 pasos + pedido) · `academia` (cursos) · `walkiver` (+ Walkurio oculta) · `contacto` (+ legales) · `cuenta` |
+| `js/paginas/` | `inicio` · `tienda` (grilla + filtros) · `ficha` · `checkout` (3 pasos + pedido) · `academia` (cursos) · `walkiver` · `walkurio` (el planeta) · `contacto` (+ legales) · `cuenta` |
 | `css/` | `ns-firma` (firma) · `wk-base` (paleta, temas, botones, formularios) · `wk-inicio` · `wk-tienda` · `wk-paginas` · `wk-forma` (la forma de la marca: barra, bloques, cinta, tipografía; se carga al final) |
 | `img/` | Logo, ícono (con fondo transparente), favicon y ramas. Los tres SVG originales quedaron en la raíz |
 
 Rutas: `/` · `/tienda` · `/categoria/:handle` · `/producto/:handle` · `/cursos` · `/curso/:slug` · `/walkiver` · `/contacto` ·
-`/checkout` · `/pedido` · `/legal/:tipo` · `/cuenta` (módulo Cuentas) · `/walkurio` (oculta).
+`/checkout` · `/pedido` · `/legal/:tipo` · `/cuenta` (módulo Cuentas) · `/walkurio` (fuera del menú hasta publicarla).
 
 ## Cómo cargar cada pieza en el panel
 
@@ -84,11 +84,24 @@ en la plataforma los productos se cargan en el panel.
 - No se migraron: 43 productos en la papelera y 1 borrador; clientes, pedidos y usuarios.
 - El e-book y los tres cursos de la demostración siguen siendo de relleno.
 
-## Walkurio (oculta)
+## Walkurio: el planeta
 
-La ruta `/walkurio`, su lugar en el menú y su columna "Universo" del pie ya existen, pero no se muestran.
-Para publicarla: `WALKURIO_PUBLICADO = true` en `js/config.js` y desarrollar la página en `js/paginas/walkiver.js`.
-No se inventó ningún contenido de Walkurio: el mapa de la portada es abstracto y no nombra regiones.
+`/walkurio` es un planeta en 3D para explorar: se llega desde el espacio, se gira arrastrando, se acerca con la rueda
+o pellizcando y se entra por zonas (y dentro de cada zona, a otras). Se ve entrando con la dirección; en el menú y en
+el pie sigue oculta hasta poner `WALKURIO_PUBLICADO = true` en `js/config.js`.
+
+| Archivo | Qué hace |
+|---|---|
+| `js/datos/walkurio.js` | **Lo que se edita.** `GEOGRAFIA`: continentes, cordilleras, zonas secas y húmedas (en grados). `ZONAS`: nombre, clima, texto, ubicación y zonas de adentro, sin límite de niveles |
+| `js/anim/planeta3d.js` | El planeta: se dibuja solo a partir de la geografía (sin fotos), con relieve, climas, mares, hielo, nubes, atmósfera y estrellas. Al entrar a una zona calcula un "parche" de detalle para que de cerca se vea nítido |
+| `js/paginas/walkurio.js` | La página: llegada, panel con migas, marcas sobre el planeta, teclado (flechas, + y −, Escape para volver) |
+| `css/wk-mundo.css` | Estilos. La página no tiene pie: es pantalla completa |
+
+- La dirección guarda dónde estás: `/walkurio#continente-central/cordillera-central` abre directo esa zona.
+- Los nombres y textos de las zonas son **provisorios** (descriptivos, sacados de la imagen de referencia) y se
+  marcan "Por definir" en la página. Cada zona tiene `provisorio: true`; sacarlo quita la marca.
+- Al cambiar coordenadas: con `node .dev/servir.mjs`, la consola del navegador avisa si una zona cayó en el agua.
+- Sin WebGL (navegadores muy viejos) queda el panel para recorrer las zonas, sin el planeta.
 
 ## Imágenes que faltan
 

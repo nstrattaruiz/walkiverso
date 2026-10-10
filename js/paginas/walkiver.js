@@ -36,20 +36,3 @@ export async function walkiver() {
     </section>` : ''}`;
   aparecer(app);
 }
-
-/**
- * Walkurio. La arquitectura está lista (ruta, menú y pie), pero el contenido se desarrolla más adelante:
- * continentes, regiones, criaturas, historias, mapas y lore. Mientras `WALKURIO_PUBLICADO` sea false,
- * la ruta responde como página inexistente y no aparece en ningún menú.
- */
-export function walkurio() {
-  titular('Walkurio');
-  app.innerHTML = `
-    <section class="wk-noche wk-pagina wk-seccion">
-      <div class="wk-cont wk-vacio">
-        <span class="wk-sobre">Walkurio</span>
-        <h1 class="wk-titulo">Un universo en desarrollo</h1>
-        <p class="wk-bajada">Esta página todavía no tiene contenido.</p>
-      </div>
-    </section>`;
-}

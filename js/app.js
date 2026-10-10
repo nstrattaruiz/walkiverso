@@ -3,7 +3,6 @@
 //        /favoritos  ·  /checkout  ·  /pedido  ·  /legal/:tipo  ·  /cuenta (módulo Cuentas de clientes)  ·  /walkurio (oculta: ver config.js)
 import { tienda, esDemo } from './datos/tienda.js';
 import { $, app, esc, estado, flecha, ir, titular, rutaWeb, url } from './ui/util.js';
-import { WALKURIO_PUBLICADO } from './config.js';
 import { pintarMenus, pintarHablemos, pintarPie, pintarAviso, pintarCookies, marcarActivo } from './ui/marco.js';
 import { iniciarCarrito, abrirCarrito } from './ui/carrito.js';
 import { iniciarBuscador } from './ui/buscador.js';
@@ -17,7 +16,8 @@ import { catalogoPagina } from './paginas/tienda.js';
 import { ficha } from './paginas/ficha.js';
 import { checkout, pedido } from './paginas/checkout.js';
 import { academia, curso } from './paginas/academia.js';
-import { walkiver, walkurio } from './paginas/walkiver.js';
+import { walkiver } from './paginas/walkiver.js';
+import { walkurio } from './paginas/walkurio.js';
 import { contacto, legal } from './paginas/contacto.js';
 import { cuenta } from './paginas/cuenta.js';
 
@@ -118,7 +118,7 @@ async function ruta() {
   marcarActivo();
   document.body.dataset.pagina = seccion ?? 'inicio';
   // La barra es transparente solo sobre páginas que empiezan con un bloque oscuro
-  document.body.dataset.tope = !seccion || seccion === 'tienda' || seccion === 'categoria' ? 'oscuro' : 'claro';
+  document.body.dataset.tope = !seccion || seccion === 'tienda' || seccion === 'walkurio' || seccion === 'categoria' ? 'oscuro' : 'claro';
   let salida = null;
   try {
     if (!seccion) salida = await inicio();
@@ -130,7 +130,8 @@ async function ruta() {
     else if (seccion === 'walkiver') { location.replace(url(`/walkiver/${location.hash}`)); return; }
     // Botón "Comprar" de la página de Walkiver: /carrito/agregar/<producto>:<cantidad> suma al carrito y lo abre
     else if (seccion === 'carrito' && valor === 'agregar') await agregarDesdeEnlace(rutaWeb().split('/')[3] ?? '');
-    else if (seccion === 'walkurio' && WALKURIO_PUBLICADO) walkurio();
+    // Walkurio se ve entrando con la dirección aunque todavía no esté en el menú (WALKURIO_PUBLICADO)
+    else if (seccion === 'walkurio') salida = await walkurio();
     else if (seccion === 'contacto') contacto();
     else if (seccion === 'favoritos') await favoritos();
     else if (seccion === 'legal' && valor) await legal(valor);
