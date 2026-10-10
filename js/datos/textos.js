@@ -18,6 +18,7 @@ export const GRUPOS = {
   WALKIVER: 'Walkiver',
   DESEO: 'Pedile un deseo',
   ACADEMIA: 'Academia y cursos',
+  WALKURIO: 'Walkurio · Planeta y zonas',
   FICHA: 'Ficha de producto',
   FAQ: 'Pie · Dudas frecuentes',
   PIE: 'Pie',
@@ -33,10 +34,13 @@ const ETIQUETAS = {
   eligio: 'Texto del elegido', verTodos: 'Botón "ver todos"', criaturas: 'Criaturas', artefactos: 'Artefactos', destacadas: 'No las dejes escapar',
   buscadas: 'Los más buscados', ultimas: 'Las últimas en llegar', universo: 'Dónde las criaturas cobran vida', diferencia: 'Una criatura / Un artefacto',
   tienda: 'Página de tienda', cuidadosTitulo: 'Título de cuidados', envios: 'Garantía: envíos', pagos: 'Garantía: pagos', taller: 'Garantía: taller', certificado: 'Fila del certificado', cuidados: 'Cuidados', CINTA: 'Frases',
+  ayuda: 'Ayuda de los controles', zonas: 'Zonas del planeta y las lunas', id: 'Identificador (sin espacios ni tildes)', dentro: 'Está dentro de (identificador; vacío = primer nivel)',
+  cuerpo: 'Dónde (planeta, luna-1 o luna-2)', clima: 'Clima', lat: 'Latitud (grados)', lon: 'Longitud (grados)', productos: 'Productos (handles separados por comas)',
+  enlaceTexto: 'Texto del enlace', enlaceUrl: 'Enlace (dirección)',
 };
 /** Campos que son del código y no se ofrecen en el panel. */
 const TECNICOS = new Set(['icono', 'href', 'especie', 'ebookHandle', 'ejemplo']);
-const tipoDe = (clave, valor) => (/^(imagen|poster|video|url|enlace)$/.test(clave) ? 'ruta' : clave === 'titulo' ? 'titulo' : clave === 'a' ? 'parrafos' : String(valor).length > 90 ? 'texto-largo' : 'texto');
+const tipoDe = (clave, valor) => (/^(imagen|poster|video|url|enlace|enlaceUrl)$/.test(clave) ? 'ruta' : clave === 'titulo' ? 'titulo' : clave === 'a' ? 'parrafos' : String(valor).length > 90 ? 'texto-largo' : 'texto');
 
 // ---------------------------------------------------------------- marcas simples ↔ HTML
 // En el panel se escribe texto con dos marcas: *cursiva* (énfasis en títulos) y **negrita**; en las respuestas,

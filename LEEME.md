@@ -86,22 +86,44 @@ en la plataforma los productos se cargan en el panel.
 
 ## Walkurio: el planeta
 
-`/walkurio` es un planeta en 3D para explorar: se llega desde el espacio, se gira arrastrando, se acerca con la rueda
-o pellizcando y se entra por zonas (y dentro de cada zona, a otras). Está en el menú (`WALKURIO_PUBLICADO = true` en
-`js/config.js`; con `false` se saca del menú y solo se entra con la dirección).
+`/walkurio` es un planeta en 3D con dos lunas: se llega desde el espacio, se gira arrastrando, se acerca con la rueda
+o pellizcando y se entra por zonas (y dentro de cada zona, a otras), también en las lunas. Está en el menú
+(`WALKURIO_PUBLICADO = true` en `js/config.js`; con `false` se saca del menú y solo se entra con la dirección).
 
 | Archivo | Qué hace |
 |---|---|
-| `js/datos/walkurio.js` | **Lo que se edita.** `GEOGRAFIA`: continentes, cordilleras, zonas secas y húmedas (en grados). `ZONAS`: nombre, clima, texto, ubicación y zonas de adentro, sin límite de niveles |
-| `js/anim/planeta3d.js` | El planeta: se dibuja solo a partir de la geografía (sin fotos), con relieve, climas, mares, hielo, nubes, atmósfera y estrellas. Al entrar a una zona calcula un "parche" de detalle para que de cerca se vea nítido |
-| `js/paginas/walkurio.js` | La página: llegada, panel con migas, marcas sobre el planeta, teclado (flechas, + y −, Escape para volver) |
+| `js/contenido.js` → `WALKURIO` | **Las zonas** (se editan desde el panel, grupo "Walkurio · Planeta y zonas"): nombre, clima, texto, ubicación, en qué cuerpo están (planeta, `luna-1`, `luna-2`), dentro de qué zona, imagen, productos y enlace |
+| `js/datos/walkurio.js` | Dónde está el mapa y cómo son las lunas (tamaño, órbita, colores). Arma el árbol de zonas |
+| `img/walkurio/` | La superficie: `tierra.webp` (color) y `campos.webp` (tierra/agua, montañas, hielo). Las arma `.dev/walkurio-mapa.mjs` |
+| `js/anim/planeta3d.js` | El 3D: planeta (relieve, mares, hielo, nubes, atmósfera), lunas con cráteres, estrellas, cámara y viajes |
+| `js/paginas/walkurio.js` | La página: carga, llegada, panel con migas, marcas, productos de cada zona, teclado (flechas, + y −, Escape) |
 | `css/wk-mundo.css` | Estilos. La página no tiene pie: es pantalla completa |
 
-- La dirección guarda dónde estás: `/walkurio#continente-central/cordillera-central` abre directo esa zona.
-- Los nombres y textos de las zonas son **provisorios** (descriptivos, sacados de la imagen de referencia) y se
-  marcan "Por definir" en la página. Cada zona tiene `provisorio: true`; sacarlo quita la marca.
-- Al cambiar coordenadas: con `node .dev/servir.mjs`, la consola del navegador avisa si una zona cayó en el agua.
-- Sin WebGL (navegadores muy viejos) queda el panel para recorrer las zonas, sin el planeta.
+**La superficie** sale del mapa plano de la lámina de referencia de Nico (`walkurio-referencia.png` en la carpeta,
+fuera del repo). El mapa de esa lámina es chico (unos 1027×415 px), así que se usa como guía de la geografía y el
+color, y el planeta le agrega relieve y detalle fino (de cerca, cada zona se calcula aparte para que se vea nítida).
+Las nubes pintadas en el mapa se quitan; el planeta tiene su propia capa de nubes. Para regenerar:
+
+    node .dev/walkurio-mapa.mjs walkurio-referencia.png 14 35 1027 415
+
+Si llega el mapa real (4096×2048, solo el mapa): `node .dev/walkurio-mapa.mjs mapa.jpg` y el planeta cambia solo.
+
+**Las zonas:**
+- Cada zona necesita `id` (sin espacios ni tildes: va en la dirección, `/walkurio#continente-central/cordillera-central`),
+  `nombre`, y `lat`/`lon` en grados. `dentro` es el `id` de la zona que la contiene (vacío = primer nivel).
+- Una luna entera es una zona de primer nivel con `cuerpo` = `luna-1` o `luna-2` y sin `lat`/`lon`. Sus regiones van
+  `dentro` de ella, con `lat`/`lon` sobre la luna.
+- **Para saber las coordenadas de un lugar:** abrir `/walkurio?ubicar` y tocar el planeta o una luna. Muestra la
+  latitud y la longitud y las copia.
+- `productos`: los handles de los productos separados por comas (el handle es lo que va en `/producto/…`). Se muestran
+  en la zona con foto y precio. Es opcional.
+- `imagen` y `enlace` (texto y dirección) también son opcionales.
+- Mientras el texto de una zona esté vacío o diga "a definir" / "por definir", la zona muestra la marca "Por definir".
+- Los nombres de fábrica son **provisorios** (descriptivos, sacados del mapa). Con `node .dev/servir.mjs`, la consola
+  del navegador avisa si una zona del planeta cayó en el agua.
+- La plataforma acepta hasta 60 zonas y 12 campos por zona.
+
+Sin WebGL (navegadores muy viejos) queda el panel para recorrer las zonas, sin el planeta.
 
 ## Fotos livianas
 

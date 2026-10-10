@@ -177,3 +177,51 @@ export const FAQ = {
 };
 
 export const PIE = { lema: 'Arte, Magia y Folklore.' };
+
+/**
+ * Walkurio: el planeta y sus dos lunas (js/paginas/walkurio.js). Las zonas se editan desde el panel ("Walkurio · Zonas").
+ * Cada zona: id (sin espacios, va en la dirección), dentro (id de la zona que la contiene; vacío = primer nivel),
+ * cuerpo (planeta, luna-1 o luna-2), lat y lon en grados (vacías en una luna entera), productos (handles separados
+ * por comas: se muestran en la zona) y enlace opcional. Mientras el texto esté vacío o diga "a definir", la zona
+ * muestra la marca "Por definir".
+ * Para saber las coordenadas de un lugar: abrir /walkurio?ubicar y tocar el planeta.
+ * Nombres y textos PROVISORIOS (descriptivos, sacados del mapa de referencia): Walkiver los reemplaza.
+ */
+const zona = (id, dentro, nombre, clima, lat, lon, texto = 'Texto a definir por Walkiver.', cuerpo = 'planeta') =>
+  ({ id, dentro, cuerpo, nombre, clima, texto, lat: String(lat), lon: String(lon), imagen: '', productos: '', enlaceTexto: '', enlaceUrl: '' });
+export const WALKURIO = {
+  titulo: 'Walkurio',
+  texto: 'Un planeta para explorar. Giralo, acercate y elegí una zona para entrar.',
+  ayuda: 'Arrastrá para girar · Rueda o pellizco para acercarte · Tocá una zona para entrar',
+  zonas: [
+    zona('continente-central', '', 'Continente central', 'Templado', 16, -14, 'Bosques al norte, llanuras secas al oeste y una cordillera que lo cruza en diagonal. Texto a definir por Walkiver.'),
+    zona('bosques-del-norte', 'continente-central', 'Bosques del norte', 'Húmedo', 26, -30),
+    zona('cordillera-central', 'continente-central', 'Cordillera central', 'Frío de altura', 12, -2),
+    zona('llanuras-secas', 'continente-central', 'Llanuras secas', 'Árido', 6, -45),
+    zona('tierras-del-este', 'continente-central', 'Tierras del este', 'Templado', 6, 20),
+    zona('continente-del-sur', '', 'Continente del sur', 'Árido y selvático', -28, -12, 'Desierto de roca al oeste y selva cerrada al este. Texto a definir por Walkiver.'),
+    zona('desierto-de-roca', 'continente-del-sur', 'Desierto de roca', 'Árido', -22, -40),
+    zona('selvas-del-este', 'continente-del-sur', 'Selvas del este', 'Húmedo', -34, 8),
+    zona('costa-sur', 'continente-del-sur', 'Costa sur', 'Templado', -44, -14),
+    zona('isla-del-este', '', 'Isla del este', 'Húmedo', -8, 56, 'Una isla larga con una sierra en su costa este. Texto a definir por Walkiver.'),
+    zona('sierra-de-la-isla', 'isla-del-este', 'Sierra de la isla', 'Frío de altura', -8, 62),
+    zona('valles-de-la-isla', 'isla-del-este', 'Valles de la isla', 'Húmedo', -3, 55),
+    zona('gran-cordillera', '', 'Gran cordillera del oeste', 'Seco y frío', 5, -112, 'Un continente atravesado de norte a sur por montañas. Texto a definir por Walkiver.'),
+    zona('las-cumbres', 'gran-cordillera', 'Las cumbres', 'Helado', 15, -104),
+    zona('desierto-alto', 'gran-cordillera', 'Desierto alto', 'Árido', 18, -128),
+    zona('costa-verde', 'gran-cordillera', 'Costa verde', 'Húmedo', -18, -150),
+    zona('tierras-del-norte', '', 'Tierras del norte', 'Frío', 50, 10, 'Bosques fríos y montañas que se pierden en el hielo. Texto a definir por Walkiver.'),
+    zona('bosques-frios', 'tierras-del-norte', 'Bosques fríos', 'Frío', 44, 22),
+    zona('montanas-del-norte', 'tierras-del-norte', 'Montañas del norte', 'Helado', 62, 5),
+    zona('islas-del-noreste', '', 'Islas del noreste', 'Templado', 31, 127, 'Islas grandes con una sierra en el medio. Texto a definir por Walkiver.'),
+    zona('sierra-del-noreste', 'islas-del-noreste', 'Sierra del noreste', 'Frío de altura', 32, 124),
+    zona('costas-del-noreste', 'islas-del-noreste', 'Costas del noreste', 'Templado', 40, 116),
+    zona('tierras-del-sur', '', 'Tierras del sur', 'Helado', -74, -43, 'Montañas y glaciares en el fondo del mundo. Texto a definir por Walkiver.'),
+    zona('montanas-del-sur', 'tierras-del-sur', 'Montañas del sur', 'Helado', -62, -70),
+    zona('glaciares', 'tierras-del-sur', 'Glaciares', 'Helado', -75, 11),
+    zona('luna-mayor', '', 'Luna mayor', 'Sin aire', '', '', 'La más grande de las dos lunas de Walkurio. Texto a definir por Walkiver.', 'luna-1'),
+    zona('region-luna-mayor', 'luna-mayor', 'Región de la luna mayor', 'Sin aire', 18, 0, 'Texto a definir por Walkiver.', 'luna-1'),
+    zona('luna-menor', '', 'Luna menor', 'Helado', '', '', 'La más chica, cubierta de hielo. Texto a definir por Walkiver.', 'luna-2'),
+    zona('region-luna-menor', 'luna-menor', 'Región de la luna menor', 'Helado', -10, 20, 'Región por definir en la luna menor: Walkiver decide qué hay acá, qué la hace distinta y quién la habita.', 'luna-2'),
+  ],
+};

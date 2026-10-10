@@ -100,7 +100,8 @@ body[data-pagina='walkurio'] #pie { display: none; }
   background-clip: text;
   text-shadow: 0 0 60px color-mix(in srgb, var(--blue-glow) 30%, transparent);
 }
-.wk-mundo.is-llegando .wk-mundo__llegada { animation: wk-mundo-llegada 4.4s var(--wk-ease) forwards; }
+.wk-mundo.is-llegando:not(.is-cargando) .wk-mundo__llegada { animation: wk-mundo-llegada 4.4s var(--wk-ease) forwards; }
+.wk-mundo.is-cargando .wk-mundo__saltar { display: none; }
 @keyframes wk-mundo-llegada {
   0% { opacity: 0; letter-spacing: 0.6em; filter: blur(10px); }
   30% { opacity: 1; letter-spacing: 0.32em; filter: blur(0); }
@@ -215,3 +216,68 @@ body[data-pagina='walkurio'] #pie { display: none; }
 @media (prefers-reduced-motion: reduce) {
   .wk-mundo__punto::after { animation: none; }
 }
+
+/* ---- Carga: mientras se preparan el mapa y las texturas ---- */
+.wk-mundo__carga {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin: 0;
+  font-size: 0.9rem;
+  letter-spacing: 0.04em;
+  color: var(--white-muted);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+.wk-mundo.is-cargando .wk-mundo__carga { opacity: 1; }
+.wk-mundo__carga span { width: 18px; height: 18px; border-radius: 50%; border: 2px solid color-mix(in srgb, var(--blue-glow) 25%, transparent); border-top-color: var(--blue-glow); animation: wk-mundo-gira 0.9s linear infinite; }
+@keyframes wk-mundo-gira { to { rotate: 360deg; } }
+
+/* ---- Modo ubicar (/walkurio?ubicar) ---- */
+.wk-mundo__ubicar {
+  position: absolute;
+  z-index: 3;
+  left: 50%;
+  top: 92px;
+  translate: -50% 0;
+  margin: 0;
+  padding: 10px 16px;
+  max-width: calc(100% - 24px);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--blue-night) 80%, transparent);
+  border: 1px dashed color-mix(in srgb, var(--blue-glow) 50%, transparent);
+  font-size: 0.85rem;
+  text-align: center;
+  color: var(--white);
+}
+.wk-mundo__ubicar small { color: var(--blue-glow); }
+
+/* ---- Lo que puede traer una zona: imagen, enlace y productos ---- */
+.wk-mundo__imagen { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; margin: 0 0 16px; border-radius: 16px; }
+.wk-mundo__enlace { display: inline-flex; align-items: center; gap: 6px; margin-top: 14px; color: var(--blue-glow); font-weight: 600; text-decoration: none; }
+.wk-mundo__enlace:hover { text-decoration: underline; text-underline-offset: 3px; }
+.wk-mundo__piezas { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.wk-mundo__piezas a {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px;
+  border-radius: 14px;
+  border: 1px solid color-mix(in srgb, var(--blue-glow) 14%, transparent);
+  background: color-mix(in srgb, var(--blue-dark) 50%, transparent);
+  color: var(--white);
+  text-decoration: none;
+  transition: background 0.2s, border-color 0.2s;
+}
+.wk-mundo__piezas a:hover { background: var(--blue-mid); border-color: var(--blue-glow); }
+.wk-mundo__pieza-foto { flex: none; width: 56px; height: 56px; overflow: hidden; border-radius: 10px; }
+.wk-mundo__piezas b { display: block; font-weight: 600; font-size: 0.92rem; }
+.wk-mundo__piezas small { color: var(--white-muted); font-size: 0.8rem; }
+
+/* La marca de una luna entera va un poco más arriba, para no tapar la luna */
+.wk-mundo__marca--cuerpo { translate: -9px -34px; }
