@@ -988,17 +988,17 @@ html.wk-sin-carga .wk-carga { display: none; }
   width: 44px;
   height: 44px;
   padding: 0;
-  border: 1px solid rgb(255 255 255 / 0.16);
-  border-radius: 50%;
+  margin-right: -10px;
+  border: 0;
   background: none;
-  color: inherit;
+  color: var(--ns-accent);
   cursor: pointer;
   opacity: 0;
-  transition: opacity 0.4s ease, background-color 0.25s, border-color 0.25s;
+  transition: opacity 0.4s ease, color 0.25s;
 }
 .ns-header.is-open .wk-panel-abrir { opacity: 1; transition-delay: calc(0.08s + var(--i, 0) * 0.05s), 0s, 0s; }
-.wk-panel-abrir:hover { background: rgb(255 255 255 / 0.08); border-color: rgb(255 255 255 / 0.32); }
-.wk-panel-abrir svg { width: 20px; height: 20px; transition: rotate 0.3s var(--wk-ease); }
+.wk-panel-abrir:hover { color: var(--white); }
+.wk-panel-abrir svg { width: 24px; height: 24px; transition: rotate 0.3s var(--wk-ease); }
 .wk-panel-item.is-abierto .wk-panel-abrir svg { rotate: 180deg; }
 .ns-panel__sub {
   grid-column: 1 / -1;
