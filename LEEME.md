@@ -118,10 +118,16 @@ Si llega el mapa real (4096×2048, solo el mapa): `node .dev/walkurio-mapa.mjs m
 - `productos`: los handles de los productos separados por comas (el handle es lo que va en `/producto/…`). Se muestran
   en la zona con foto y precio. Es opcional.
 - `imagen` y `enlace` (texto y dirección) también son opcionales.
+- `paisaje`: cómo se ve de cerca una zona del **último nivel** (una zona sin zonas adentro). Al entrar, la cámara
+  baja casi al suelo mirando al horizonte, el relieve se levanta de verdad y aparecen las cosas del paisaje:
+  `montañas` (cordilleras con nieve y pinos en los valles), `bosque` (pinos), `selva` (árboles de copa redonda),
+  `hielo` (nieve, témpanos e icebergs en el agua), `desierto` (dunas y rocas), `llanura` (pasto y árboles sueltos) o
+  `costa`. Vacío: el planeta lo decide mirando el mapa en ese punto. Se puede escribir con o sin tilde.
 - Mientras el texto de una zona esté vacío o diga "a definir" / "por definir", la zona muestra la marca "Por definir".
 - Los nombres de fábrica son **provisorios** (descriptivos, sacados del mapa). Con `node .dev/servir.mjs`, la consola
   del navegador avisa si una zona del planeta cayó en el agua.
-- La plataforma acepta hasta 60 zonas y 12 campos por zona.
+- La plataforma acepta hasta 60 zonas y 16 campos por zona (con la versión de la plataforma que sube el límite;
+  con la anterior, de 12, el campo que se pierde es el texto del enlace, que queda en "Ver más").
 
 **Día y noche:** Walkurio sigue la hora de quien mira (amanecer y atardecer según la época del año; del lado sur si
 su zona horaria es de Sudamérica, como Uruguay). De día el sol se ve arriba a la izquierda y el planeta está iluminado;

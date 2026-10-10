@@ -112,7 +112,8 @@ Se genera desde `js/contenido.js`, no se escribe a mano. Al agregar o quitar un 
 **Página de Walkiver** (`walkiver/`, copiada tal cual de walkiverso-web): sus textos e imágenes van en los grupos
 "Walkiver · …", con claves `WKV.*`.
 
-**Zonas de Walkurio** (`WALKURIO.zonas`): una lista de 12 campos por zona (el límite de la plataforma). Cómo se
+**Zonas de Walkurio** (`WALKURIO.zonas`): una lista de 13 campos por zona. La plataforma aceptaba 12; se subió a 16 en
+`apps/api/src/content/site-texts.ts` (sin commitear). Mientras no esté publicada, el campo 13 (texto del enlace) se ignora. Cómo se
 llena cada campo, cómo se ubica una zona (`/walkurio?ubicar`) y cómo se le adjuntan productos: en `LEEME.md`, "Walkurio".
  La lista sale de `walkiver/campos.js`, que genera
 `node .dev/walkiver-campos.mjs` leyendo la página en el navegador (con `node .dev/servir.mjs` levantado). Si se toca

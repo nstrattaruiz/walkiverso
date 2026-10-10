@@ -37,6 +37,7 @@ const ETIQUETAS = {
   ayuda: 'Ayuda de los controles', zonas: 'Zonas del planeta y las lunas', id: 'Identificador (sin espacios ni tildes)', dentro: 'Está dentro de (identificador; vacío = primer nivel)',
   cuerpo: 'Dónde (planeta, luna-1 o luna-2)', clima: 'Clima', lat: 'Latitud (grados)', lon: 'Longitud (grados)', productos: 'Productos (handles separados por comas)',
   enlaceTexto: 'Texto del enlace', enlaceUrl: 'Enlace (dirección)',
+  paisaje: 'Paisaje de cerca: montañas, bosque, selva, hielo, desierto, llanura o costa (vacío = según el mapa)',
 };
 /** Campos que son del código y no se ofrecen en el panel. */
 const TECNICOS = new Set(['icono', 'href', 'especie', 'ebookHandle', 'ejemplo']);

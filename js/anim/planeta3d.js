@@ -16,10 +16,14 @@ export const dirDe = (lat, lon, v = new THREE.Vector3()) =>
 
 // Altura de la cámara sobre la superficie (en radios del cuerpo) e inclinación (radianes) en cada nivel de zoom.
 // El nivel 0 (el cuerpo entero) se calcula según la pantalla para que entre completo.
-const ALTURA = [null, 0.95, 0.34, 0.15, 0.08];
-const INCLINA = [0, 0.22, 0.6, 0.92, 1.05];
+const ALTURA = [null, 0.95, 0.34, 0.15, 0.08, 0.075];
+const INCLINA = [0, 0.22, 0.6, 0.92, 1.05, 1.16];
 // Cada zona del planeta tiene su propio horneado de detalle: cuántos grados cubre en cada nivel
-const PARCHE = [null, 46, 17, 8, 4];
+const PARCHE = [null, 46, 17, 8, 4, 18];
+// Paisaje de cerca (nivel 5): cuánto se levanta el relieve (en radios del planeta) y tamaño de árboles, rocas y témpanos
+const NIVEL_PAISAJE = 5;
+const ESCALA_RELIEVE = 0.024;
+const TAM = 0.0032;
 
 // Ruido: se lee de una textura chica de números al azar (texturaRuido) en vez de calcularse. Así los programas quedan
 // chicos y se preparan enseguida: con el ruido calculado, Chrome en Windows tardaba segundos y congelaba la página.
@@ -75,6 +79,7 @@ const HORNO_COMUN = /* glsl */`
 
 const HORNO_PLANETA = /* glsl */`
   uniform float uPaso;
+  uniform float uPaisaje;
   uniform sampler2D uTierra;
   uniform sampler2D uCampos;
   ${HORNO_COMUN}
@@ -96,6 +101,15 @@ const HORNO_PLANETA = /* glsl */`
     e += m * (0.05 + r * 0.6) * smoothstep(-0.02, 0.05, e);
     e += (crestas(p * 26.0) - 0.35) * (0.006 + m * 0.03) * smoothstep(0.0, 0.06, e);
     if (uFino > 0.0) e += ((crestas(p * 70.0) - 0.35) * 0.022 + (crestas(p * 190.0) - 0.35) * 0.008 + snoise(p * 520.0) * 0.003) * smoothstep(0.0, 0.04, e) * (0.5 + c.g);
+    // Paisaje de la zona (solo de cerca): 1 montañas · 2 bosque · 3 selva · 4 hielo · 5 desierto · 6 llanura · 7 costa
+    if (uFino > 0.0 && uPaisaje > 0.5) {
+      float tierra = smoothstep(-0.01, 0.05, e);
+      if (uPaisaje < 1.5) e += ((crestas(p * 34.0) - 0.3) * 0.2 + (crestas(p * 95.0) - 0.35) * 0.05) * tierra;
+      else if (uPaisaje < 3.5) e += (fbm(p * 70.0, 3) * 0.014 + 0.004) * tierra;
+      else if (uPaisaje < 4.5) e = e > 0.0 ? e * 0.7 + fbm(p * 50.0, 3) * 0.012 : e;
+      else if (uPaisaje < 5.5) e += pow(abs(sin(dot(p, vec3(260.0, 90.0, 140.0)) + snoise(p * 40.0) * 2.5)), 3.0) * 0.016 * tierra;
+      else if (uPaisaje < 6.5) e = e > 0.0 ? e * 0.55 + fbm(p * 60.0, 3) * 0.006 : e;
+    }
     return e;
   }
 #endif
@@ -111,6 +125,11 @@ const HORNO_PLANETA = /* glsl */`
     float h2 = max(terreno(normalize(p + t2 * uPaso), w, c), 0.0);
     vec3 n = normalize(p - ((h1 - h0) * t1 + (h2 - h0) * t2) / uPaso * (0.05 + uFino * 0.02));
     gl_FragColor = vec4(n * 0.5 + 0.5, clamp(h0, 0.0, 1.0));
+#elif MODO == 6
+    // Altura del paisaje de cerca (en dos canales, para que el relieve no salga escalonado)
+    vec3 w, c;
+    float h01 = clamp(terreno(p, w, c) * 0.5 + 0.5, 0.0, 0.9999) * 255.0;
+    gl_FragColor = vec4(floor(h01) / 255.0, fract(h01), c.b, 1.0);
 #elif MODO == 2
     // Nubes: remolinos grandes y velos estirados de este a oeste; más en las zonas templadas y frías
     vec3 q = p * 1.7;
@@ -137,6 +156,12 @@ const HORNO_PLANETA = /* glsl */`
       float hielo = smoothstep(0.35, 0.7, c.b + snoise(p * 18.0) * 0.12);
       col = mix(col, vec3(0.86, 0.91, 0.97), hielo);
       agua = 1.0 - hielo;
+      // Hielo de cerca: témpanos chicos flotando entre los grandes
+      if (uFino > 0.0 && abs(uPaisaje - 4.0) < 0.5) {
+        float tem = smoothstep(0.55, 0.6, ruido01(p * 70.0) * 0.7 + ruido01(p * 190.0) * 0.3) * smoothstep(-0.14, -0.01, e);
+        col = mix(col, vec3(0.88, 0.93, 0.98), tem);
+        agua *= 1.0 - tem;
+      }
     } else {
       // Tierra: el color del mapa, con textura fina (bosques en manchas, roca en las montañas) y nieve arriba
       col = texture2D(uTierra, uvMapa(w)).rgb;
@@ -145,6 +170,17 @@ const HORNO_PLANETA = /* glsl */`
       float verde = col.g - max(col.r, col.b);
       col = mix(col, col * vec3(0.72, 0.8, 0.7), smoothstep(0.0, 0.5, snoise(p * 95.0 + 3.0)) * smoothstep(0.0, 0.06, verde));
       col = mix(col, vec3(0.42, 0.35, 0.28), smoothstep(0.3, 0.55, e) * 0.4);
+      if (uFino > 0.0 && uPaisaje > 1.5) {
+        // El color del paisaje elegido, con manchas para que no sea parejo
+        float m = 0.5 + 0.5 * snoise(p * 140.0) * 0.7 + 0.5 * snoise(p * 400.0) * 0.3;
+        vec3 tono = uPaisaje < 2.5 ? mix(vec3(0.06, 0.17, 0.07), vec3(0.15, 0.27, 0.1), m)
+          : uPaisaje < 3.5 ? mix(vec3(0.08, 0.23, 0.06), vec3(0.2, 0.36, 0.1), m)
+          : uPaisaje < 4.5 ? mix(vec3(0.8, 0.87, 0.95), vec3(0.96, 0.98, 1.0), m)
+          : uPaisaje < 5.5 ? mix(vec3(0.7, 0.54, 0.34), vec3(0.86, 0.7, 0.47), m)
+          : uPaisaje < 6.5 ? mix(vec3(0.3, 0.42, 0.16), vec3(0.47, 0.53, 0.23), m)
+          : col;
+        col = mix(col, tono, uPaisaje < 4.5 && uPaisaje > 3.5 ? 0.85 : 0.72);
+      }
       float nieve = max(smoothstep(0.6, 0.7, e + snoise(p * 55.0) * 0.05 + snoise(p * 170.0) * 0.025), smoothstep(0.35, 0.75, c.b + snoise(p * 25.0) * 0.12));
       col = mix(col, vec3(0.93, 0.95, 0.98), nieve);
       col = mix(vec3(0.78, 0.72, 0.55), col, smoothstep(0.0, 0.006, e));
@@ -212,7 +248,7 @@ const ESFERA_VERT = /* glsl */`
 
 const PLANETA_FRAG = /* glsl */`
   uniform sampler2D uColor; uniform sampler2D uNormal; uniform sampler2D uNubes;
-  uniform vec3 uSol; uniform float uGiroNubes; uniform float uDetalle; uniform float uNoche; uniform float uT;
+  uniform vec3 uSol; uniform float uGiroNubes; uniform float uDetalle; uniform float uNoche; uniform float uT; uniform float uNiebla;
   uniform sampler2D uPColor; uniform sampler2D uPNormal; uniform vec4 uParche; uniform float uPPeso;
   varying vec2 vUv; varying vec3 vP; varying vec3 vW;
   ${RUIDO}
@@ -250,6 +286,11 @@ const PLANETA_FRAG = /* glsl */`
     float fr = pow(1.0 - max(dot(P, V), 0.0), 2.6);
     col = mix(col, vec3(0.32, 0.6, 1.0) * (0.12 + 0.9 * dia), fr * 0.7 * (1.0 - 0.45 * uDetalle));
     col = mix(col, col * vec3(0.94, 0.98, 1.06), 0.5);
+    // En el paisaje de cerca, lo lejano se pierde en una bruma azul (como al mirar el horizonte)
+    if (uNiebla > 0.001) {
+      float lejos = length(cameraPosition - vW);
+      col = mix(col, mix(vec3(0.05, 0.08, 0.16), vec3(0.5, 0.66, 0.88), dia) * (0.25 + 0.75 * dia), (1.0 - exp(-lejos * lejos * 55.0)) * uNiebla * 0.85);
+    }
     // Aurora: cortinas de luz suaves cerca de los polos, solo en el lado de noche
     if (uNoche > 0.01) {
       float la = abs(asin(clamp(P.y, -1.0, 1.0)));
@@ -323,6 +364,78 @@ const SOL_FRAG = /* glsl */`
     gl_FragColor = vec4(col, clamp(max(col.r, max(col.g, col.b)), 0.0, 1.0));
   }`;
 
+// Terreno del paisaje de cerca: una malla que cubre el parche y se levanta con la altura horneada (relieve de verdad,
+// con silueta contra el horizonte). En los bordes se hunde bajo la esfera, así empalma sin que se note.
+const TERRENO_VERT = /* glsl */`
+  uniform sampler2D uAltura; uniform vec4 uParche; uniform float uEscala; uniform float uPaso;
+  varying vec2 vUv; varying vec3 vN; varying vec3 vW; varying vec3 vP;
+  vec3 dirParche(vec2 uv) { float la = uParche.x + (uv.y - 0.5) * uParche.z; float lo = uParche.y + (uv.x - 0.5) * uParche.w; return vec3(cos(la) * sin(lo), sin(la), cos(la) * cos(lo)); }
+  float alto(vec2 uv) { vec4 a = texture2D(uAltura, clamp(uv, 0.0, 1.0)); return max((a.r * 255.0 + a.g) / 255.0 * 2.0 - 1.0, 0.0); }
+  vec3 punto(vec2 uv) {
+    float borde = smoothstep(0.0, 0.07, min(min(uv.x, 1.0 - uv.x), min(uv.y, 1.0 - uv.y)));
+    return dirParche(uv) * (1.0 + (alto(uv) * uEscala + 0.0003) * borde - 0.001 * (1.0 - borde));
+  }
+  void main() {
+    vUv = uv;
+    vec3 p = punto(uv);
+    vN = normalize(cross(punto(uv + vec2(uPaso, 0.0)) - punto(uv - vec2(uPaso, 0.0)), punto(uv + vec2(0.0, uPaso)) - punto(uv - vec2(0.0, uPaso))));
+    if (dot(vN, p) < 0.0) vN = -vN;
+    vP = normalize(p);
+    vec4 m = modelMatrix * vec4(p, 1.0);
+    vW = m.xyz;
+    gl_Position = projectionMatrix * viewMatrix * m;
+  }`;
+const TERRENO_FRAG = /* glsl */`
+  uniform sampler2D uPColor; uniform sampler2D uPNormal; uniform vec3 uSol; uniform float uNoche;
+  varying vec2 vUv; varying vec3 vN; varying vec3 vW; varying vec3 vP;
+  void main() {
+    vec4 c = texture2D(uPColor, vUv);
+    vec3 fino = normalize(texture2D(uPNormal, vUv).xyz * 2.0 - 1.0);
+    vec3 n = normalize(vN + (fino - vP) * 0.7);
+    vec3 L = normalize(uSol), V = normalize(cameraPosition - vW);
+    float dg = dot(vP, L), dia = smoothstep(-0.14, 0.28, dg), agua = c.a;
+    float dif = mix(max(dot(n, L), 0.0), max(dg, 0.0) * 0.7 + 0.3, agua);
+    vec3 col = c.rgb * (mix(vec3(0.03, 0.06, 0.13), vec3(0.08, 0.12, 0.21), uNoche) + vec3(1.0, 0.97, 0.92) * dif * 1.2 * dia);
+    col += vec3(0.85, 0.93, 1.0) * pow(max(dot(vP, normalize(L + V)), 0.0), 80.0) * 0.5 * agua * dia;
+    col = mix(col, col * vec3(0.94, 0.98, 1.06), 0.5);
+    float lejos = length(cameraPosition - vW);
+    col = mix(col, mix(vec3(0.05, 0.08, 0.16), vec3(0.5, 0.66, 0.88), dia) * (0.25 + 0.75 * dia), (1.0 - exp(-lejos * lejos * 55.0)) * 0.85);
+    gl_FragColor = vec4(col, 1.0);
+  }`;
+
+/** Une geometrías (sin índices) en una sola, con un color por pieza (tronco, copa). */
+function unir(piezas) {
+  const pos = [], nor = [], col = [];
+  for (const [g, color] of piezas) {
+    let s = g;
+    if (g.index) { g.computeVertexNormals(); s = g.toNonIndexed(); }
+    pos.push(...s.attributes.position.array); nor.push(...s.attributes.normal.array);
+    for (let i = 0; i < s.attributes.position.count; i++) col.push(...color);
+  }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+  g.setAttribute('normal', new THREE.Float32BufferAttribute(nor, 3));
+  g.setAttribute('color', new THREE.Float32BufferAttribute(col, 3));
+  return g;
+}
+/** Una piedra o un témpano: un poliedro con los vértices movidos al azar (siempre igual, con la misma semilla). */
+function irregular(base, cuanto, semilla) {
+  const g = base.toNonIndexed(), p = g.attributes.position, azar = numerosAl(semilla), mov = new Map();
+  for (let i = 0; i < p.count; i++) {
+    const k = [p.getX(i), p.getY(i), p.getZ(i)].map((x) => x.toFixed(3)).join();
+    if (!mov.has(k)) mov.set(k, 1 + (azar() - 0.5) * cuanto);
+    const m = mov.get(k);
+    p.setXYZ(i, p.getX(i) * m, p.getY(i) * m, p.getZ(i) * m);
+  }
+  g.computeVertexNormals();
+  return g;
+}
+/** Números al azar que se repiten con la misma semilla (el mismo bosque cada vez que volvés a la zona). */
+function numerosAl(semilla) {
+  let a = Math.floor(semilla) >>> 0;
+  return () => { a = (a + 0x6D2B79F5) >>> 0; let x = Math.imul(a ^ (a >>> 15), 1 | a); x ^= x + Math.imul(x ^ (x >>> 7), 61 | x); return ((x ^ (x >>> 14)) >>> 0) / 4294967296; };
+}
+
 // Suma luz al color sin tocar la transparencia del lienzo: así el halo y las estrellas no tapan el fondo de la página
 // (los shaders que lo usan devuelven el color ya multiplicado por su transparencia)
 const SUMAR = { blending: THREE.CustomBlending, blendEquation: THREE.AddEquation, blendSrc: THREE.OneFactor, blendDst: THREE.OneFactor, blendSrcAlpha: THREE.OneFactor, blendDstAlpha: THREE.OneFactor };
@@ -381,11 +494,11 @@ export async function crearPlaneta(lienzo, { mapa, lunas = [] }) {
     uPaso: { value: 0.002 }, uParche: { value: new THREE.Vector4() }, uFino: { value: 0 },
     uTierra: { value: null }, uCampos: { value: null },
     uLuna: { value: new THREE.Vector2() }, uClaro: { value: new THREE.Color() }, uOscuro: { value: new THREE.Color() },
-    uAltura: { value: null }, uTexel: { value: new THREE.Vector2() }, uRuido: { value: ruido },
+    uAltura: { value: null }, uTexel: { value: new THREE.Vector2() }, uRuido: { value: ruido }, uPaisaje: { value: 0 },
   };
   const VERT_HORNO = 'varying vec2 vUv; void main() { vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }';
-  const hornos = [0, 1, 2, 3, 4, 5].map((MODO) => new THREE.ShaderMaterial({
-    defines: { MODO }, uniforms: uH, vertexShader: VERT_HORNO, fragmentShader: MODO < 3 ? HORNO_PLANETA : HORNO_LUNA, depthTest: false, depthWrite: false,
+  const hornos = [0, 1, 2, 3, 4, 5, 6].map((MODO) => new THREE.ShaderMaterial({
+    defines: { MODO }, uniforms: uH, vertexShader: VERT_HORNO, fragmentShader: MODO < 3 || MODO === 6 ? HORNO_PLANETA : HORNO_LUNA, depthTest: false, depthWrite: false,
   }));
   const plano = new THREE.PlaneGeometry(2, 2);
   const cuadro2D = new THREE.Mesh(plano, hornos[0]);
@@ -418,7 +531,8 @@ export async function crearPlaneta(lienzo, { mapa, lunas = [] }) {
    * Hornea un modo en `rt`, en la franja de filas [desde, hasta). Con `parche`, solo esa porción del cuerpo, con más
    * detalle. Con `luna`, los datos de esa luna; con `altura`, la altura ya horneada de la que salen normal y color.
    */
-  const hornear = (rt, modo, desde = 0, hasta = rt.height, parche = null, luna = null, altura = null) => {
+  const hornear = (rt, modo, desde = 0, hasta = rt.height, parche = null, luna = null, altura = null, paisaje = 0) => {
+    uH.uPaisaje.value = paisaje;
     cuadro2D.material = hornos[modo];
     uH.uParche.value.copy(parche ?? sinParche);
     uH.uFino.value = parche ? 1 : 0;
@@ -430,14 +544,14 @@ export async function crearPlaneta(lienzo, { mapa, lunas = [] }) {
     renderer.render(escenaHorno, camHorno);
     renderer.setRenderTarget(null);
   };
-  const enFranjas = (cola, rt, modo, partes, parche, luna, altura) => {
+  const enFranjas = (cola, rt, modo, partes, parche, luna, altura, paisaje = 0) => {
     const franja = Math.ceil(rt.height / partes);
     // Las versiones reducidas de la textura (mipmaps) se calculan una sola vez, con la última franja: hacerlo en cada
     // franja, con texturas de 4096 px, frenaba la animación
     const conMip = rt.texture.minFilter === THREE.LinearMipmapLinearFilter;
     for (let y = 0; y < rt.height; y += franja) {
       const hasta = Math.min(rt.height, y + franja);
-      cola.push(() => { if (conMip) rt.texture.generateMipmaps = hasta >= rt.height; hornear(rt, modo, y, hasta, parche, luna, altura); });
+      cola.push(() => { if (conMip) rt.texture.generateMipmaps = hasta >= rt.height; hornear(rt, modo, y, hasta, parche, luna, altura, paisaje); });
     }
   };
   /** Una luna (o un parche de luna): primero la altura; después normal y color, que la leen. */
@@ -463,14 +577,17 @@ export async function crearPlaneta(lienzo, { mapa, lunas = [] }) {
   const ladoParche = chico ? 1024 : 2048;
   const parches = [0, 1].map(() => ({ color: destino(ladoParche, ladoParche), normal: destino(ladoParche, ladoParche), altura: destinoAltura(ladoParche, ladoParche) }));
   let parcheVisible = -1, colaParche = [], pesoParche = 0, pesoObjetivo = 0, cuerpoParche = null;
-  const pedirParche = (cuerpo, lat, lon, n) => {
+  const pedirParche = (cuerpo, lat, lon, n, paisaje = 0) => {
     const tam = PARCHE[Math.min(n, PARCHE.length - 1)] * RAD;
     const zona = new THREE.Vector4(lat * RAD, lon * RAD, tam, Math.min(Math.PI, tam / Math.max(0.25, Math.cos(lat * RAD))));
     const libreP = parches[parcheVisible === 0 ? 1 : 0];
     const luna = cuerpo === 'planeta' ? null : cuerpos.get(cuerpo);
     colaParche = [];
     if (luna) hornearLuna(colaParche, libreP, luna, zona, 12);
-    else { enFranjas(colaParche, libreP.color, 0, 24, zona); enFranjas(colaParche, libreP.normal, 1, 24, zona); }
+    else {
+      enFranjas(colaParche, libreP.color, 0, 24, zona, null, null, paisaje); enFranjas(colaParche, libreP.normal, 1, 24, zona, null, null, paisaje);
+      if (paisaje) enFranjas(colaParche, libreP.altura, 6, 12, zona, null, null, paisaje);
+    }
     colaParche.push(() => {
       parcheVisible = parches.indexOf(libreP);
       if (cuerpoParche !== cuerpo) pesoParche = 0;
@@ -478,6 +595,7 @@ export async function crearPlaneta(lienzo, { mapa, lunas = [] }) {
       const u = (luna ? luna.mat : matPlaneta).uniforms;
       u.uPColor.value = libreP.color.texture; u.uPNormal.value = libreP.normal.texture; u.uParche.value.copy(zona);
       pesoObjetivo = 1;
+      if (paisaje) armarPaisaje(zona, paisaje, libreP); else quitarPaisaje();
     });
   };
 
@@ -487,7 +605,7 @@ export async function crearPlaneta(lienzo, { mapa, lunas = [] }) {
   const geo = new THREE.SphereGeometry(1, chico ? 160 : 220, chico ? 100 : 140);
   const matPlaneta = new THREE.ShaderMaterial({
     uniforms: {
-      uColor: { value: bajo.color.texture }, uNormal: { value: bajo.normal.texture }, uNubes: { value: bajo.nubes.texture }, uSol, uGiroNubes, uDetalle: { value: 0 }, uRuido: { value: ruido }, uNoche: { value: 0 }, uT: { value: 0 },
+      uColor: { value: bajo.color.texture }, uNormal: { value: bajo.normal.texture }, uNubes: { value: bajo.nubes.texture }, uSol, uGiroNubes, uDetalle: { value: 0 }, uRuido: { value: ruido }, uNoche: { value: 0 }, uT: { value: 0 }, uNiebla: { value: 0 },
       uPColor: { value: null }, uPNormal: { value: null }, uParche: { value: new THREE.Vector4(0, 0, 1, 1) }, uPPeso: { value: 0 },
     },
     vertexShader: ESFERA_VERT, fragmentShader: PLANETA_FRAG,
@@ -513,6 +631,115 @@ export async function crearPlaneta(lienzo, { mapa, lunas = [] }) {
   }));
   sol.frustumCulled = false;
   escena.add(sol);
+  // --- Paisaje de cerca ---
+  const ladoTerreno = chico ? 192 : 320;
+  const matTerreno = new THREE.ShaderMaterial({
+    uniforms: {
+      uAltura: { value: null }, uParche: { value: new THREE.Vector4(0, 0, 1, 1) }, uEscala: { value: 0 }, uPaso: { value: 1 / ladoTerreno },
+      uPColor: { value: null }, uPNormal: { value: null }, uSol, uNoche: matPlaneta.uniforms.uNoche,
+    },
+    vertexShader: TERRENO_VERT, fragmentShader: TERRENO_FRAG,
+  });
+  const terreno = new THREE.Mesh(new THREE.PlaneGeometry(1, 1, ladoTerreno, ladoTerreno), matTerreno);
+  terreno.frustumCulled = false;
+  terreno.visible = false;
+  escena.add(terreno);
+  // Árboles, rocas y témpanos: muchas copias de una misma forma, con luz común (sol y luz ambiente)
+  const luzSol = new THREE.DirectionalLight(0xfff2e0, 2.6), luzAmbiente = new THREE.AmbientLight(0xa9c6ff, 0.55);
+  const bruma = new THREE.FogExp2(0x7fa8e0, Math.sqrt(55));
+  const brumaDia = new THREE.Color().setRGB(0.5, 0.66, 0.88, THREE.SRGBColorSpace), brumaNoche = new THREE.Color().setRGB(0.012, 0.02, 0.04, THREE.SRGBColorSpace);
+  escena.add(luzSol, luzAmbiente);
+  const uCrece = { value: 0 };
+  const matCosas = new THREE.MeshLambertMaterial({ vertexColors: true });
+  matCosas.onBeforeCompile = (s) => {
+    s.uniforms.uCrece = uCrece;
+    s.vertexShader = 'uniform float uCrece;\n' + s.vertexShader.replace('#include <begin_vertex>', '#include <begin_vertex>\n  transformed *= uCrece;');
+  };
+  const FORMAS = {
+    conifera: unir([[new THREE.CylinderGeometry(0.05, 0.07, 0.3, 5).translate(0, 0.15, 0), [0.35, 0.24, 0.15]],
+      [new THREE.ConeGeometry(0.42, 0.7, 7).translate(0, 0.6, 0), [1, 1, 1]], [new THREE.ConeGeometry(0.3, 0.55, 7).translate(0, 0.98, 0), [1, 1, 1]]]),
+    copa: unir([[new THREE.CylinderGeometry(0.06, 0.08, 0.4, 5).translate(0, 0.2, 0), [0.35, 0.24, 0.15]],
+      [irregular(new THREE.IcosahedronGeometry(0.42, 1), 0.35, 7).translate(0, 0.7, 0), [1, 1, 1]]]),
+    roca: unir([[irregular(new THREE.DodecahedronGeometry(0.5, 0), 0.5, 3).scale(1, 0.55, 1), [1, 1, 1]]]),
+    tempano: unir([[irregular(new THREE.IcosahedronGeometry(0.5, 1), 0.45, 11).scale(1, 0.6, 1), [1, 1, 1]]]),
+  };
+  let paisajeVivo = null, subida = 0, subidaObjetivo = 0;
+  /** Saca el paisaje de cerca: se hunde y después se borra. */
+  const quitarPaisaje = () => { subidaObjetivo = 0; };
+  const muestraAltura = destinoAltura(256, 256);
+  const muestraColor = new THREE.WebGLRenderTarget(256, 256, { depthBuffer: false });
+  const leer = (rt) => { const d = new Uint8Array(256 * 256 * 4); renderer.readRenderTargetPixels(rt, 0, 0, 256, 256, d); return d; };
+  /** Arma el paisaje de cerca de una zona: el terreno con relieve y, según el paisaje, árboles, rocas o témpanos. */
+  const armarPaisaje = (zona, tipo, juego) => {
+    for (const m of paisajeVivo?.cosas ?? []) { escena.remove(m); m.dispose(); }
+    hornear(muestraAltura, 6, 0, 256, zona, null, null, tipo);
+    hornear(muestraColor, 0, 0, 256, zona, null, null, tipo);
+    const alt = leer(muestraAltura), col = leer(muestraColor);
+    const u = matTerreno.uniforms;
+    u.uAltura.value = juego.altura.texture; u.uPColor.value = juego.color.texture; u.uPNormal.value = juego.normal.texture; u.uParche.value.copy(zona);
+    const azar = numerosAl(Math.abs(zona.x * 1e4 + zona.y * 1e3));
+    const muestra = (s, v) => {
+      const i = (Math.min(255, Math.floor(v * 256)) * 256 + Math.min(255, Math.floor(s * 256))) * 4;
+      return { e: (alt[i] + alt[i + 1] / 255) / 255 * 2 - 1, r: col[i] / 255, g: col[i + 1] / 255, b: col[i + 2] / 255, agua: col[i + 3] > 127 };
+    };
+    const lugar = (s, v, e, hundir) => {
+      const la = zona.x + (v - 0.5) * zona.z, lo = zona.y + (s - 0.5) * zona.w;
+      const borde = THREE.MathUtils.smoothstep(Math.min(s, 1 - s, v, 1 - v), 0, 0.07);
+      return new THREE.Vector3(Math.cos(la) * Math.sin(lo), Math.sin(la), Math.cos(la) * Math.cos(lo))
+        .multiplyScalar(1 + (Math.max(e, 0) * ESCALA_RELIEVE + 0.0003) * borde - 0.001 * (1 - borde) - hundir);
+    };
+    const mucho = chico ? 0.45 : 1;
+    // Qué se pone y dónde, según el paisaje
+    const reglas = {
+      1: [['conifera', 3200, (m) => !m.agua && m.e < 0.2 && m.r + m.g + m.b < 2.1, 0.45, [0.11, 0.25, 0.12]], ['roca', 220, (m) => !m.agua && m.e > 0.12, 0.55, [0.5, 0.45, 0.4]]],
+      2: [['conifera', 11000, (m) => !m.agua && m.e < 0.45 && m.r + m.g + m.b < 2.1, 0.5, [0.09, 0.22, 0.1]]],
+      3: [['copa', 9000, (m) => !m.agua && m.r + m.g + m.b < 2.2, 0.62, [0.13, 0.33, 0.09]]],
+      4: [['tempano', 520, (m) => m.agua, 1, [0.9, 0.95, 1]], ['roca', 120, (m) => !m.agua, 0.6, [0.85, 0.9, 0.97]]],
+      5: [['roca', 380, (m) => !m.agua, 0.5, [0.6, 0.45, 0.3]]],
+      6: [['copa', 1600, (m) => !m.agua && m.e < 0.3, 0.55, [0.2, 0.36, 0.12]], ['conifera', 500, (m) => !m.agua && m.e < 0.3, 0.5, [0.12, 0.27, 0.13]]],
+      7: [['copa', 1200, (m) => !m.agua && m.e < 0.12, 0.55, [0.17, 0.35, 0.13]], ['roca', 240, (m) => !m.agua && m.e < 0.04, 0.45, [0.62, 0.56, 0.48]]],
+    }[tipo] ?? [];
+    const Y = new THREE.Vector3(0, 1, 0), q = new THREE.Quaternion(), giro = new THREE.Quaternion(), M = new THREE.Matrix4(), c = new THREE.Color();
+    const cosas = reglas.map(([forma, cuantos, vale, tam, tono]) => {
+      const n = Math.round(cuantos * mucho), malla = new THREE.InstancedMesh(FORMAS[forma], matCosas, n);
+      let k = 0;
+      for (let intento = 0; intento < n * 6 && k < n; intento++) {
+        const s = 0.05 + azar() * 0.9, v = 0.05 + azar() * 0.9, m = muestra(s, v);
+        if (!vale(m)) continue;
+        const flota = forma === 'tempano';
+        const pos = lugar(s, v, flota ? 0 : m.e, flota ? 0.0004 : 0.0002);
+        const arriba = pos.clone().normalize();
+        q.setFromUnitVectors(Y, arriba); giro.setFromAxisAngle(arriba, azar() * Math.PI * 2); q.premultiply(giro);
+        const e = TAM * tam * (0.6 + azar() * 0.8);
+        M.compose(pos, q, new THREE.Vector3(e * (0.8 + azar() * 0.5), e * (0.8 + azar() * 0.6), e * (0.8 + azar() * 0.5)));
+        malla.setMatrixAt(k, M);
+        const luz = 0.75 + azar() * 0.5;
+        malla.setColorAt(k, c.setRGB(tono[0] * luz, tono[1] * luz, tono[2] * luz, THREE.SRGBColorSpace));
+        k++;
+      }
+      malla.count = k;
+      malla.frustumCulled = false;
+      escena.add(malla);
+      return malla;
+    });
+    paisajeVivo = { cosas };
+    terreno.visible = true;
+    subidaObjetivo = 1;
+  };
+  /** Si la zona no dice qué paisaje es, se decide mirando el mapa en ese punto. */
+  const paisajeSegun = (lat, lon) => {
+    const p = dirDe(lat, lon), u = ((Math.atan2(p.z, -p.x) / (2 * Math.PI)) % 1 + 1) % 1, vv = 1 - Math.acos(p.y) / Math.PI;
+    const x = Math.floor(u * bajo.color.width), y = Math.floor(vv * bajo.color.height), c = new Uint8Array(4), n = new Uint8Array(4);
+    renderer.readRenderTargetPixels(bajo.color, x, y, 1, 1, c); renderer.readRenderTargetPixels(bajo.normal, x, y, 1, 1, n);
+    const [r, g, b] = [c[0] / 255, c[1] / 255, c[2] / 255];
+    if (c[3] > 127) return 7;
+    if (r + g + b > 2.3 || Math.abs(lat) > 64) return 4;
+    if (n[3] / 255 > 0.32) return 1;
+    if (r > g * 1.04 && r > 0.4) return 5;
+    if (g > r && g > b && r + g + b < 1.0) return 2;
+    return 6;
+  };
+
   // Día y noche: 0 = día (el sol arriba a un costado, el planeta iluminado), 1 = noche (el sol detrás del planeta)
   let fase = 0, faseObjetivo = 0;
 
@@ -644,7 +871,7 @@ export async function crearPlaneta(lienzo, { mapa, lunas = [] }) {
   const gradosPorPx = () => (cam.h * 75) / altoPx;
   const limitarLat = () => { cam.lat = Math.max(-80, Math.min(80, cam.lat)); };
   const acercar = (f) => {
-    const n = nivel, min = n === 0 ? (cam.cuerpo === 'planeta' ? 0.09 : 0.4) : ALTURA[Math.min(n, ALTURA.length - 1)] * 0.45;
+    const n = nivel, min = n === 0 ? (cam.cuerpo === 'planeta' ? 0.09 : 0.4) : ALTURA[Math.min(n, ALTURA.length - 1)] * (n === NIVEL_PAISAJE ? 0.8 : 0.45);
     cam.h = Math.max(min, Math.min(alturaDe(0) * 1.5, cam.h * f));
     quieto = 0;
     if (n > 0 && cam.h > alturaDe(n) * 2.3 && alAlejar) alAlejar();
@@ -753,6 +980,20 @@ export async function crearPlaneta(lienzo, { mapa, lunas = [] }) {
       l.malla.visible = l.alfa > 0.02;
       l.linea.material.opacity = 0.12 * (1 - Math.min(1, matPlaneta.uniforms.uDetalle.value * 3)) * (cam.cuerpo === 'planeta' ? 1 : 0.4);
     }
+    // El paisaje de cerca: primero sube el relieve y después crecen árboles y rocas; al irse, se hunde
+    if (subida !== subidaObjetivo) {
+      subida = reducido ? subidaObjetivo : subidaObjetivo > subida ? Math.min(1, subida + real / 1.4) : Math.max(0, subida - real / 0.6);
+      if (subida === 0 && paisajeVivo) { for (const m of paisajeVivo.cosas) { escena.remove(m); m.dispose(); } paisajeVivo = null; terreno.visible = false; }
+    }
+    const subeK = 1 - Math.pow(1 - Math.min(1, subida * 1.25), 3);
+    matTerreno.uniforms.uEscala.value = ESCALA_RELIEVE * subeK;
+    uCrece.value = subidaObjetivo ? THREE.MathUtils.smoothstep(subida, 0.75, 1) : subida;
+    matPlaneta.uniforms.uNiebla.value = subida;
+    nubes.visible = subida < 0.2;
+    luzSol.position.copy(uSol.value).multiplyScalar(10);
+    escena.fog = subida > 0 ? bruma : null;
+    bruma.color.lerpColors(brumaDia, brumaNoche, matPlaneta.uniforms.uNoche.value);
+    luzAmbiente.intensity = 0.55 - 0.35 * matPlaneta.uniforms.uNoche.value;
     renderer.render(escena, camara);
     alCuadro?.();
     raf = requestAnimationFrame(cuadro);
@@ -784,7 +1025,8 @@ export async function crearPlaneta(lienzo, { mapa, lunas = [] }) {
      * Viaja a un lugar: { cuerpo, lat, lon } en un nivel de zoom (0 = el cuerpo entero).
      * Sin latitud, se queda en la que está (en una luna, la mira desde el lado opuesto al planeta).
      */
-    ir({ cuerpo = 'planeta', lat = null, lon = null }, n, ms) {
+    ir({ cuerpo = 'planeta', lat = null, lon = null }, n, ms, paisaje = null) {
+      if (paisaje !== null && cuerpo === 'planeta' && lat !== null) n = NIVEL_PAISAJE;
       nivel = n; quieto = 0; vel.lon = vel.lat = 0;
       const b = cuerpos.get(cuerpo) ?? cuerpos.get('planeta');
       if (lat === null) {
@@ -792,7 +1034,8 @@ export async function crearPlaneta(lienzo, { mapa, lunas = [] }) {
         else if (cuerpo === cam.cuerpo) { lat = cam.lat; lon = cam.lon; }
         else { const d = camara.position.clone().normalize(); lat = Math.asin(d.y) / RAD; lon = Math.atan2(d.x, d.z) / RAD; }
       }
-      if (n > 0) pedirParche(cuerpo, lat, lon, n); else { colaParche = []; pesoObjetivo = 0; }
+      if (n === NIVEL_PAISAJE) pedirParche(cuerpo, lat, lon, n, paisaje || paisajeSegun(lat, lon));
+      else { quitarPaisaje(); if (n > 0) pedirParche(cuerpo, lat, lon, n); else { colaParche = []; pesoObjetivo = 0; } }
       const dLat = n === 0 ? Math.max(-35, Math.min(35, lat)) : lat;
       return volarA({ cuerpo, lat: dLat, lon, h: alturaDe(n, cuerpo), t: INCLINA[Math.min(n, INCLINA.length - 1)] }, ms ?? (cuerpo !== cam.cuerpo ? 2600 : n === 0 ? 1900 : 2100));
     },
@@ -834,6 +1077,8 @@ export async function crearPlaneta(lienzo, { mapa, lunas = [] }) {
     set alTocar(fn) { alTocar = fn; },
     destruir() {
       vivo = false; cancelAnimationFrame(raf); control.abort(); ojo.disconnect(); ro.disconnect();
+      for (const m of paisajeVivo?.cosas ?? []) m.dispose();
+      Object.values(FORMAS).forEach((g) => g.dispose()); matCosas.dispose(); muestraAltura.dispose(); muestraColor.dispose();
       for (const g of [bajo, alto, ...parches, ...lunasVivas.flatMap((l) => [l.tex, l.previa])]) for (const rt of Object.values(g)) rt.dispose();
       escena.traverse((o) => { o.geometry?.dispose(); o.material?.dispose(); });
       texTierra.dispose(); texCampos.dispose(); hornos.forEach((m) => m.dispose()); plano.dispose(); ruido.dispose(); renderer.dispose();

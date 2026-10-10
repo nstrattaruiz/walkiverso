@@ -5,7 +5,7 @@
 // /walkurio?ubicar: al tocar el planeta (o una luna) muestra y copia sus coordenadas, para ubicar zonas nuevas.
 import { $, app, esc, esExterno, flecha, reducido, titular } from '../ui/util.js';
 import { WALKURIO } from '../contenido.js';
-import { LUNAS, MAPA, arbolDeZonas } from '../datos/walkurio.js';
+import { LUNAS, MAPA, PAISAJES, arbolDeZonas } from '../datos/walkurio.js';
 import { catalogo, precio } from '../datos/modelo.js';
 import { arte } from '../ui/tarjeta.js';
 
@@ -134,7 +134,9 @@ export async function walkurio() {
     pintar();
     $('#mundo-titulo').focus({ preventScroll: true });
     marcas.classList.add('is-viajando');
-    if (planeta) await planeta.ir(lugar(actual()), nivelDe(camino));
+    // Una zona del planeta sin zonas adentro es el último nivel: ahí se baja al paisaje de cerca (0 = según el mapa)
+    const z = actual(), hoja = z !== RAIZ && z.cuerpo === 'planeta' && z.lat !== null && !z.zonas.length;
+    if (planeta) await planeta.ir(lugar(z), nivelDe(camino), undefined, hoja ? PAISAJES[z.paisaje] ?? 0 : null);
     marcas.classList.remove('is-viajando');
   };
   const entrar = (id) => { const z = hijos().find((h) => h.id === id); if (z) viajar([...camino, z]); };

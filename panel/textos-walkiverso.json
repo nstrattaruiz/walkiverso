@@ -936,6 +936,11 @@
        "tipo": "texto"
       },
       {
+       "clave": "paisaje",
+       "etiqueta": "Paisaje de cerca: montañas, bosque, selva, hielo, desierto, llanura o costa (vacío = según el mapa)",
+       "tipo": "texto"
+      },
+      {
        "clave": "texto",
        "etiqueta": "Texto",
        "tipo": "texto-largo"
@@ -961,14 +966,14 @@
        "tipo": "texto"
       },
       {
-       "clave": "enlaceTexto",
-       "etiqueta": "Texto del enlace",
-       "tipo": "texto"
-      },
-      {
        "clave": "enlaceUrl",
        "etiqueta": "Enlace (dirección)",
        "tipo": "ruta"
+      },
+      {
+       "clave": "enlaceTexto",
+       "etiqueta": "Texto del enlace",
+       "tipo": "texto"
       }
      ],
      "valor": [
@@ -978,13 +983,14 @@
        "cuerpo": "planeta",
        "nombre": "Continente central",
        "clima": "Templado",
+       "paisaje": "",
        "texto": "Bosques al norte, llanuras secas al oeste y una cordillera que lo cruza en diagonal. Texto a definir por Walkiver.",
        "lat": "16",
        "lon": "-14",
        "imagen": "",
        "productos": "",
-       "enlaceTexto": "",
-       "enlaceUrl": ""
+       "enlaceUrl": "",
+       "enlaceTexto": ""
       },
       {
        "id": "bosques-del-norte",
@@ -992,13 +998,14 @@
        "cuerpo": "planeta",
        "nombre": "Bosques del norte",
        "clima": "Húmedo",
+       "paisaje": "bosque",
        "texto": "Texto a definir por Walkiver.",
        "lat": "26",
        "lon": "-30",
        "imagen": "",
        "productos": "",
-       "enlaceTexto": "",
-       "enlaceUrl": ""
+       "enlaceUrl": "",
+       "enlaceTexto": ""
       },
       {
        "id": "cordillera-central",
@@ -1006,13 +1013,14 @@
        "cuerpo": "planeta",
        "nombre": "Cordillera central",
        "clima": "Frío de altura",
+       "paisaje": "montañas",
        "texto": "Texto a definir por Walkiver.",
        "lat": "12",
        "lon": "-2",
        "imagen": "",
        "productos": "",
-       "enlaceTexto": "",
-       "enlaceUrl": ""
+       "enlaceUrl": "",
+       "enlaceTexto": ""
       },
       {
        "id": "llanuras-secas",
@@ -1020,13 +1028,14 @@
        "cuerpo": "planeta",
        "nombre": "Llanuras secas",
        "clima": "Árido",
+       "paisaje": "desierto",
        "texto": "Texto a definir por Walkiver.",
        "lat": "6",
        "lon": "-45",
        "imagen": "",
        "productos": "",
-       "enlaceTexto": "",
-       "enlaceUrl": ""
+       "enlaceUrl": "",
+       "enlaceTexto": ""
       },
       {
        "id": "tierras-del-este",
@@ -1034,13 +1043,14 @@
        "cuerpo": "planeta",
        "nombre": "Tierras del este",
        "clima": "Templado",
+       "paisaje": "llanura",
        "texto": "Texto a definir por Walkiver.",
        "lat": "6",
        "lon": "20",
        "imagen": "",
        "productos": "",
-       "enlaceTexto": "",
-       "enlaceUrl": ""
+       "enlaceUrl": "",
+       "enlaceTexto": ""
       },
       {
        "id": "continente-del-sur",
@@ -1048,13 +1058,14 @@
        "cuerpo": "planeta",
        "nombre": "Continente del sur",
        "clima": "Árido y selvático",
+       "paisaje": "",
        "texto": "Desierto de roca al oeste y selva cerrada al este. Texto a definir por Walkiver.",
        "lat": "-28",
        "lon": "-12",
        "imagen": "",
        "productos": "",
-       "enlaceTexto": "",
-       "enlaceUrl": ""
+       "enlaceUrl": "",
+       "enlaceTexto": ""
       },
       {
        "id": "desierto-de-roca",
@@ -1062,13 +1073,14 @@
        "cuerpo": "planeta",
        "nombre": "Desierto de roca",
        "clima": "Árido",
+       "paisaje": "desierto",
        "texto": "Texto a definir por Walkiver.",
        "lat": "-22",
        "lon": "-40",
        "imagen": "",
        "productos": "",
-       "enlaceTexto": "",
-       "enlaceUrl": ""
+       "enlaceUrl": "",
+       "enlaceTexto": ""
       },
       {
        "id": "selvas-del-este",
@@ -1076,13 +1088,14 @@
        "cuerpo": "planeta",
        "nombre": "Selvas del este",
        "clima": "Húmedo",
+       "paisaje": "selva",
        "texto": "Texto a definir por Walkiver.",
        "lat": "-34",
        "lon": "8",
        "imagen": "",
        "productos": "",
-       "enlaceTexto": "",
-       "enlaceUrl": ""
+       "enlaceUrl": "",
+       "enlaceTexto": ""
       },
       {
        "id": "costa-sur",
@@ -1090,13 +1103,14 @@
        "cuerpo": "planeta",
        "nombre": "Costa sur",
        "clima": "Templado",
+       "paisaje": "costa",
        "texto": "Texto a definir por Walkiver.",
        "lat": "-44",
        "lon": "-14",
        "imagen": "",
        "productos": "",
-       "enlaceTexto": "",
-       "enlaceUrl": ""
+       "enlaceUrl": "",
+       "enlaceTexto": ""
       },
       {
        "id": "isla-del-este",
@@ -1104,13 +1118,14 @@
        "cuerpo": "planeta",
        "nombre": "Isla del este",
        "clima": "Húmedo",
+       "paisaje": "",
        "texto": "Una isla larga con una sierra en su costa este. Texto a definir por Walkiver.",
        "lat": "-8",
        "lon": "56",
        "imagen": "",
        "productos": "",
-       "enlaceTexto": "",
-       "enlaceUrl": ""
+       "enlaceUrl": "",
+       "enlaceTexto": ""
       },
       {
        "id": "sierra-de-la-isla",
@@ -1118,13 +1133,14 @@
        "cuerpo": "planeta",
        "nombre": "Sierra de la isla",
        "clima": "Frío de altura",
+       "paisaje": "montañas",
        "texto": "Texto a definir por Walkiver.",
        "lat": "-8",
        "lon": "62",
        "imagen": "",
        "productos": "",
-       "enlaceTexto": "",
-       "enlaceUrl": ""
+       "enlaceUrl": "",
+       "enlaceTexto": ""
       },
       {
        "id": "valles-de-la-isla",
@@ -1132,13 +1148,14 @@
        "cuerpo": "planeta",
        "nombre": "Valles de la isla",
        "clima": "Húmedo",
+       "paisaje": "bosque",
        "texto": "Texto a definir por Walkiver.",
        "lat": "-3",
        "lon": "55",
        "imagen": "",
        "productos": "",
-       "enlaceTexto": "",
-       "enlaceUrl": ""
+       "enlaceUrl": "",
+       "enlaceTexto": ""
       },
       {
        "id": "gran-cordillera",
@@ -1146,13 +1163,14 @@
        "cuerpo": "planeta",
        "nombre": "Gran cordillera del oeste",
        "clima": "Seco y frío",
+       "paisaje": "",
        "texto": "Un continente atravesado de norte a sur por montañas. Texto a definir por Walkiver.",
        "lat": "5",
        "lon": "-112",
        "imagen": "",
        "productos": "",
-       "enlaceTexto": "",
-       "enlaceUrl": ""
+       "enlaceUrl": "",
+       "enlaceTexto": ""
       },
       {
        "id": "las-cumbres",
@@ -1160,13 +1178,14 @@
        "cuerpo": "planeta",
        "nombre": "Las cumbres",
        "clima": "Helado",
+       "paisaje": "montañas",
        "texto": "Texto a definir por Walkiver.",
        "lat": "15",
        "lon": "-104",
        "imagen": "",
        "productos": "",
-       "enlaceTexto": "",
-       "enlaceUrl": ""
+       "enlaceUrl": "",
+       "enlaceTexto": ""
       },
       {
        "id": "desierto-alto",
@@ -1174,13 +1193,14 @@
        "cuerpo": "planeta",
        "nombre": "Desierto alto",
        "clima": "Árido",
+       "paisaje": "desierto",
        "texto": "Texto a definir por Walkiver.",
        "lat": "18",
        "lon": "-128",
        "imagen": "",
        "productos": "",
-       "enlaceTexto": "",
-       "enlaceUrl": ""
+       "enlaceUrl": "",
+       "enlaceTexto": ""
       },
       {
        "id": "costa-verde",
@@ -1188,13 +1208,14 @@
        "cuerpo": "planeta",
        "nombre": "Costa verde",
        "clima": "Húmedo",
+       "paisaje": "selva",
        "texto": "Texto a definir por Walkiver.",
        "lat": "-18",
        "lon": "-150",
        "imagen": "",
        "productos": "",
-       "enlaceTexto": "",
-       "enlaceUrl": ""
+       "enlaceUrl": "",
+       "enlaceTexto": ""
       },
       {
        "id": "tierras-del-norte",
@@ -1202,13 +1223,14 @@
        "cuerpo": "planeta",
        "nombre": "Tierras del norte",
        "clima": "Frío",
+       "paisaje": "",
        "texto": "Bosques fríos y montañas que se pierden en el hielo. Texto a definir por Walkiver.",
        "lat": "50",
        "lon": "10",
        "imagen": "",
        "productos": "",
-       "enlaceTexto": "",
-       "enlaceUrl": ""
+       "enlaceUrl": "",
+       "enlaceTexto": ""
       },
       {
        "id": "bosques-frios",
@@ -1216,13 +1238,14 @@
        "cuerpo": "planeta",
        "nombre": "Bosques fríos",
        "clima": "Frío",
+       "paisaje": "bosque",
        "texto": "Texto a definir por Walkiver.",
        "lat": "44",
        "lon": "22",
        "imagen": "",
        "productos": "",
-       "enlaceTexto": "",
-       "enlaceUrl": ""
+       "enlaceUrl": "",
+       "enlaceTexto": ""
       },
       {
        "id": "montanas-del-norte",
@@ -1230,13 +1253,14 @@
        "cuerpo": "planeta",
        "nombre": "Montañas del norte",
        "clima": "Helado",
+       "paisaje": "montañas",
        "texto": "Texto a definir por Walkiver.",
        "lat": "62",
        "lon": "5",
        "imagen": "",
        "productos": "",
-       "enlaceTexto": "",
-       "enlaceUrl": ""
+       "enlaceUrl": "",
+       "enlaceTexto": ""
       },
       {
        "id": "islas-del-noreste",
@@ -1244,13 +1268,14 @@
        "cuerpo": "planeta",
        "nombre": "Islas del noreste",
        "clima": "Templado",
+       "paisaje": "",
        "texto": "Islas grandes con una sierra en el medio. Texto a definir por Walkiver.",
        "lat": "31",
        "lon": "127",
        "imagen": "",
        "productos": "",
-       "enlaceTexto": "",
-       "enlaceUrl": ""
+       "enlaceUrl": "",
+       "enlaceTexto": ""
       },
       {
        "id": "sierra-del-noreste",
@@ -1258,13 +1283,14 @@
        "cuerpo": "planeta",
        "nombre": "Sierra del noreste",
        "clima": "Frío de altura",
+       "paisaje": "montañas",
        "texto": "Texto a definir por Walkiver.",
        "lat": "32",
        "lon": "124",
        "imagen": "",
        "productos": "",
-       "enlaceTexto": "",
-       "enlaceUrl": ""
+       "enlaceUrl": "",
+       "enlaceTexto": ""
       },
       {
        "id": "costas-del-noreste",
@@ -1272,13 +1298,14 @@
        "cuerpo": "planeta",
        "nombre": "Costas del noreste",
        "clima": "Templado",
+       "paisaje": "costa",
        "texto": "Texto a definir por Walkiver.",
        "lat": "40",
        "lon": "116",
        "imagen": "",
        "productos": "",
-       "enlaceTexto": "",
-       "enlaceUrl": ""
+       "enlaceUrl": "",
+       "enlaceTexto": ""
       },
       {
        "id": "tierras-del-sur",
@@ -1286,13 +1313,14 @@
        "cuerpo": "planeta",
        "nombre": "Tierras del sur",
        "clima": "Helado",
+       "paisaje": "",
        "texto": "Montañas y glaciares en el fondo del mundo. Texto a definir por Walkiver.",
        "lat": "-74",
        "lon": "-43",
        "imagen": "",
        "productos": "",
-       "enlaceTexto": "",
-       "enlaceUrl": ""
+       "enlaceUrl": "",
+       "enlaceTexto": ""
       },
       {
        "id": "montanas-del-sur",
@@ -1300,13 +1328,14 @@
        "cuerpo": "planeta",
        "nombre": "Montañas del sur",
        "clima": "Helado",
+       "paisaje": "montañas",
        "texto": "Texto a definir por Walkiver.",
        "lat": "-62",
        "lon": "-70",
        "imagen": "",
        "productos": "",
-       "enlaceTexto": "",
-       "enlaceUrl": ""
+       "enlaceUrl": "",
+       "enlaceTexto": ""
       },
       {
        "id": "glaciares",
@@ -1314,13 +1343,14 @@
        "cuerpo": "planeta",
        "nombre": "Glaciares",
        "clima": "Helado",
+       "paisaje": "hielo",
        "texto": "Texto a definir por Walkiver.",
        "lat": "-75",
        "lon": "11",
        "imagen": "",
        "productos": "",
-       "enlaceTexto": "",
-       "enlaceUrl": ""
+       "enlaceUrl": "",
+       "enlaceTexto": ""
       },
       {
        "id": "luna-mayor",
@@ -1328,13 +1358,14 @@
        "cuerpo": "luna-1",
        "nombre": "Luna mayor",
        "clima": "Sin aire",
+       "paisaje": "",
        "texto": "La más grande de las dos lunas de Walkurio. Texto a definir por Walkiver.",
        "lat": "",
        "lon": "",
        "imagen": "",
        "productos": "",
-       "enlaceTexto": "",
-       "enlaceUrl": ""
+       "enlaceUrl": "",
+       "enlaceTexto": ""
       },
       {
        "id": "region-luna-mayor",
@@ -1342,13 +1373,14 @@
        "cuerpo": "luna-1",
        "nombre": "Región de la luna mayor",
        "clima": "Sin aire",
+       "paisaje": "",
        "texto": "Texto a definir por Walkiver.",
        "lat": "18",
        "lon": "0",
        "imagen": "",
        "productos": "",
-       "enlaceTexto": "",
-       "enlaceUrl": ""
+       "enlaceUrl": "",
+       "enlaceTexto": ""
       },
       {
        "id": "luna-menor",
@@ -1356,13 +1388,14 @@
        "cuerpo": "luna-2",
        "nombre": "Luna menor",
        "clima": "Helado",
+       "paisaje": "",
        "texto": "La más chica, cubierta de hielo. Texto a definir por Walkiver.",
        "lat": "",
        "lon": "",
        "imagen": "",
        "productos": "",
-       "enlaceTexto": "",
-       "enlaceUrl": ""
+       "enlaceUrl": "",
+       "enlaceTexto": ""
       },
       {
        "id": "region-luna-menor",
@@ -1370,13 +1403,14 @@
        "cuerpo": "luna-2",
        "nombre": "Región de la luna menor",
        "clima": "Helado",
+       "paisaje": "",
        "texto": "Región por definir en la luna menor: Walkiver decide qué hay acá, qué la hace distinta y quién la habita.",
        "lat": "-10",
        "lon": "20",
        "imagen": "",
        "productos": "",
-       "enlaceTexto": "",
-       "enlaceUrl": ""
+       "enlaceUrl": "",
+       "enlaceTexto": ""
       }
      ]
     }

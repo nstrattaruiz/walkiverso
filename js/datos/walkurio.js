@@ -13,6 +13,16 @@ export const LUNAS = [
   { id: 'luna-2', radio: 0.085, orbita: 2.55, inclinacion: -22, vuelta: 260, inicio: 215, claro: [0.82, 0.88, 0.96], oscuro: [0.48, 0.58, 0.72], crateres: 0.55, semilla: 7.7 },
 ];
 
+/** Los paisajes de cerca que sabe dibujar el planeta (el número es el que usa js/anim/planeta3d.js). */
+export const PAISAJES = { montanas: 1, bosque: 2, selva: 3, hielo: 4, desierto: 5, llanura: 6, costa: 7 };
+const SINONIMOS = { montana: 'montanas', sierra: 'montanas', cordillera: 'montanas', bosques: 'bosque', selvas: 'selva', jungla: 'selva', glaciar: 'hielo', glaciares: 'hielo', polo: 'hielo', nieve: 'hielo', desiertos: 'desierto', arido: 'desierto', llanuras: 'llanura', pradera: 'llanura', praderas: 'llanura', costas: 'costa', playa: 'costa' };
+/** "Montañas", "montaña", "Glaciar"… → la clave del paisaje (o '' si no se reconoce: el planeta decide según el mapa). */
+export function paisajeDe(texto) {
+  const p = String(texto ?? '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
+  const k = SINONIMOS[p] ?? p;
+  return PAISAJES[k] ? k : '';
+}
+
 /**
  * Arma el árbol de zonas a partir de la lista plana del panel.
  * Cada zona sale con: id, nombre, clima, texto, cuerpo, lat/lon (números o null), imagen, productos (lista de handles),
@@ -26,6 +36,7 @@ export function arbolDeZonas(lista) {
     cuerpo: limpio(z.cuerpo), lat: num(z.lat), lon: num(z.lon), imagen: limpio(z.imagen),
     productos: limpio(z.productos).split(/[\s,]+/).filter(Boolean),
     enlace: limpio(z.enlaceUrl) ? { texto: limpio(z.enlaceTexto) || 'Ver más', url: limpio(z.enlaceUrl) } : null,
+    paisaje: paisajeDe(z.paisaje),
     // Mientras no tenga texto propio (vacío, o dice "a definir" o "por definir"), se marca "Por definir"
     provisorio: !limpio(z.texto) || /(a|por) definir/i.test(z.texto), zonas: [],
   }));

@@ -182,13 +182,22 @@ export const PIE = { lema: 'Arte, Magia y Folklore.' };
  * Walkurio: el planeta y sus dos lunas (js/paginas/walkurio.js). Las zonas se editan desde el panel ("Walkurio · Zonas").
  * Cada zona: id (sin espacios, va en la dirección), dentro (id de la zona que la contiene; vacío = primer nivel),
  * cuerpo (planeta, luna-1 o luna-2), lat y lon en grados (vacías en una luna entera), productos (handles separados
- * por comas: se muestran en la zona) y enlace opcional. Mientras el texto esté vacío o diga "a definir", la zona
+ * por comas: se muestran en la zona), enlace opcional y paisaje: cómo se ve de cerca una zona del último nivel
+ * (montañas, bosque, selva, hielo, desierto, llanura o costa; vacío = según el mapa). Mientras el texto esté vacío o diga "a definir", la zona
  * muestra la marca "Por definir".
  * Para saber las coordenadas de un lugar: abrir /walkurio?ubicar y tocar el planeta.
  * Nombres y textos PROVISORIOS (descriptivos, sacados del mapa de referencia): Walkiver los reemplaza.
  */
+// Paisaje de cerca de cada zona del último nivel (montañas, bosque, selva, hielo, desierto, llanura o costa)
+const PAISAJES = {
+  'cordillera-central': 'montañas', 'bosques-del-norte': 'bosque', 'llanuras-secas': 'desierto', 'tierras-del-este': 'llanura',
+  'desierto-de-roca': 'desierto', 'selvas-del-este': 'selva', 'costa-sur': 'costa', 'sierra-de-la-isla': 'montañas',
+  'valles-de-la-isla': 'bosque', 'las-cumbres': 'montañas', 'desierto-alto': 'desierto', 'costa-verde': 'selva',
+  'bosques-frios': 'bosque', 'montanas-del-norte': 'montañas', 'sierra-del-noreste': 'montañas', 'costas-del-noreste': 'costa',
+  'montanas-del-sur': 'montañas', 'glaciares': 'hielo',
+};
 const zona = (id, dentro, nombre, clima, lat, lon, texto = 'Texto a definir por Walkiver.', cuerpo = 'planeta') =>
-  ({ id, dentro, cuerpo, nombre, clima, texto, lat: String(lat), lon: String(lon), imagen: '', productos: '', enlaceTexto: '', enlaceUrl: '' });
+  ({ id, dentro, cuerpo, nombre, clima, paisaje: PAISAJES[id] ?? '', texto, lat: String(lat), lon: String(lon), imagen: '', productos: '', enlaceUrl: '', enlaceTexto: '' });
 export const WALKURIO = {
   titulo: 'Walkurio',
   texto: 'Un planeta para explorar. Giralo, acercate y elegí una zona para entrar.',
