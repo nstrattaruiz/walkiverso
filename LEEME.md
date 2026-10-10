@@ -103,6 +103,13 @@ o pellizcando y se entra por zonas (y dentro de cada zona, a otras). Está en el
 - Al cambiar coordenadas: con `node .dev/servir.mjs`, la consola del navegador avisa si una zona cayó en el agua.
 - Sin WebGL (navegadores muy viejos) queda el panel para recorrer las zonas, sin el planeta.
 
+## Fotos livianas
+
+Después de sumar fotos a `img/`, correr `node .dev/optimizar-imagenes.mjs`: achica los fondos a 2000 px y las fotos de
+producto a 1200 px, recomprime las que pasan de 140 KB y pasa JPG y PNG a WEBP (corrigiendo `js/datos/catalogo.js`).
+Usa sharp de la plataforma (`C:devplataforma`). En la web, las fotos aparecen con un fundido cuando terminan de
+llegar (`.wk-fotos-suaves` en `css/wk-forma.css`), y three.js se baja cuando la página está quieta.
+
 ## Imágenes que faltan
 
 Mientras no haya fotos, cada lugar muestra un marco de espera azul con el símbolo. Las fotos de las piezas se

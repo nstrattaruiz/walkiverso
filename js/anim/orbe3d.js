@@ -125,8 +125,10 @@ function montarOrbe(lienzo) {
     renderer.render(escena, camara);
     if (!reducido) raf = requestAnimationFrame(cuadro);
   };
-  const seguir = () => { if (!raf) { ultimo = performance.now(); raf = requestAnimationFrame(cuadro); } };
-  seguir();
+  const seguir = () => { if (!raf && listo) { ultimo = performance.now(); raf = requestAnimationFrame(cuadro); } };
+  // Los shaders se compilan en paralelo (sin trabar el scroll) y recién ahí empieza a dibujar
+  let listo = false;
+  renderer.compileAsync(escena, camara).catch(() => {}).finally(() => { listo = true; seguir(); });
 
   return {
     energia(v) { objetivo = v; if (reducido) seguir(); },
@@ -165,7 +167,7 @@ export function crearOrbe3D(lienzo, respaldo) {
     if (!en.isIntersecting || real) return;
     io.disconnect();
     setTimeout(montar, 0);
-  }, { rootMargin: '500px 0px' });
+  }, { rootMargin: '1400px 0px' });
   io.observe(lienzo);
   return {
     energia(v) { energia = v; real?.energia(v); },

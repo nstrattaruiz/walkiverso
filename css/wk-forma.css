@@ -1047,3 +1047,10 @@ html.wk-sin-carga .wk-carga { display: none; }
   .ns-bar .ns-cta svg { width: 21px; height: 21px; }
   .ns-bar .ns-cta .wk-contador { position: absolute; top: 1px; right: -1px; min-width: 17px; height: 17px; padding-inline: 4px; font-size: 0.64rem; }
 }
+
+/* Fotos: aparecen con un fundido cuando terminan de llegar (la clase la pone js/app.js), sin pintarse de a pedazos */
+.wk-fotos-suaves :is(img.wk-arte, .wk-puerta__foto, .wk-ficha img, .wk-galeria img):not(.is-cargada) { opacity: 0; }
+.wk-fotos-suaves :is(img.wk-arte, .wk-puerta__foto, .wk-ficha img, .wk-galeria img).is-cargada { animation: wk-foto-llega 0.7s ease both; }
+.wk-fotos-suaves .wk-hero__fotos img:not(.is-cargada) { opacity: 0 !important; }
+@keyframes wk-foto-llega { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .wk-fotos-suaves :is(img.wk-arte, .wk-puerta__foto, .wk-ficha img, .wk-galeria img).is-cargada { animation: none; } }

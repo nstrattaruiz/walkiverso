@@ -40,8 +40,11 @@ function crearBola(lienzo) {
     io.disconnect();
     try { const { crearOrbe3D } = await import('../anim/orbe3d.js'); if (vivo) real = crearOrbe3D(lienzo, plana); } catch { if (vivo) real = plana(lienzo); }
     real?.energia(energia);
-  }, { rootMargin: '700px 0px' });
+  }, { rootMargin: '1600px 0px' });
   io.observe(lienzo);
+  // three.js pesa: se baja y se prepara cuando la página está quieta, así no frena el scroll al llegar a la sección
+  const adelantar = () => import('../anim/orbe3d.js').catch(() => {});
+  if ('requestIdleCallback' in window) requestIdleCallback(adelantar, { timeout: 6000 }); else setTimeout(adelantar, 3000);
   return {
     energia(v) { energia = v; real?.energia(v); },
     pulso(v) { real?.pulso?.(v); },

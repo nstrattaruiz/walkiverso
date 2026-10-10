@@ -21,6 +21,19 @@ import { walkurio } from './paginas/walkurio.js';
 import { contacto, legal } from './paginas/contacto.js';
 import { cuenta } from './paginas/cuenta.js';
 
+// Las fotos aparecen con un fundido cuando terminan de llegar, en vez de pintarse de a pedazos (ver .wk-fotos-suaves en wk-forma.css)
+document.documentElement.classList.add('wk-fotos-suaves');
+const fotoLista = (e) => { if (e.target.tagName === 'IMG') e.target.classList.add('is-cargada'); };
+document.addEventListener('load', fotoLista, true);
+document.addEventListener('error', fotoLista, true);
+// Las que ya estaban cargadas al entrar a la página (memoria del navegador) se muestran directo
+new MutationObserver((cambios) => {
+  for (const c of cambios) for (const n of c.addedNodes) {
+    if (n.nodeType !== 1) continue;
+    for (const img of n.tagName === 'IMG' ? [n] : n.querySelectorAll('img')) if (img.complete) img.classList.add('is-cargada');
+  }
+}).observe(document.documentElement, { childList: true, subtree: true });
+
 // ---------------------------------------------------------------- carga inicial
 // La entrada se disipa cuando la primera página ya está dibujada (y pasó el tiempo mínimo para que el logo termine de emerger).
 const sinCarga = document.documentElement.classList.contains('wk-sin-carga');

@@ -1917,14 +1917,14 @@ export const CATALOGO = [
   "compareAtPrice": null,
   "available": false,
   "image": {
-   "url": "img/productos/minidragora-pinkileaf/1.png",
+   "url": "img/productos/minidragora-pinkileaf/1.webp",
    "width": 600,
    "height": 600,
    "alt": "Pinkileaf, Minidrágora"
   },
   "images": [
    {
-    "url": "img/productos/minidragora-pinkileaf/1.png",
+    "url": "img/productos/minidragora-pinkileaf/1.webp",
     "width": 600,
     "height": 600,
     "alt": "Pinkileaf, Minidrágora"
@@ -2391,14 +2391,14 @@ export const CATALOGO = [
   "compareAtPrice": null,
   "available": false,
   "image": {
-   "url": "img/productos/mandragora-mundraroot/1.jpeg",
+   "url": "img/productos/mandragora-mundraroot/1.webp",
    "width": 2372,
    "height": 2560,
    "alt": "Mundraroot, Mandrágora"
   },
   "images": [
    {
-    "url": "img/productos/mandragora-mundraroot/1.jpeg",
+    "url": "img/productos/mandragora-mundraroot/1.webp",
     "width": 2372,
     "height": 2560,
     "alt": "Mundraroot, Mandrágora"
