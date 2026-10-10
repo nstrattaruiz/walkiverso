@@ -20,14 +20,49 @@ export function pintarMenus() {
   // Cuenta (módulo Cuentas de clientes): a la derecha de la barra, y también en el menú grande
   const cuenta = info.modules?.accounts ? { label: cliente ? 'Mi cuenta' : 'Ingresar', kind: 'url', url: '/cuenta', children: [] } : null;
   const main = [...base.filter((l) => l.url !== '/cuenta'), ...(cuenta ? [cuenta] : [])];
-  $('#nav').innerHTML = base.filter((l) => l.url !== '/cuenta').map((l) => `${enlace(l)}${esc(l.label)}</a>`).join('');
+  // Barra del medio: lo que tiene ramificaciones (por ejemplo, las categorías de la tienda) se despliega debajo
+  $('#nav').innerHTML = base.filter((l) => l.url !== '/cuenta').map((l, i) => {
+    const hijos = l.children?.filter(publicado) ?? [];
+    if (!hijos.length) return `${enlace(l)}${esc(l.label)}</a>`;
+    return `<div class="wk-nav-item">${enlace(l)}${esc(l.label)}</a>
+      <button type="button" class="wk-nav-abrir" aria-expanded="false" aria-controls="nav-sub-${i}" aria-label="Ver lo que hay en ${esc(l.label)}">${CHEVRON}</button>
+      <div class="wk-nav-sub" id="nav-sub-${i}">${hijos.map((c) => `${enlace(c)}${esc(c.label)}</a>`).join('')}</div></div>`;
+  }).join('');
   const acceso = $('#cuenta-enlace');
   acceso.hidden = !cuenta;
   if (cuenta) acceso.innerHTML = `${icono('i-user')}<span>${esc(cuenta.label)}</span>`;
-  $('#panel-nav').innerHTML = main.map((l, i) =>
-    `${enlace(l, ` style="--i:${i}"`)}<small>${String(i + 1).padStart(2, '0')}</small>${esc(l.label)}</a>${l.children?.filter(publicado).length
-      ? `<div class="ns-panel__sub">${l.children.filter(publicado).map((c) => `${enlace(c)}${esc(c.label)}</a>`).join('')}</div>` : ''}`).join('');
+  // Menú grande (☰): las ramificaciones van plegadas debajo de su enlace y se abren con la flecha
+  $('#panel-nav').innerHTML = main.map((l, i) => {
+    const hijos = l.children?.filter(publicado) ?? [];
+    const principal = `${enlace(l, ` style="--i:${i}"`)}<small>${String(i + 1).padStart(2, '0')}</small>${esc(l.label)}</a>`;
+    if (!hijos.length) return principal;
+    return `<div class="wk-panel-item" style="--i:${i}">${principal}
+      <button type="button" class="wk-panel-abrir" aria-expanded="false" aria-controls="panel-sub-${i}" aria-label="Ver lo que hay en ${esc(l.label)}">${CHEVRON}</button>
+      <div class="ns-panel__sub" id="panel-sub-${i}" inert><div>${hijos.map((c) => `${enlace(c)}${esc(c.label)}</a>`).join('')}</div></div></div>`;
+  }).join('');
   marcarActivo();
+}
+
+const CHEVRON = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m6 9 6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+/** Las flechas de los menús: abren y cierran las ramificaciones. Se conecta una sola vez. */
+export function conectarSubmenus() {
+  const cerrarBarra = (salvo) => $$('#nav .wk-nav-item.is-abierto').forEach((it) => {
+    if (it === salvo) return;
+    it.classList.remove('is-abierto');
+    it.querySelector('.wk-nav-abrir').setAttribute('aria-expanded', 'false');
+  });
+  document.addEventListener('click', (e) => {
+    const b = e.target.closest('.wk-nav-abrir, .wk-panel-abrir');
+    if (!b) { if (!e.target.closest('.wk-nav-sub')) cerrarBarra(); return; }
+    const item = b.parentElement, abierto = !item.classList.contains('is-abierto');
+    if (b.classList.contains('wk-nav-abrir')) cerrarBarra(item);
+    item.classList.toggle('is-abierto', abierto);
+    b.setAttribute('aria-expanded', String(abierto));
+    const sub = item.querySelector('.ns-panel__sub');
+    if (sub) sub.inert = !abierto;
+  });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') cerrarBarra(); });
 }
 
 /** Resalta en el menú la sección en la que está el visitante. */
