@@ -19,12 +19,30 @@ export async function walkurio() {
     <section class="wk-mundo is-llegando is-cargando" aria-labelledby="mundo-titulo">
       <canvas class="wk-mundo__lienzo" aria-hidden="true"></canvas>
       <div class="wk-mundo__marcas" id="mundo-marcas"></div>
-      <p class="wk-mundo__carga" role="status"><span aria-hidden="true"></span>Preparando ${esc(RAIZ.nombre)}…</p>
+      <div class="wk-mundo__carga" aria-hidden="true">
+        <span class="wk-mundo__semilla"></span>
+        ${Array.from({ length: 34 }, (_, i) => `<i style="--a:${(i * 137.5) % 360}deg;--r:${70 + ((i * 53) % 150)}px;--t:${2.4 + (i % 5) * 0.45}s;--d:${-((i * 0.37) % 3)}s;--s:${2 + (i % 3)}px"><b></b></i>`).join('')}
+      </div>
+      <p class="wk-sr" role="status" id="mundo-estado">Cargando ${esc(RAIZ.nombre)}…</p>
       <p class="wk-mundo__llegada" aria-hidden="true"><span>${esc(RAIZ.nombre)}</span></p>
       <aside class="wk-mundo__panel" id="mundo-panel">
         <nav class="wk-mundo__migas" aria-label="Dónde estás"><ol id="mundo-migas"></ol></nav>
         <div class="wk-mundo__ficha" id="mundo-ficha"></div>
       </aside>
+      <div class="wk-mundo__cielo">
+        <button type="button" class="wk-mundo__cielo-boton" id="mundo-cielo" aria-pressed="false">
+          <svg viewBox="0 0 48 48" aria-hidden="true" focusable="false">
+            <circle class="cielo-orbita" cx="24" cy="24" r="15" fill="none" stroke="currentColor" stroke-width="1" stroke-dasharray="2 3"/>
+            <circle class="cielo-planeta" cx="24" cy="24" r="6"/>
+            <g class="cielo-rueda">
+              <g class="cielo-sol"><circle cx="24" cy="9" r="3.6"/><path d="M24 2.5v2M24 13.5v2M17.5 9h2M28.5 9h2M19.4 4.4l1.4 1.4M27.2 12.2l1.4 1.4M19.4 13.6l1.4-1.4M27.2 5.8l1.4-1.4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></g>
+              <mask id="cielo-medialuna"><rect width="48" height="48" fill="#fff"/><circle cx="26.6" cy="37.4" r="3.9" fill="#000"/></mask>
+              <circle class="cielo-luna" cx="24" cy="39" r="4.6" mask="url(#cielo-medialuna)"/>
+            </g>
+          </svg>
+        </button>
+        <p class="wk-mundo__cielo-nota" id="mundo-cielo-nota" aria-live="polite"></p>
+      </div>
       <div class="wk-mundo__zoom" role="group" aria-label="Acercar y alejar">
         <button type="button" data-zoom="0.72" aria-label="Acercar">+</button>
         <button type="button" data-zoom="1.38" aria-label="Alejar">−</button>
@@ -36,6 +54,12 @@ export async function walkurio() {
   const seccion = $('.wk-mundo'), marcas = $('#mundo-marcas'), panel = $('#mundo-panel');
   const control = new AbortController();
   const { signal } = control;
+  {
+    const s = seccion.getBoundingClientRect(), p = panel.getBoundingClientRect(), carga = $('.wk-mundo__carga');
+    const compu = innerWidth >= 900;
+    carga.style.setProperty('--cx', `${compu ? p.right - s.left + (s.right - p.right) / 2 : s.width / 2}px`);
+    carga.style.setProperty('--cy', `${compu ? 84 + (s.height - 84) / 2 : (84 + p.top - s.top) / 2}px`);
+  }
 
   // Dónde estás: la cadena de zonas desde el planeta
   let camino = [];
@@ -56,6 +80,7 @@ export async function walkurio() {
     seccion.classList.add('sin-3d');
   }
   seccion.classList.remove('is-cargando');
+  $('#mundo-estado').textContent = '';
 
   // Productos de una zona (handles del panel): se buscan en el catálogo una sola vez
   let piezas = null;
@@ -174,6 +199,45 @@ export async function walkurio() {
     addEventListener('resize', encuadrar, { signal });
   }
 
+  // --- Día y noche ---
+  // Sigue la hora de quien mira: amanece y anochece según la época del año (del lado sur si la zona horaria es de
+  // Sudamérica). El botón del cielo lo cambia a mano; si elegís lo mismo que marca tu hora, vuelve a seguirla.
+  const delSur = /Montevideo|Argentina|Buenos_Aires|Santiago|Sao_Paulo|Asuncion|Punta_Arenas|Porto_Alegre|Campo_Grande|Cuiaba|La_Paz|Lima/
+    .test(Intl.DateTimeFormat().resolvedOptions().timeZone ?? '');
+  const esDeDia = (f = new Date()) => {
+    const dia = (f - new Date(f.getFullYear(), 0, 0)) / 864e5;
+    const verano = Math.cos((2 * Math.PI * (dia - 172)) / 365) * (delSur ? -1 : 1);
+    const h = f.getHours() + f.getMinutes() / 60;
+    return h >= 6.6 - 0.8 * verano && h < 19.1 + 0.9 * verano;
+  };
+  let noche = !esDeDia(), aMano = false, notaHasta = 0;
+  const boton = $('#mundo-cielo'), nota = $('#mundo-cielo-nota');
+  const pintarCielo = (anunciar) => {
+    seccion.dataset.cielo = noche ? 'noche' : 'dia';
+    boton.setAttribute('aria-pressed', String(noche));
+    boton.setAttribute('aria-label', noche ? 'Es de noche en Walkurio. Pasar a día' : 'Es de día en Walkurio. Pasar a noche');
+    if (!anunciar) return;
+    nota.textContent = `${noche ? 'De noche' : 'De día'} · ${aMano ? 'elegido por vos' : 'como en tu hora'}`;
+    nota.classList.add('is-visible');
+    notaHasta = Date.now() + 3200;
+    setTimeout(() => { if (Date.now() >= notaHasta) nota.classList.remove('is-visible'); }, 3300);
+  };
+  planeta?.noche(noche, true);
+  pintarCielo(false);
+  boton.addEventListener('click', () => {
+    noche = !noche;
+    aMano = noche !== !esDeDia();
+    planeta?.noche(noche);
+    pintarCielo(true);
+  }, { signal });
+  const vigia = setInterval(() => {
+    if (aMano || noche === !esDeDia()) return;
+    noche = !noche;
+    planeta?.noche(noche);
+    pintarCielo(true);
+  }, 60000);
+  signal.addEventListener('abort', () => clearInterval(vigia));
+
   // Si la dirección trae una zona (#continente-central/…), se llega directo ahí
   const pedido = [];
   for (const id of decodeURIComponent(location.hash.slice(1)).split('/').filter(Boolean)) {
@@ -188,6 +252,7 @@ export async function walkurio() {
     if (llegado || signal.aborted) return;
     llegado = true;
     seccion.classList.remove('is-llegando');
+    setTimeout(() => { if (!signal.aborted) pintarCielo(true); }, 900);
     $('#mundo-saltar')?.remove();
     if (pedido.length) viajar(pedido);
   };

@@ -212,7 +212,7 @@ const ESFERA_VERT = /* glsl */`
 
 const PLANETA_FRAG = /* glsl */`
   uniform sampler2D uColor; uniform sampler2D uNormal; uniform sampler2D uNubes;
-  uniform vec3 uSol; uniform float uGiroNubes; uniform float uDetalle;
+  uniform vec3 uSol; uniform float uGiroNubes; uniform float uDetalle; uniform float uNoche; uniform float uT;
   uniform sampler2D uPColor; uniform sampler2D uPNormal; uniform vec4 uParche; uniform float uPPeso;
   varying vec2 vUv; varying vec3 vP; varying vec3 vW;
   ${RUIDO}
@@ -240,7 +240,8 @@ const PLANETA_FRAG = /* glsl */`
     float dg = dot(P, L);
     float dia = smoothstep(-0.14, 0.28, dg);
     float dif = mix(max(dot(n, L), 0.0), max(dg, 0.0) * 0.7 + 0.3, agua);
-    col = col * (vec3(0.03, 0.06, 0.13) + vec3(1.0, 0.97, 0.92) * dif * 1.2 * dia);
+    // De noche, el lado oscuro queda con luz de luna: se ve, pero azulado y apagado
+    col = col * (mix(vec3(0.03, 0.06, 0.13), vec3(0.08, 0.12, 0.21), uNoche) + vec3(1.0, 0.97, 0.92) * dif * 1.2 * dia);
     vec3 H = normalize(L + V);
     float sp = pow(max(dot(P, H), 0.0), 80.0) * 0.5 + pow(max(dot(P, H), 0.0), 14.0) * 0.04 * (1.0 - uDetalle);
     col += vec3(0.85, 0.93, 1.0) * sp * agua * dia;
@@ -249,6 +250,13 @@ const PLANETA_FRAG = /* glsl */`
     float fr = pow(1.0 - max(dot(P, V), 0.0), 2.6);
     col = mix(col, vec3(0.32, 0.6, 1.0) * (0.12 + 0.9 * dia), fr * 0.7 * (1.0 - 0.45 * uDetalle));
     col = mix(col, col * vec3(0.94, 0.98, 1.06), 0.5);
+    // Aurora: cortinas de luz suaves cerca de los polos, solo en el lado de noche
+    if (uNoche > 0.01) {
+      float la = abs(asin(clamp(P.y, -1.0, 1.0)));
+      float banda = smoothstep(1.0, 1.12, la) * smoothstep(1.38, 1.2, la);
+      float cortina = pow(0.5 + 0.5 * sin(atan(P.x, P.z) * 9.0 + snoise(P * 5.0 + uT * 0.04) * 4.0 + uT * 0.12), 3.0);
+      col += vec3(0.25, 0.85, 0.95) * banda * cortina * (1.0 - dia) * uNoche * 0.45;
+    }
     gl_FragColor = vec4(col, 1.0);
   }`;
 
@@ -299,6 +307,19 @@ const ATMOS_FRAG = /* glsl */`
     float g = pow(clamp((1.06 - d) / 0.06, 0.0, 1.0), 2.4);
     float dia = smoothstep(-0.4, 0.45, dot(normalize(c), normalize(uSol)));
     vec3 col = vec3(0.3, 0.58, 1.0) * g * (0.12 + 1.2 * dia);
+    col += vec3(0.75, 0.82, 1.0) * g * pow(max(dot(rd, normalize(uSol)), 0.0), 5.0) * 1.4;
+    gl_FragColor = vec4(col, clamp(max(col.r, max(col.g, col.b)), 0.0, 1.0));
+  }`;
+
+const SOL_FRAG = /* glsl */`
+  varying vec2 vUv;
+  void main() {
+    vec2 q = vUv * 2.0 - 1.0;
+    float r = length(q);
+    float nucleo = smoothstep(0.032, 0.024, r);
+    float halo = exp(-r * r * 60.0) * 0.75 + exp(-r * 7.0) * 0.26;
+    float rayos = pow(0.5 + 0.5 * sin(atan(q.y, q.x) * 14.0), 4.0) * exp(-r * 7.0) * 0.18;
+    vec3 col = (vec3(1.0, 0.97, 0.9) * nucleo * 1.6 + vec3(1.0, 0.86, 0.64) * (halo + rayos)) * (1.0 - smoothstep(0.8, 1.0, r));
     gl_FragColor = vec4(col, clamp(max(col.r, max(col.g, col.b)), 0.0, 1.0));
   }`;
 
@@ -321,10 +342,10 @@ function estrellas(cuantas) {
   g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
   g.setAttribute('aDat', new THREE.BufferAttribute(dat, 3));
   const m = new THREE.ShaderMaterial({
-    uniforms: { uT: { value: 0 }, uDpr: { value: 1 } },
-    vertexShader: `attribute vec3 aDat; uniform float uT; uniform float uDpr; varying float vA; varying float vTono;
+    uniforms: { uT: { value: 0 }, uDpr: { value: 1 }, uBrillo: { value: 1 } },
+    vertexShader: `attribute vec3 aDat; uniform float uT; uniform float uDpr; uniform float uBrillo; varying float vA; varying float vTono;
       void main() { gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-        gl_PointSize = aDat.y * uDpr; vTono = aDat.x; vA = aDat.z * (0.7 + 0.3 * sin(uT * (0.5 + aDat.x * 1.8) + aDat.x * 40.0)); }`,
+        gl_PointSize = aDat.y * uDpr; vTono = aDat.x; vA = uBrillo * aDat.z * (0.7 + 0.3 * sin(uT * (0.5 + aDat.x * 1.8) + aDat.x * 40.0)); }`,
     fragmentShader: `varying float vA; varying float vTono;
       void main() { float a = smoothstep(0.5, 0.05, length(gl_PointCoord - 0.5)) * vA;
         gl_FragColor = vec4(mix(vec3(0.75, 0.86, 1.0), vec3(1.0, 0.95, 0.88), vTono) * a, a); }`,
@@ -466,7 +487,7 @@ export async function crearPlaneta(lienzo, { mapa, lunas = [] }) {
   const geo = new THREE.SphereGeometry(1, chico ? 160 : 220, chico ? 100 : 140);
   const matPlaneta = new THREE.ShaderMaterial({
     uniforms: {
-      uColor: { value: bajo.color.texture }, uNormal: { value: bajo.normal.texture }, uNubes: { value: bajo.nubes.texture }, uSol, uGiroNubes, uDetalle: { value: 0 }, uRuido: { value: ruido },
+      uColor: { value: bajo.color.texture }, uNormal: { value: bajo.normal.texture }, uNubes: { value: bajo.nubes.texture }, uSol, uGiroNubes, uDetalle: { value: 0 }, uRuido: { value: ruido }, uNoche: { value: 0 }, uT: { value: 0 },
       uPColor: { value: null }, uPNormal: { value: null }, uParche: { value: new THREE.Vector4(0, 0, 1, 1) }, uPPeso: { value: 0 },
     },
     vertexShader: ESFERA_VERT, fragmentShader: PLANETA_FRAG,
@@ -486,6 +507,14 @@ export async function crearPlaneta(lienzo, { mapa, lunas = [] }) {
   const cielo = estrellas(chico ? 1800 : 3200);
   cielo.material.uniforms.uDpr.value = dpr;
   escena.add(cielo, planeta, nubes, atmosfera);
+  const sol = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.ShaderMaterial({
+    vertexShader: 'varying vec2 vUv; void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
+    fragmentShader: SOL_FRAG, transparent: true, depthWrite: false, ...SUMAR,
+  }));
+  sol.frustumCulled = false;
+  escena.add(sol);
+  // Día y noche: 0 = día (el sol arriba a un costado, el planeta iluminado), 1 = noche (el sol detrás del planeta)
+  let fase = 0, faseObjetivo = 0;
 
   const cuerpos = new Map([['planeta', { r: 1, centro: new THREE.Vector3() }]]);
   const geoLuna = new THREE.SphereGeometry(1, 96, 64);
@@ -546,7 +575,17 @@ export async function crearPlaneta(lienzo, { mapa, lunas = [] }) {
     const der = new THREE.Vector3().setFromMatrixColumn(camara.matrixWorld, 0);
     const arr = new THREE.Vector3().setFromMatrixColumn(camara.matrixWorld, 1);
     const haciaCam = camara.position.clone().sub(p.mira).normalize();
-    uSol.value.copy(haciaCam).addScaledVector(der, -0.55).addScaledVector(arr, 0.5).normalize();
+    const luzDia = haciaCam.clone().addScaledVector(der, -0.55).addScaledVector(arr, 0.5).normalize();
+    const luzNoche = haciaCam.clone().multiplyScalar(-0.75).addScaledVector(der, -0.5).addScaledVector(arr, 0.4).normalize();
+    const k = fase * fase * (3 - 2 * fase);
+    uSol.value.copy(luzDia).applyQuaternion(new THREE.Quaternion().slerp(new THREE.Quaternion().setFromUnitVectors(luzDia, luzNoche), k));
+    // El sol se ve arriba a la izquierda de día; al pasar a la noche viaja hasta quedar escondido detrás del planeta
+    const enCam = new THREE.Vector3(-0.3, 0.25, -1).lerp(new THREE.Vector3(-0.08, 0.07, -1), k).normalize().transformDirection(camara.matrixWorld);
+    sol.position.copy(camara.position).addScaledVector(enCam, 60);
+    sol.quaternion.copy(camara.quaternion);
+    sol.scale.setScalar(60 * Math.tan(24 * RAD) * 2);
+    cielo.material.uniforms.uBrillo.value = 0.45 + 0.55 * k;
+    matPlaneta.uniforms.uNoche.value = k;
     const hPlaneta = camara.position.length() - 1;
     matPlaneta.uniforms.uDetalle.value = THREE.MathUtils.smoothstep(0.7 - hPlaneta, 0, 0.55);
     matNubes.uniforms.uCerca.value = THREE.MathUtils.smoothstep(0.5 - hPlaneta, 0, 0.4);
@@ -697,6 +736,9 @@ export async function crearPlaneta(lienzo, { mapa, lunas = [] }) {
     }
     if (!reducido) uGiroNubes.value = (reloj * 0.0008) % 1;
     cielo.material.uniforms.uT.value = reloj;
+    matPlaneta.uniforms.uT.value = reloj;
+    // El paso de día a noche (o al revés) dura unos segundos: se ve al sol cruzar y a la sombra barrer el planeta
+    if (fase !== faseObjetivo) fase = reducido ? faseObjetivo : faseObjetivo > fase ? Math.min(faseObjetivo, fase + real / 2.6) : Math.max(faseObjetivo, fase - real / 2.6);
     ubicar(enVuelo ?? pose(cam, poseA));
     // Una luna que se cruza delante de la cámara (o la envuelve) se desvanece; las órbitas, solo de lejos
     const cerca = cam.cuerpo !== 'planeta' || nivel > 0;
@@ -783,6 +825,8 @@ export async function crearPlaneta(lienzo, { mapa, lunas = [] }) {
     },
     /** Dónde está la cámara (para depurar). */
     get estado() { return { ...cam, nivel, vuelo: !!vuelo, pos: camara.position.toArray() }; },
+    /** De noche (true) o de día (false). Con `ya`, sin la transición. */
+    noche(si, ya = false) { faseObjetivo = si ? 1 : 0; if (ya) fase = faseObjetivo; },
     get volando() { return !!vuelo; },
     set alCuadro(fn) { alCuadro = fn; },
     set alAlejar(fn) { alAlejar = fn; },

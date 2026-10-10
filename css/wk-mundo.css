@@ -217,26 +217,124 @@ body[data-pagina='walkurio'] #pie { display: none; }
   .wk-mundo__punto::after { animation: none; }
 }
 
-/* ---- Carga: mientras se preparan el mapa y las texturas ---- */
+/* ---- Carga: polvo de estrellas que gira y cae hacia una semilla de luz, donde va a aparecer el planeta ----
+   Todo se anima con transform y opacity: lo mueve la placa de video, así no se traba mientras el planeta se prepara */
 .wk-mundo__carga {
   position: absolute;
-  inset: 0;
   z-index: 3;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  margin: 0;
-  font-size: 0.9rem;
-  letter-spacing: 0.04em;
-  color: var(--white-muted);
+  left: var(--cx, 50%);
+  top: var(--cy, 50%);
+  width: 0;
+  height: 0;
   pointer-events: none;
   opacity: 0;
-  transition: opacity 0.5s ease;
+  transition: opacity 0.9s ease;
 }
 .wk-mundo.is-cargando .wk-mundo__carga { opacity: 1; }
-.wk-mundo__carga span { width: 18px; height: 18px; border-radius: 50%; border: 2px solid color-mix(in srgb, var(--blue-glow) 25%, transparent); border-top-color: var(--blue-glow); animation: wk-mundo-gira 0.9s linear infinite; }
-@keyframes wk-mundo-gira { to { rotate: 360deg; } }
+.wk-mundo__carga i { position: absolute; left: 0; top: 0; rotate: var(--a); animation: wk-mundo-orbita var(--t) linear var(--d) infinite; }
+.wk-mundo__carga b {
+  position: absolute;
+  width: var(--s);
+  height: var(--s);
+  margin: calc(var(--s) / -2) 0 0 calc(var(--s) / -2);
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 6px 1px var(--blue-glow), 0 0 14px 2px color-mix(in srgb, var(--blue-light) 50%, transparent);
+  animation: wk-mundo-cae var(--t) cubic-bezier(0.5, 0, 0.75, 0.6) var(--d) infinite;
+}
+@keyframes wk-mundo-orbita { from { rotate: var(--a); } to { rotate: calc(var(--a) + 360deg); } }
+@keyframes wk-mundo-cae {
+  0% { transform: translateX(var(--r)) scale(1); opacity: 0; }
+  18% { opacity: 1; }
+  80% { opacity: 0.9; }
+  100% { transform: translateX(4px) scale(0.25); opacity: 0; }
+}
+.wk-mundo__semilla {
+  position: absolute;
+  left: -46px;
+  top: -46px;
+  width: 92px;
+  height: 92px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff 0 5%, color-mix(in srgb, var(--blue-glow) 90%, transparent) 13%, color-mix(in srgb, var(--blue-light) 35%, transparent) 34%, transparent 70%);
+  animation: wk-mundo-late 2.4s ease-in-out infinite alternate;
+  transition: scale 1.2s var(--wk-ease), opacity 1.2s ease;
+}
+/* Al terminar, la semilla se abre en un destello mientras llega el planeta */
+.wk-mundo:not(.is-cargando) .wk-mundo__semilla { scale: 3.2; opacity: 0; }
+@keyframes wk-mundo-late { from { transform: scale(0.82); opacity: 0.75; } to { transform: scale(1.12); opacity: 1; } }
+@media (prefers-reduced-motion: reduce) {
+  .wk-mundo__carga i { display: none; }
+  .wk-mundo__semilla { animation: none; }
+}
+
+/* ---- Día y noche: el botón del cielo y la luz de fondo ---- */
+.wk-mundo::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 40% 36% at 37% 18%, rgb(255 232 196 / 0.06), transparent 70%),
+    radial-gradient(ellipse 80% 70% at 62% 45%, color-mix(in srgb, var(--blue-mid) 20%, transparent), transparent 75%);
+  transition: opacity 2.6s ease;
+}
+.wk-mundo[data-cielo='noche']::before { opacity: 0; }
+.wk-mundo__cielo { position: absolute; z-index: 2; right: calc(var(--wk-x) - 5px); bottom: 136px; }
+.wk-mundo__cielo-boton {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid color-mix(in srgb, var(--blue-glow) 22%, transparent);
+  background: color-mix(in srgb, var(--blue-night) 60%, transparent);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  color: var(--white);
+  cursor: pointer;
+}
+.wk-mundo__cielo-boton:hover { background: var(--blue-mid); }
+.wk-mundo__cielo-boton svg { width: 50px; height: 50px; overflow: visible; }
+.cielo-orbita { opacity: 0.35; }
+.cielo-planeta { fill: var(--blue-light); }
+.cielo-rueda { transform-origin: 24px 24px; transition: transform 2.6s cubic-bezier(0.45, 0, 0.2, 1); }
+.cielo-sol { color: #FFD27A; fill: #FFD27A; transition: opacity 1.4s ease; }
+.cielo-luna { fill: var(--white-muted); opacity: 0.3; transition: opacity 1.4s ease; }
+/* De noche la rueda da media vuelta: el sol se pone abajo y la luna sale arriba */
+.wk-mundo[data-cielo='noche'] .cielo-rueda { transform: rotate(180deg); }
+.wk-mundo[data-cielo='noche'] .cielo-sol { opacity: 0.3; }
+.wk-mundo[data-cielo='noche'] .cielo-luna { opacity: 1; }
+.wk-mundo__cielo-nota {
+  position: absolute;
+  right: calc(100% + 10px);
+  top: 50%;
+  margin: 0;
+  padding: 8px 14px;
+  border-radius: 999px;
+  white-space: nowrap;
+  font-size: 0.8rem;
+  color: var(--white);
+  background: color-mix(in srgb, var(--blue-night) 75%, transparent);
+  border: 1px solid color-mix(in srgb, var(--blue-glow) 18%, transparent);
+  opacity: 0;
+  translate: 8px -50%;
+  transition: opacity 0.5s ease, translate 0.5s var(--wk-ease);
+  pointer-events: none;
+}
+.wk-mundo__cielo-nota.is-visible { opacity: 1; translate: 0 -50%; }
+.wk-mundo.is-llegando .wk-mundo__cielo { opacity: 0; pointer-events: none; }
+.wk-mundo__cielo { transition: opacity 0.9s var(--wk-ease); }
+.wk-mundo.sin-3d .wk-mundo__cielo { display: none; }
+@media (max-width: 899px) {
+  .wk-mundo__cielo { right: 12px; bottom: calc(min(42svh, 360px) + 24px + 96px); }
+  .wk-mundo__cielo { right: 7px; }
+  .wk-mundo__cielo-boton { width: 50px; height: 50px; }
+  .wk-mundo__cielo-boton svg { width: 44px; height: 44px; }
+}
+@media (prefers-reduced-motion: reduce) { .cielo-rueda { transition: none; } }
+
 
 /* ---- Modo ubicar (/walkurio?ubicar) ---- */
 .wk-mundo__ubicar {

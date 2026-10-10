@@ -123,6 +123,15 @@ Si llega el mapa real (4096×2048, solo el mapa): `node .dev/walkurio-mapa.mjs m
   del navegador avisa si una zona del planeta cayó en el agua.
 - La plataforma acepta hasta 60 zonas y 12 campos por zona.
 
+**Día y noche:** Walkurio sigue la hora de quien mira (amanecer y atardecer según la época del año; del lado sur si
+su zona horaria es de Sudamérica, como Uruguay). De día el sol se ve arriba a la izquierda y el planeta está iluminado;
+de noche el sol queda detrás del planeta: borde de luz, luz de luna, más estrellas y una aurora suave en los polos.
+El botón del cielo (un sol y una luna que giran alrededor de un planetita, abajo a la derecha) lo cambia a mano; si se
+elige lo mismo que marca la hora, vuelve a seguirla. La hora se revisa cada minuto.
+
+**Mientras carga:** polvo de estrellas que gira y cae hacia una semilla de luz, donde va a aparecer el planeta. Está
+hecho solo con CSS (transform y opacity), así no se traba mientras el planeta se prepara.
+
 Sin WebGL (navegadores muy viejos) queda el panel para recorrer las zonas, sin el planeta.
 
 ## Fotos livianas
