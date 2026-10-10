@@ -386,12 +386,12 @@ const TERRENO_VERT = /* glsl */`
     gl_Position = projectionMatrix * viewMatrix * m;
   }`;
 const TERRENO_FRAG = /* glsl */`
-  uniform sampler2D uPColor; uniform sampler2D uPNormal; uniform vec3 uSol; uniform float uNoche;
+  uniform sampler2D uPColor; uniform sampler2D uPNormal; uniform vec3 uSol; uniform float uNoche; uniform float uNiebla;
   varying vec2 vUv; varying vec3 vN; varying vec3 vW; varying vec3 vP;
   void main() {
     vec4 c = texture2D(uPColor, vUv);
     vec3 fino = normalize(texture2D(uPNormal, vUv).xyz * 2.0 - 1.0);
-    vec3 n = normalize(vN + (fino - vP) * 0.7);
+    vec3 n = normalize(vN + (fino - vP));
     vec3 L = normalize(uSol), V = normalize(cameraPosition - vW);
     float dg = dot(vP, L), dia = smoothstep(-0.14, 0.28, dg), agua = c.a;
     float dif = mix(max(dot(n, L), 0.0), max(dg, 0.0) * 0.7 + 0.3, agua);
@@ -399,7 +399,7 @@ const TERRENO_FRAG = /* glsl */`
     col += vec3(0.85, 0.93, 1.0) * pow(max(dot(vP, normalize(L + V)), 0.0), 80.0) * 0.5 * agua * dia;
     col = mix(col, col * vec3(0.94, 0.98, 1.06), 0.5);
     float lejos = length(cameraPosition - vW);
-    col = mix(col, mix(vec3(0.05, 0.08, 0.16), vec3(0.5, 0.66, 0.88), dia) * (0.25 + 0.75 * dia), (1.0 - exp(-lejos * lejos * 55.0)) * 0.85);
+    col = mix(col, mix(vec3(0.05, 0.08, 0.16), vec3(0.5, 0.66, 0.88), dia) * (0.25 + 0.75 * dia), (1.0 - exp(-lejos * lejos * 55.0)) * 0.85 * uNiebla);
     gl_FragColor = vec4(col, 1.0);
   }`;
 
@@ -636,7 +636,7 @@ export async function crearPlaneta(lienzo, { mapa, lunas = [] }) {
   const matTerreno = new THREE.ShaderMaterial({
     uniforms: {
       uAltura: { value: null }, uParche: { value: new THREE.Vector4(0, 0, 1, 1) }, uEscala: { value: 0 }, uPaso: { value: 1 / ladoTerreno },
-      uPColor: { value: null }, uPNormal: { value: null }, uSol, uNoche: matPlaneta.uniforms.uNoche,
+      uPColor: { value: null }, uPNormal: { value: null }, uSol, uNoche: matPlaneta.uniforms.uNoche, uNiebla: matPlaneta.uniforms.uNiebla,
     },
     vertexShader: TERRENO_VERT, fragmentShader: TERRENO_FRAG,
   });
@@ -988,10 +988,14 @@ export async function crearPlaneta(lienzo, { mapa, lunas = [] }) {
     const subeK = 1 - Math.pow(1 - Math.min(1, subida * 1.25), 3);
     matTerreno.uniforms.uEscala.value = ESCALA_RELIEVE * subeK;
     uCrece.value = subidaObjetivo ? THREE.MathUtils.smoothstep(subida, 0.75, 1) : subida;
-    matPlaneta.uniforms.uNiebla.value = subida;
+    const abajo = THREE.MathUtils.smoothstep(0.26 - (camara.position.length() - 1), 0, 0.17);
+    const niebla = subida * abajo;
+    matPlaneta.uniforms.uNiebla.value = niebla;
+    bruma.density = Math.sqrt(55 * niebla);
+    terreno.visible = !!paisajeVivo && abajo > 0.01;
     nubes.visible = subida < 0.2;
     luzSol.position.copy(uSol.value).multiplyScalar(10);
-    escena.fog = subida > 0 ? bruma : null;
+    escena.fog = niebla > 0.001 ? bruma : null;
     bruma.color.lerpColors(brumaDia, brumaNoche, matPlaneta.uniforms.uNoche.value);
     luzAmbiente.intensity = 0.55 - 0.35 * matPlaneta.uniforms.uNoche.value;
     renderer.render(escena, camara);
