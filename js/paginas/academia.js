@@ -106,7 +106,7 @@ export async function curso(slug, abierta) {
     </section>`;
   // Reproductor protegido de la plataforma: ningún clic lleva a YouTube y al darle play se abre en pantalla grande dentro de la web
   if (actual?.video && tienda.cursos.reproductor) tienda.cursos.reproductor($('#leccion-video'), actual, { color: estado.info.colors?.primary, grande: true });
-  $('[data-leccion]').forEach((b) => b.addEventListener('click', () => { curso(slug, b.dataset.leccion); window.scrollTo(0, 0); }));
+  $$('[data-leccion]').forEach((b) => b.addEventListener('click', () => { curso(slug, b.dataset.leccion); window.scrollTo(0, 0); }));
   $('#vista')?.addEventListener('click', async () => {
     await tienda.cursos.avance(slug, actual.id, !actual.done);
     const sig = c.lessons[c.lessons.findIndex((l) => l.id === actual.id) + 1];

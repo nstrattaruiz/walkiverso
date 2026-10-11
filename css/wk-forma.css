@@ -1054,3 +1054,29 @@ html.wk-sin-carga .wk-carga { display: none; }
 .wk-fotos-suaves .wk-hero__fotos img:not(.is-cargada) { opacity: 0 !important; }
 @keyframes wk-foto-llega { from { opacity: 0; } to { opacity: 1; } }
 @media (prefers-reduced-motion: reduce) { .wk-fotos-suaves :is(img.wk-arte, .wk-puerta__foto, .wk-ficha img, .wk-galeria img).is-cargada { animation: none; } }
+
+/* Agregar al carrito desde la tarjeta: debajo del corazón, mismo estilo de círculo */
+.wk-al-carrito {
+  position: absolute; top: 58px; right: 10px; z-index: 2;
+  display: grid; place-items: center; width: 40px; height: 40px; padding: 0; border: 0; border-radius: 50%;
+  background: rgb(255 255 255 / 0.88); color: var(--blue-deep); cursor: pointer;
+  transition: transform 0.35s var(--wk-ease), background-color 0.25s, color 0.25s;
+}
+.wk-al-carrito--solo { top: 10px; }
+.wk-al-carrito svg { width: 19px; height: 19px; }
+.wk-al-carrito b { position: absolute; right: 7px; bottom: 7px; display: grid; place-items: center; width: 13px; height: 13px; border-radius: 50%; background: var(--blue-deep); color: var(--white); font: 700 11px/1 var(--wk-body); }
+.wk-al-carrito:hover { transform: scale(1.1); background: var(--blue-deep); color: var(--white); }
+.wk-al-carrito:hover b { background: var(--white); color: var(--blue-deep); }
+.wk-al-carrito.is-cargando { opacity: 0.6; pointer-events: none; }
+.wk-al-carrito.is-agregado { background: var(--blue-deep); color: var(--white); animation: wk-pulso 0.6s var(--wk-ease); }
+.wk-al-carrito.is-agregado b { background: var(--white); color: var(--blue-deep); }
+.wk-al-carrito.is-error { background: #b3261e; color: var(--white); }
+@media (max-width: 749px) {
+  .wk-al-carrito { top: 54px; right: 8px; width: 38px; height: 38px; }
+  .wk-al-carrito--solo { top: 8px; }
+}
+/* Tarjetas anchas (1 o 2 piezas): el corazón va a la izquierda; el botón, debajo */
+@media (min-width: 750px) {
+  .wk-grilla:is([data-n='1'], [data-n='2']) .wk-al-carrito { top: 74px; right: auto; left: 26px; }
+  .wk-grilla:is([data-n='1'], [data-n='2']) .wk-al-carrito--solo { top: 26px; }
+}

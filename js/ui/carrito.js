@@ -85,6 +85,26 @@ export async function iniciarCarrito() {
     try { await tienda.carrito.cambiar(Number(b.dataset.linea), Number(b.dataset.cant)); }
     catch (err) { const aviso = $('#carrito-error'); if (aviso) aviso.textContent = err.message; }
   });
+  // Botón "agregar" de las tarjetas: suma la pieza y abre el carrito; si falla (se agotó), lo avisa en el botón
+  document.addEventListener('click', async (e) => {
+    const b = e.target.closest('[data-al-carrito]');
+    if (!b) return;
+    e.preventDefault();
+    if (b.disabled) return;
+    b.disabled = true; b.classList.add('is-cargando');
+    try {
+      await tienda.carrito.agregar(b.dataset.alCarrito, Number(b.dataset.cant) || 1);
+      b.classList.remove('is-cargando'); b.classList.add('is-agregado');
+      abrirCarrito();
+      setTimeout(() => b.classList.remove('is-agregado'), 1800);
+    } catch (err) {
+      b.classList.remove('is-cargando');
+      b.title = err.message;
+      b.classList.add('is-error');
+      setTimeout(() => b.classList.remove('is-error'), 2200);
+    }
+    b.disabled = false;
+  });
   tienda.carrito.alCambiar(pintar);
   pintar(await tienda.carrito.ver());
 }

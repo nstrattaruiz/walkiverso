@@ -1,5 +1,5 @@
 // Product Card y Product Grid: la tarjeta de una pieza y la grilla que las ordena.
-import { esc, flecha } from './util.js';
+import { esc, flecha, icono } from './util.js';
 import { NOMBRE, precio } from '../datos/modelo.js';
 import { corazon } from './favoritos.js';
 
@@ -41,6 +41,16 @@ function resumen(pz, largo = 190) {
  */
 export const fila = (piezas, clase = 'wk-grilla--carril') => `<div class="wk-grilla ${clase}"${piezas.length < 4 ? ` data-n="${piezas.length}"` : ''}>${piezas.map(tarjeta).join('')}</div>`;
 
+/**
+ * Agregar al carrito sin entrar a la pieza. Solo cuando se puede comprar directo: disponible, con precio a la vista y
+ * sin opciones para elegir (si tiene talles o versiones, se elige en la ficha).
+ */
+const alCarrito = (pz, solo) => {
+  const variantes = pz.crudo?.variants ?? [];
+  if (!pz.available || pz.priceHidden || !pz.variantId || variantes.filter((v) => v.available).length > 1) return '';
+  return `<button type="button" class="wk-al-carrito${solo ? ' wk-al-carrito--solo' : ''}" data-al-carrito="${esc(pz.variantId)}" data-cant="${pz.crudo?.multiple > 1 ? pz.crudo.multiple : 1}" aria-label="${esc(`Agregar ${pz.name} al carrito`)}">${icono('i-bag')}<b aria-hidden="true">+</b></button>`;
+};
+
 export function tarjeta(pz, i = 0) {
   const n = NOMBRE[pz.tipo];
   const meta = [pz.especieTexto, pz.technique].filter(Boolean).map(esc).join('<i aria-hidden="true"> · </i>');
@@ -62,7 +72,7 @@ export function tarjeta(pz, i = 0) {
         </div>
       </div>
     </a>
-    ${pz.tipo === 'criatura' || pz.tipo === 'artefacto' ? corazon(pz) : ''}
+    ${pz.tipo === 'criatura' || pz.tipo === 'artefacto' ? corazon(pz) + alCarrito(pz) : alCarrito(pz, true)}
   </article>`;
 }
 
