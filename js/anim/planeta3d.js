@@ -1394,6 +1394,22 @@ export async function crearPlaneta(lienzo, { mapa, lunas = [] }) {
     get estado() { return { ...cam, nivel, vuelo: !!vuelo, pos: camara.position.toArray() }; },
     /** De noche (true) o de día (false). Con `ya`, sin la transición. */
     noche(si, ya = false) { faseObjetivo = si ? 1 : 0; if (ya) fase = faseObjetivo; },
+    /** Solo para .dev/walkurio-portada.mjs: el color (agua en alfa) y las nubes ya horneados, como píxeles. */
+    exportar() {
+      const leer = (rt) => {
+        const d = new Uint8ClampedArray(rt.width * rt.height * 4); renderer.readRenderTargetPixels(rt, 0, 0, rt.width, rt.height, d);
+        const c = document.createElement('canvas'); c.width = rt.width; c.height = rt.height;
+        const img = new ImageData(rt.width, rt.height), fila = rt.width * 4;
+        for (let y = 0; y < rt.height; y++) img.data.set(d.subarray((rt.height - 1 - y) * fila, (rt.height - y) * fila), y * fila);
+        // El alfa (agua, o nubes) pasa al rojo de una segunda imagen; la primera queda opaca (si no, se pierde el color)
+        const mascara = new ImageData(rt.width, rt.height);
+        for (let i = 0; i < img.data.length; i += 4) { mascara.data[i] = mascara.data[i + 1] = mascara.data[i + 2] = img.data[i + 3]; mascara.data[i + 3] = 255; img.data[i + 3] = 255; }
+        const c2 = document.createElement('canvas'); c2.width = rt.width; c2.height = rt.height; c2.getContext('2d').putImageData(mascara, 0, 0);
+        c.getContext('2d').putImageData(img, 0, 0);
+        return [c.toDataURL('image/png'), c2.toDataURL('image/png')];
+      };
+      return { color: leer(alto.color), nubes: leer(alto.nubes) };
+    },
     get volando() { return !!vuelo; },
     set alCuadro(fn) { alCuadro = fn; },
     set alAlejar(fn) { alAlejar = fn; },

@@ -1085,7 +1085,10 @@ html.wk-sin-carga .wk-carga { display: none; }
 .wk-universo__ir { margin: 18px 0 0; }
 .wk-universo__mundo { position: relative; display: block; aspect-ratio: 1 / 0.9; color: inherit; text-decoration: none; cursor: grab; }
 .wk-universo__mundo:active { cursor: grabbing; }
-.wk-universo__globo { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: pan-y; }
+.wk-universo__globo { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: pan-y; opacity: 0; transition: opacity 1.4s ease; }
+.wk-universo__globo.is-listo { opacity: 1; }
+/* Un brillo suave detrás del planeta, para que se despegue del fondo claro */
+.wk-universo__mundo::before { content: ''; position: absolute; inset: 12%; border-radius: 50%; background: radial-gradient(closest-side, rgb(18 59 120 / 0.28), rgb(76 142 217 / 0.12) 60%, transparent); pointer-events: none; }
 .wk-universo__pista { position: absolute; left: 50%; bottom: 2%; translate: -50% 0; white-space: nowrap; font-size: 0.74rem; letter-spacing: 0.08em; color: var(--fg-2); opacity: 0; transition: opacity 0.4s ease; }
 .wk-universo__mundo:hover .wk-universo__pista, .wk-universo__mundo:focus-visible .wk-universo__pista { opacity: 1; }
 @media (max-width: 899px) { .wk-universo__mundo { aspect-ratio: 1 / 0.95; margin-top: -10px; } .wk-universo__pista { opacity: 1; } }

@@ -1,167 +1,163 @@
-// Walkurio dibujado, para la portada ("Dónde las criaturas cobran vida"): el planeta en líneas, como un mapa de curvas
-// de nivel sobre una esfera que gira despacio. Las costas y el relieve son los de verdad (img/walkurio/curvas.json,
-// sale de .dev/walkurio-curvas.mjs). Lo de atrás se ve tenue, como a través de un globo de vidrio; las dos lunas orbitan
-// y las zonas del panel brillan sobre la superficie. Se puede girar arrastrando. Solo un lienzo 2D: es liviano.
-const RAD = Math.PI / 180;
+// Walkurio en la portada ("Dónde las criaturas cobran vida"): el planeta real, chico y liviano. Usa la superficie ya
+// calculada del planeta (img/walkurio/portada, sale de .dev/walkurio-portada.mjs) en vez de calcularla: una esfera
+// con su foto, nubes que se mueven, atmósfera y las dos lunas con sus mapas reales. Gira despacio y se puede girar
+// arrastrando; tocarlo lleva a Walkurio.
+// Para que la portada no se trabe: se arma recién cuando la sección se acerca a la pantalla, las imágenes se
+// decodifican fuera del hilo principal, los programas se preparan en paralelo y aparece con un fundido ya listo.
+// Las lunas orbitan dentro del lienzo: nunca se cortan contra el texto.
+const espera = (ms) => new Promise((r) => setTimeout(r, ms));
+
+const VERT = /* glsl */`
+  varying vec2 vUv; varying vec3 vN; varying vec3 vW;
+  void main() { vUv = uv; vN = normalize(mat3(modelMatrix) * normal); vec4 m = modelMatrix * vec4(position, 1.0); vW = m.xyz; gl_Position = projectionMatrix * viewMatrix * m; }`;
+const PLANETA = /* glsl */`
+  uniform sampler2D uMapa; uniform sampler2D uNubes; uniform vec3 uSol; uniform float uT;
+  varying vec2 vUv; varying vec3 vN; varying vec3 vW;
+  void main() {
+    vec4 c = texture2D(uMapa, vUv);
+    vec3 n = normalize(vN), L = normalize(uSol), V = normalize(cameraPosition - vW);
+    float d = dot(n, L), dia = smoothstep(-0.15, 0.3, d);
+    float nube = smoothstep(0.08, 0.7, texture2D(uNubes, vUv + vec2(uT * 0.004, 0.0)).r);
+    float sombra = texture2D(uNubes, vUv + vec2(uT * 0.004 + 0.003, 0.002)).r;
+    vec3 col = c.rgb * (0.05 + 1.15 * max(d, 0.0) * (1.0 - sombra * 0.35));
+    float agua = (1.0 - c.a) / 0.8;   // el agua viene invertida en el alfa (ver .dev/walkurio-portada.mjs)
+    col += vec3(0.9, 0.95, 1.0) * pow(max(dot(reflect(-L, n), V), 0.0), 40.0) * 0.45 * agua * dia;
+    col = mix(col, vec3(0.96, 0.97, 1.0) * (0.06 + 1.05 * max(d, 0.0)), nube * 0.85);
+    float rim = pow(1.0 - max(dot(n, V), 0.0), 2.4);
+    col = mix(col, vec3(0.35, 0.62, 1.0) * (0.25 + 0.9 * dia), rim * 0.65);
+    gl_FragColor = vec4(col, 1.0);
+  }`;
+const ATMOS = /* glsl */`
+  uniform vec3 uSol; varying vec2 vUv; varying vec3 vN; varying vec3 vW;
+  void main() {
+    vec3 n = normalize(vN), V = normalize(cameraPosition - vW);
+    float borde = pow(max(dot(n, -V), 0.0), 3.0);
+    float dia = smoothstep(-0.5, 0.5, dot(n, normalize(uSol)));
+    gl_FragColor = vec4(vec3(0.42, 0.68, 1.0), borde * (0.25 + 0.6 * dia));
+  }`;
+const LUNA = /* glsl */`
+  uniform sampler2D uMapa; uniform vec3 uSol; uniform vec3 uTinte;
+  varying vec2 vUv; varying vec3 vN; varying vec3 vW;
+  void main() {
+    vec3 c = texture2D(uMapa, vUv).rgb * uTinte;
+    float d = max(dot(normalize(vN), normalize(uSol)), 0.0);
+    gl_FragColor = vec4(c * (0.06 + 1.1 * d), 1.0);
+  }`;
 
 /**
- * @param lienzo un <canvas>
- * @param zonas [{ lat, lon, nombre }] (las zonas de primer nivel del planeta)
+ * @param lienzo un <canvas> (dentro del enlace a Walkurio)
  * @returns función para detenerlo
  */
-export function globo(lienzo, zonas = []) {
-  const ctx = lienzo.getContext('2d');
-  const reducido = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  let curvas = null, vivo = true, visible = false, raf = 0, ultimo = 0;
-  let giro = -20, inclina = 16, arrastre = null, vel = 0, ancho = 0, alto = 0, dpr = 1;
-  const t0 = performance.now();
-  fetch('img/walkurio/curvas.json').then((r) => r.json()).then((d) => { curvas = d.niveles; seguir(); }).catch(() => {});
-
-  const medir = () => {
-    dpr = Math.min(devicePixelRatio || 1, 2);
-    ancho = lienzo.clientWidth; alto = lienzo.clientHeight;
-    lienzo.width = Math.round(ancho * dpr); lienzo.height = Math.round(alto * dpr);
-    if (!raf) dibujar(performance.now());
-  };
-
-  // Proyección ortográfica: [x, y, z] en pantalla (z > 0 = de frente)
-  const proyectar = (lat, lon, cx, cy, r) => {
-    const la = lat * RAD, lo = (lon + giro) * RAD, ci = Math.cos(inclina * RAD), si = Math.sin(inclina * RAD);
-    const x = Math.cos(la) * Math.sin(lo), y = Math.sin(la), z = Math.cos(la) * Math.cos(lo);
-    const y2 = y * ci - z * si, z2 = y * si + z * ci;
-    return [cx + x * r, cy - y2 * r, z2];
-  };
-
-  const ESTILO = [ // por nivel: [grosor, opacidad de frente]
-    [1.5, 0.9], [1, 0.55], [0.9, 0.42], [0.8, 0.34],
-  ];
-  function dibujar(ahora) {
-    const t = (ahora - t0) / 1000;
-    const W = ancho * dpr, H = alto * dpr;
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.clearRect(0, 0, W, H);
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    const r = Math.min(ancho, alto) * 0.36, cx = ancho / 2, cy = alto / 2;
-    const azul = (a) => `rgba(18, 59, 120, ${a})`, celeste = (a) => `rgba(76, 142, 217, ${a})`;
-
-    // Lunas: posición en su órbita (inclinada); las que pasan por detrás se dibujan antes que el planeta
-    const lunas = [
-      { r: r * 0.11, orb: r * 1.42, inc: 0.32, vuelta: 46, fase: 0.7 },
-      { r: r * 0.07, orb: r * 1.75, inc: -0.42, vuelta: 72, fase: 3.6 },
-    ].map((l) => {
-      const ang = (reducido ? 0 : t / l.vuelta) * Math.PI * 2 + l.fase;
-      const x = Math.cos(ang) * l.orb, zz = Math.sin(ang) * l.orb;
-      return { ...l, x: cx + x, y: cy - zz * Math.sin(l.inc) * 0.5 + zz * 0.06, z: zz };
-    });
-    const orbitas = () => {
-      ctx.setLineDash([2, 6]); ctx.lineWidth = 1; ctx.strokeStyle = celeste(0.35);
-      for (const l of lunas) { ctx.beginPath(); ctx.ellipse(cx, cy, l.orb, Math.abs(l.orb * Math.sin(l.inc) * 0.5), 0.06 * Math.sign(l.inc), 0, Math.PI * 2); ctx.stroke(); }
-      ctx.setLineDash([]);
-    };
-    const luna = (l) => {
-      const g = ctx.createRadialGradient(l.x - l.r * 0.4, l.y - l.r * 0.4, l.r * 0.1, l.x, l.y, l.r);
-      g.addColorStop(0, '#ffffff'); g.addColorStop(1, '#bcd3ef');
-      ctx.fillStyle = g; ctx.strokeStyle = azul(0.7); ctx.lineWidth = 1.1;
-      ctx.beginPath(); ctx.arc(l.x, l.y, l.r, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
-      ctx.lineWidth = 0.7; ctx.strokeStyle = azul(0.35);
-      ctx.beginPath(); ctx.arc(l.x + l.r * 0.25, l.y - l.r * 0.1, l.r * 0.28, 0, Math.PI * 2); ctx.stroke();
-      ctx.beginPath(); ctx.arc(l.x - l.r * 0.35, l.y + l.r * 0.35, l.r * 0.16, 0, Math.PI * 2); ctx.stroke();
-    };
-    orbitas();
-    lunas.filter((l) => l.z < 0).forEach(luna);
-
-    // Halo y esfera
-    const halo = ctx.createRadialGradient(cx, cy, r * 0.95, cx, cy, r * 1.28);
-    halo.addColorStop(0, celeste(0.28)); halo.addColorStop(1, celeste(0));
-    ctx.fillStyle = halo; ctx.beginPath(); ctx.arc(cx, cy, r * 1.28, 0, Math.PI * 2); ctx.fill();
-    const esfera = ctx.createRadialGradient(cx - r * 0.35, cy - r * 0.4, r * 0.1, cx, cy, r);
-    esfera.addColorStop(0, '#ffffff'); esfera.addColorStop(0.6, '#e6eff9'); esfera.addColorStop(1, '#bfd5ef');
-    ctx.fillStyle = esfera; ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.fill();
-
-    // Paralelos y meridianos, muy tenues
-    ctx.lineWidth = 0.6; ctx.strokeStyle = celeste(0.22);
-    const linea = (puntos) => {
-      ctx.beginPath(); let abierta = false;
-      for (const [lat, lon] of puntos) {
-        const [x, y, z] = proyectar(lat, lon, cx, cy, r);
-        if (z < 0) { abierta = false; continue; }
-        if (abierta) ctx.lineTo(x, y); else { ctx.moveTo(x, y); abierta = true; }
-      }
-      ctx.stroke();
-    };
-    for (let lon = -180; lon < 180; lon += 30) linea(Array.from({ length: 37 }, (_, k) => [-90 + k * 5, lon]));
-    for (let lat = -60; lat <= 60; lat += 30) linea(Array.from({ length: 73 }, (_, k) => [lat, -180 + k * 5]));
-
-    if (curvas) {
-      // Primero lo de atrás (tenue, como visto a través del vidrio), después lo de adelante
-      for (const delante of [false, true]) {
-        curvas.forEach((nivel, n) => {
-          const [grosor, op] = ESTILO[n];
-          ctx.lineWidth = grosor; ctx.strokeStyle = azul(delante ? op : op * 0.12);
-          ctx.beginPath();
-          for (const l of nivel) {
-            let abierta = false;
-            for (let k = 0; k < l.length; k += 2) {
-              const [x, y, z] = proyectar(l[k], l[k + 1], cx, cy, r);
-              if ((z >= 0) !== delante) { abierta = false; continue; }
-              if (abierta) ctx.lineTo(x, y); else { ctx.moveTo(x, y); abierta = true; }
-            }
-          }
-          ctx.stroke();
-        });
-      }
-    }
-    // Borde de la esfera y su brillo
-    ctx.lineWidth = 1.4; ctx.strokeStyle = azul(0.55);
-    ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.stroke();
-
-    // Zonas: una luz que late sobre cada una (solo las de frente)
-    zonas.forEach((zona, i) => {
-      const [x, y, z] = proyectar(zona.lat, zona.lon, cx, cy, r);
-      if (z < 0.15) return;
-      const a = Math.min(1, (z - 0.15) / 0.3), pulso = reducido ? 0.5 : (t * 0.45 + i * 0.37) % 1;
-      ctx.fillStyle = celeste(0.35 * (1 - pulso) * a);
-      ctx.beginPath(); ctx.arc(x, y, 3 + pulso * 12, 0, Math.PI * 2); ctx.fill();
-      ctx.fillStyle = azul(0.95 * a); ctx.beginPath(); ctx.arc(x, y, 2.6, 0, Math.PI * 2); ctx.fill();
-    });
-    lunas.filter((l) => l.z >= 0).forEach(luna);
-  }
-
-  const cuadro = (ahora) => {
-    raf = 0;
-    if (!vivo || !visible) return;
-    const dt = Math.min(0.05, (ahora - (ultimo || ahora)) / 1000); ultimo = ahora;
-    if (!arrastre) { giro += (reducido ? 0 : 6) * dt + vel * dt; vel *= Math.pow(0.05, dt); }
-    dibujar(ahora);
-    if (!reducido || arrastre || Math.abs(vel) > 0.5) raf = requestAnimationFrame(cuadro);
-  };
-  const seguir = () => { if (!raf && vivo && visible) { ultimo = 0; raf = requestAnimationFrame(cuadro); } };
-
-  // Girar arrastrando
-  const control = new AbortController(), { signal } = control;
-  lienzo.addEventListener('pointerdown', (e) => { arrastre = { x: e.clientX, y: e.clientY, giro, inclina, t: performance.now(), movio: false }; lienzo.setPointerCapture(e.pointerId); seguir(); }, { signal });
-  lienzo.addEventListener('pointermove', (e) => {
-    if (!arrastre) return;
-    const dx = e.clientX - arrastre.x, dy = e.clientY - arrastre.y;
-    if (Math.hypot(dx, dy) > 4) arrastre.movio = true;
-    const nuevo = arrastre.giro + dx * 0.4;
-    vel = (nuevo - giro) / 0.016; giro = nuevo;
-    inclina = Math.max(-40, Math.min(50, arrastre.inclina - dy * 0.25));
-  }, { signal });
-  const soltar = (e) => {
-    if (!arrastre) return;
-    // Un toque sin arrastrar es un clic (el lienzo está dentro del enlace a Walkurio)
-    if (arrastre.movio) e.preventDefault?.();
-    lienzo.dataset.arrastro = arrastre.movio ? '1' : '';
-    arrastre = null; vel = Math.max(-120, Math.min(120, vel));
-  };
-  lienzo.addEventListener('pointerup', soltar, { signal });
-  lienzo.addEventListener('pointercancel', soltar, { signal });
-  lienzo.closest('a')?.addEventListener('click', (e) => { if (lienzo.dataset.arrastro) { e.preventDefault(); e.stopPropagation(); lienzo.dataset.arrastro = ''; } }, { signal, capture: true });
-
-  const ojo = new IntersectionObserver(([en]) => { visible = en.isIntersecting; if (visible) seguir(); }, { rootMargin: '100px' });
+export function globo(lienzo) {
+  let vivo = true, detenerReal = null;
+  const control = new AbortController();
+  // Se arma recién cuando la sección está por aparecer
+  const ojo = new IntersectionObserver(([en]) => {
+    if (!en.isIntersecting) return;
+    ojo.disconnect();
+    armar().then((d) => { if (vivo) detenerReal = d; else d(); }).catch((e) => console.warn('Walkurio de la portada:', e));
+  }, { rootMargin: '500px 0px' });
   ojo.observe(lienzo);
-  const ro = new ResizeObserver(medir); ro.observe(lienzo);
-  medir();
-  return () => { vivo = false; cancelAnimationFrame(raf); ojo.disconnect(); ro.disconnect(); control.abort(); };
+  return () => { vivo = false; ojo.disconnect(); control.abort(); detenerReal?.(); };
+
+  async function armar() {
+    const THREE = await import('../vendor/three.module.min.js');
+    if (!vivo) return () => {};
+    const reducido = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const renderer = new THREE.WebGLRenderer({ canvas: lienzo, antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 1.75));
+    const escena = new THREE.Scene(), camara = new THREE.PerspectiveCamera(26, 1, 0.1, 100);
+    camara.position.set(0, 0.35, 6.2); camara.lookAt(0, 0, 0);
+
+    // Imágenes: decodificadas fuera del hilo principal
+    const cargador = new THREE.ImageBitmapLoader().setOptions({ imageOrientation: 'flipY', premultiplyAlpha: 'none' });
+    const textura = (url) => cargador.loadAsync(url).then((img) => { const t = new THREE.Texture(img); t.needsUpdate = true; t.anisotropy = 4; return t; });
+    const [mapa, nubes, luna1, luna2] = await Promise.all(['img/walkurio/portada/planeta.webp', 'img/walkurio/portada/nubes.webp', 'img/walkurio/portada/luna-1.webp', 'img/walkurio/portada/luna-2.webp'].map(textura));
+    mapa.colorSpace = THREE.NoColorSpace;
+    nubes.wrapS = THREE.RepeatWrapping; mapa.wrapS = THREE.RepeatWrapping;
+    if (!vivo) { renderer.dispose(); return () => {}; }
+
+    const uSol = { value: new THREE.Vector3(-0.6, 0.4, 0.75).normalize() }, uT = { value: 0 };
+    const planeta = new THREE.Mesh(new THREE.SphereGeometry(1, 96, 64), new THREE.ShaderMaterial({ uniforms: { uMapa: { value: mapa }, uNubes: { value: nubes }, uSol, uT }, vertexShader: VERT, fragmentShader: PLANETA }));
+    const atmosfera = new THREE.Mesh(new THREE.SphereGeometry(1.1, 64, 32), new THREE.ShaderMaterial({ uniforms: { uSol }, vertexShader: VERT, fragmentShader: ATMOS, side: THREE.BackSide, transparent: true, depthWrite: false }));
+    const ejes = new THREE.Group();
+    ejes.rotation.z = 0.32;
+    ejes.add(planeta);
+    escena.add(ejes, atmosfera);
+    const lunas = [
+      { tex: luna1, r: 0.15, orbita: 1.42, inc: 0.38, vuelta: 40, fase: 0.6, tinte: [1.02, 1, 0.96] },
+      { tex: luna2, r: 0.1, orbita: 1.62, inc: -0.5, vuelta: 64, fase: 3.4, tinte: [0.86, 0.95, 1.12] },
+    ].map((l) => {
+      const m = new THREE.Mesh(new THREE.SphereGeometry(1, 40, 24), new THREE.ShaderMaterial({ uniforms: { uMapa: { value: l.tex }, uSol, uTinte: { value: new THREE.Vector3(...l.tinte) } }, vertexShader: VERT, fragmentShader: LUNA }));
+      m.scale.setScalar(l.r);
+      escena.add(m);
+      return { ...l, malla: m };
+    });
+
+    let ancho = 1, alto = 1;
+    const medir = () => {
+      ancho = lienzo.clientWidth || 1; alto = lienzo.clientHeight || 1;
+      renderer.setSize(ancho, alto, false);
+      camara.aspect = ancho / alto;
+      // Que entren el planeta y las órbitas de las lunas, con aire alrededor
+      const radio = 1.72, distancia = radio / Math.sin(THREE.MathUtils.degToRad(camara.fov / 2) * Math.min(1, camara.aspect));
+      camara.position.setLength(distancia);
+      camara.updateProjectionMatrix();
+    };
+    medir();
+
+    // Arrastrar para girar; un toque sin arrastrar es un clic (lleva a Walkurio)
+    const { signal } = control;
+    let arrastre = null, vel = 0, giro = 0, inclina = 0;
+    lienzo.addEventListener('pointerdown', (e) => { arrastre = { x: e.clientX, y: e.clientY, giro, inclina, movio: false }; lienzo.setPointerCapture(e.pointerId); seguir(); }, { signal });
+    lienzo.addEventListener('pointermove', (e) => {
+      if (!arrastre) return;
+      const dx = e.clientX - arrastre.x, dy = e.clientY - arrastre.y;
+      if (Math.hypot(dx, dy) > 4) arrastre.movio = true;
+      const nuevo = arrastre.giro + dx * 0.01; vel = (nuevo - giro) * 60; giro = nuevo;
+      inclina = Math.max(-0.6, Math.min(0.6, arrastre.inclina + dy * 0.005));
+    }, { signal });
+    const soltar = () => { if (!arrastre) return; lienzo.dataset.arrastro = arrastre.movio ? '1' : ''; arrastre = null; vel = Math.max(-3, Math.min(3, vel)); };
+    lienzo.addEventListener('pointerup', soltar, { signal });
+    lienzo.addEventListener('pointercancel', soltar, { signal });
+    lienzo.closest('a')?.addEventListener('click', (e) => { if (lienzo.dataset.arrastro) { e.preventDefault(); e.stopPropagation(); lienzo.dataset.arrastro = ''; } }, { signal, capture: true });
+
+    let raf = 0, ultimo = 0, reloj = 0, visible = true;
+    const cuadro = (ahora) => {
+      raf = 0;
+      if (!vivo || !visible) return;
+      const dt = Math.min(0.05, ultimo ? (ahora - ultimo) / 1000 : 0); ultimo = ahora;
+      if (!reducido) reloj += dt;
+      if (!arrastre) { giro += (reducido ? 0 : 0.09) * dt + vel * dt; vel *= Math.pow(0.04, dt); }
+      planeta.rotation.y = giro; ejes.rotation.x = inclina;
+      uT.value = reloj;
+      for (const l of lunas) {
+        const a = reloj / l.vuelta * Math.PI * 2 + l.fase;
+        l.malla.position.set(Math.cos(a) * l.orbita, Math.sin(a) * l.orbita * Math.sin(l.inc), Math.sin(a) * l.orbita * Math.cos(l.inc));
+        l.malla.rotation.y = reloj * 0.05;
+      }
+      renderer.render(escena, camara);
+      if (!reducido || arrastre || Math.abs(vel) > 0.01) raf = requestAnimationFrame(cuadro);
+    };
+    const seguir = () => { if (!raf && vivo && visible) { ultimo = 0; raf = requestAnimationFrame(cuadro); } };
+
+    // Todo listo antes de mostrarse: programas compilados en paralelo y texturas subidas de a una por cuadro
+    await renderer.compileAsync(escena, camara).catch(() => {});
+    for (const t of [mapa, nubes, luna1, luna2]) { renderer.initTexture(t); await new Promise((r) => requestAnimationFrame(r)); }
+    if (!vivo) { renderer.dispose(); return () => {}; }
+    renderer.render(escena, camara);
+    await espera(30);
+    lienzo.classList.add('is-listo');
+
+    const ojoVisible = new IntersectionObserver(([en]) => { visible = en.isIntersecting; if (visible) seguir(); });
+    ojoVisible.observe(lienzo);
+    const ro = new ResizeObserver(() => { medir(); if (!raf) renderer.render(escena, camara); }); ro.observe(lienzo);
+    seguir();
+    return () => {
+      cancelAnimationFrame(raf); ojoVisible.disconnect(); ro.disconnect();
+      escena.traverse((o) => { o.geometry?.dispose(); o.material?.dispose(); });
+      [mapa, nubes, luna1, luna2].forEach((t) => { t.image?.close?.(); t.dispose(); });
+      renderer.dispose();
+    };
+  }
 }

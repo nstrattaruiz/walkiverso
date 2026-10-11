@@ -13,7 +13,6 @@ import { deseo, activarDeseo } from '../secciones/deseo.js';
 import { reels, activarReels } from '../secciones/reels.js';
 import { particulas } from '../anim/particulas.js';
 import { globo } from '../anim/globo.js';
-import { arbolDeZonas } from '../datos/walkurio.js';
 import { WALKURIO_PUBLICADO } from '../config.js';
 import { escena, aparecer } from '../anim/efectos.js';
 import { tarjetaCurso } from './academia.js';
@@ -476,9 +475,9 @@ export async function inicio() {
   activarProceso();
   activarDuendes(losDuendes);
   detener.push(activarPuertas(), activarDeseo());
-  // Walkurio dibujado: gira con sus lunas y marca las zonas de primer nivel del planeta
+  // Walkurio en chico: gira con sus lunas (se arma recién cuando la sección se acerca)
   const lienzoGlobo = $('.wk-universo__globo');
-  if (lienzoGlobo) detener.push(globo(lienzoGlobo, arbolDeZonas(T.WALKURIO.zonas).filter((z) => z.cuerpo === 'planeta' && z.lat !== null)));
+  if (lienzoGlobo) detener.push(globo(lienzoGlobo));
   activarReels();
   $('#dejar-voz')?.addEventListener('click', formularioVoz);
   aparecer(app);
