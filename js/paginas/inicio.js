@@ -12,6 +12,9 @@ import { puertas, activarPuertas } from '../secciones/puertas.js';
 import { deseo, activarDeseo } from '../secciones/deseo.js';
 import { reels, activarReels } from '../secciones/reels.js';
 import { particulas } from '../anim/particulas.js';
+import { globo } from '../anim/globo.js';
+import { arbolDeZonas } from '../datos/walkurio.js';
+import { WALKURIO_PUBLICADO } from '../config.js';
 import { escena, aparecer } from '../anim/efectos.js';
 import { tarjetaCurso } from './academia.js';
 import * as T from '../contenido.js';
@@ -249,8 +252,11 @@ const universo = () => `
         <h2 class="wk-titulo">${T.SECCIONES.universo.titulo}</h2>
         <p class="wk-bajada">${esc(T.SECCIONES.universo.texto)}</p>
         <p class="wk-universo__pronto">${esc(T.SECCIONES.universo.pronto)}</p>
+        ${WALKURIO_PUBLICADO ? `<p class="wk-universo__ir"><a class="wk-btn wk-btn--tinta" href="/walkurio" data-link>${esc(T.SECCIONES.universo.cta)} ${flecha}</a></p>` : ''}
       </div>
-      <div class="wk-universo__mapa" data-ver style="--d:1">${territorio()}</div>
+      ${WALKURIO_PUBLICADO
+        ? `<a class="wk-universo__mundo" href="/walkurio" data-link data-ver style="--d:1" aria-label="${esc(T.SECCIONES.universo.cta)}"><canvas class="wk-universo__globo" aria-hidden="true"></canvas><span class="wk-universo__pista" aria-hidden="true">Arrastrá para girarlo · Tocá para entrar</span></a>`
+        : `<div class="wk-universo__mapa" data-ver style="--d:1">${territorio()}</div>`}
     </div>
   </section>`;
 
@@ -470,6 +476,9 @@ export async function inicio() {
   activarProceso();
   activarDuendes(losDuendes);
   detener.push(activarPuertas(), activarDeseo());
+  // Walkurio dibujado: gira con sus lunas y marca las zonas de primer nivel del planeta
+  const lienzoGlobo = $('.wk-universo__globo');
+  if (lienzoGlobo) detener.push(globo(lienzoGlobo, arbolDeZonas(T.WALKURIO.zonas).filter((z) => z.cuerpo === 'planeta' && z.lat !== null)));
   activarReels();
   $('#dejar-voz')?.addEventListener('click', formularioVoz);
   aparecer(app);

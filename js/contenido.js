@@ -70,6 +70,7 @@ export const SECCIONES = {
     sobre: 'El universo',
     pronto: 'Un territorio en desarrollo',
     titulo: 'Dónde las criaturas <em>cobran vida</em>',
+    cta: 'Explorar Walkurio',
     texto: 'Un universo que crece con cada criatura, cada historia y cada nueva creación.',
   },
   diferencia: [

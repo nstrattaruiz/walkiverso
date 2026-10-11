@@ -1080,3 +1080,12 @@ html.wk-sin-carga .wk-carga { display: none; }
   .wk-grilla:is([data-n='1'], [data-n='2']) .wk-al-carrito { top: 74px; right: auto; left: 26px; }
   .wk-grilla:is([data-n='1'], [data-n='2']) .wk-al-carrito--solo { top: 26px; }
 }
+
+/* Walkurio dibujado en "Dónde las criaturas cobran vida": el globo en líneas, con sus lunas */
+.wk-universo__ir { margin: 18px 0 0; }
+.wk-universo__mundo { position: relative; display: block; aspect-ratio: 1 / 0.9; color: inherit; text-decoration: none; cursor: grab; }
+.wk-universo__mundo:active { cursor: grabbing; }
+.wk-universo__globo { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: pan-y; }
+.wk-universo__pista { position: absolute; left: 50%; bottom: 2%; translate: -50% 0; white-space: nowrap; font-size: 0.74rem; letter-spacing: 0.08em; color: var(--fg-2); opacity: 0; transition: opacity 0.4s ease; }
+.wk-universo__mundo:hover .wk-universo__pista, .wk-universo__mundo:focus-visible .wk-universo__pista { opacity: 1; }
+@media (max-width: 899px) { .wk-universo__mundo { aspect-ratio: 1 / 0.95; margin-top: -10px; } .wk-universo__pista { opacity: 1; } }

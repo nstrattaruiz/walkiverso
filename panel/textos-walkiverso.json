@@ -303,6 +303,13 @@
     },
     {
      "sub": "Dónde las criaturas cobran vida",
+     "clave": "SECCIONES.universo.cta",
+     "etiqueta": "Texto del botón",
+     "tipo": "texto",
+     "valor": "Explorar Walkurio"
+    },
+    {
+     "sub": "Dónde las criaturas cobran vida",
      "clave": "SECCIONES.universo.texto",
      "etiqueta": "Texto",
      "tipo": "texto",
