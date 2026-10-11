@@ -937,7 +937,7 @@
       },
       {
        "clave": "paisaje",
-       "etiqueta": "Paisaje de cerca: montañas, bosque, selva, hielo, desierto, llanura o costa (vacío = según el mapa)",
+       "etiqueta": "Paisaje de cerca: montañas, bosque, bosque frío, selva, hielo, desierto, llanura o costa (vacío = según el mapa)",
        "tipo": "texto"
       },
       {
@@ -1238,7 +1238,7 @@
        "cuerpo": "planeta",
        "nombre": "Bosques fríos",
        "clima": "Frío",
-       "paisaje": "bosque",
+       "paisaje": "bosque frío",
        "texto": "Texto a definir por Walkiver.",
        "lat": "44",
        "lon": "22",

@@ -392,3 +392,8 @@ body[data-pagina='walkurio'] #pie { display: none; }
 
 /* La marca de una luna entera va un poco más arriba, para no tapar la luna */
 .wk-mundo__marca--cuerpo { translate: -9px -34px; }
+
+/* Mientras se prepara el planeta, el lienzo no se ve (lo que dibuja en ese momento son ensayos y destellaba);
+   aparece con un fundido cuando empieza la llegada */
+.wk-mundo__lienzo { transition: opacity 0.9s ease; }
+.wk-mundo.is-cargando .wk-mundo__lienzo { opacity: 0; }

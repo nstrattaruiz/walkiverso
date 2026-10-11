@@ -144,6 +144,16 @@ extraer de cada .zip la imagen `*_diff_*.jpg` y `*_disp_*.png` a una carpeta y c
 dibujado: azul con nubes de día y, de noche, estrellas que titilan y una vía láctea. Los cielos HDRI de la carpeta
 (1K) no se usan: ampliados a esa vista se pixelaban; con versiones de 4K u 8K se podrían usar.
 
+**Árboles, rocas y lunas reales:** árboles y arbustos de Quaternius (pinos, árboles de hoja, arbustos) teñidos con
+colores reales; rocas de Poly Haven simplificadas y semienterradas; en el bosque frío y la montaña los árboles se
+cubren de nieve en lo que mira hacia arriba. Suelos de Poly Haven con su relieve real (piso de bosque, arena, grava,
+roca, costa, sendero). Las lunas usan mapas reales ("moon 2" la mayor; "moon zoom", teñida de hielo, la menor).
+Todo está en `img/walkurio/modelos`, `texturas` y `lunas`; lo arma `node .dev/walkurio-modelos.mjs <Quaternius>
+<Poly Haven> "Nuevas Texturas"` a partir de los paquetes de la carpeta `Nuevas Texturas/` (fuera del repo: 1,2 GB),
+extrayendo antes el .zip de Quaternius (carpetas OBJ y Textures) y cada paquete .gltf.zip de Poly Haven en su carpeta.
+Los árboles de Poly Haven no se usan: traen millones de triángulos (de 40 a 270 MB cada uno) y trabarían la página.
+Paisajes: montañas, bosque, bosque frío, selva, hielo, desierto, llanura y costa.
+
 **Mientras carga:** polvo de estrellas que gira y cae hacia una semilla de luz, donde va a aparecer el planeta. Está
 hecho solo con CSS (transform y opacity), así no se traba mientras el planeta se prepara.
 

@@ -193,7 +193,7 @@ const PAISAJES = {
   'cordillera-central': 'montañas', 'bosques-del-norte': 'bosque', 'llanuras-secas': 'desierto', 'tierras-del-este': 'llanura',
   'desierto-de-roca': 'desierto', 'selvas-del-este': 'selva', 'costa-sur': 'costa', 'sierra-de-la-isla': 'montañas',
   'valles-de-la-isla': 'bosque', 'las-cumbres': 'montañas', 'desierto-alto': 'desierto', 'costa-verde': 'selva',
-  'bosques-frios': 'bosque', 'montanas-del-norte': 'montañas', 'sierra-del-noreste': 'montañas', 'costas-del-noreste': 'costa',
+  'bosques-frios': 'bosque frío', 'montanas-del-norte': 'montañas', 'sierra-del-noreste': 'montañas', 'costas-del-noreste': 'costa',
   'montanas-del-sur': 'montañas', 'glaciares': 'hielo',
 };
 const zona = (id, dentro, nombre, clima, lat, lon, texto = 'Texto a definir por Walkiver.', cuerpo = 'planeta') =>
