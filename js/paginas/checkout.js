@@ -228,8 +228,10 @@ export async function checkout() {
         cliente: { nombre: d.nombre, email: d.email, telefono: d.telefono, nacimiento: d.nacimiento || null }, volver: '/pedido',
       });
       olvidarCatalogo();   // la pieza ya encontró hogar
-      // Pago online (Mercado Pago, PayPal): a pagar. Si no, al pedido con las instrucciones.
-      if (r.payUrl) { location.href = r.payUrl; return; }
+      // Mercado Pago dentro de la web (tarjeta, débito, Abitab, Redpagos): se paga en la página del pedido.
+      // PayPal, o una plataforma que todavía no lo trae: a pagar en la pasarela, como siempre.
+      // Si no, al pedido con las instrucciones.
+      if (r.payUrl && !(r.embedded && typeof tienda.checkout.pagarEnLaWeb === 'function')) { location.href = r.payUrl; return; }
       ir(`/pedido?pedido=${encodeURIComponent(r.token)}`);
     } catch (err) { aviso.textContent = err.message; boton.disabled = false; }
   });
@@ -258,7 +260,8 @@ export async function pedido(token) {
         <h1 class="wk-titulo">${cancelado ? 'Pedido cancelado' : pagado ? '¡Ya tiene <em>hogar</em>!' : '¡Recibimos tu <em>pedido</em>!'}</h1>
         <p class="wk-bajada">${esc(o.paymentLabel ?? '')} · ${cancelado ? 'cancelado' : pagado ? 'pagado' : 'pendiente de pago'}</p>
         ${o.instructions && !cancelado ? `<div class="wk-pedido__caja"><strong>Cómo pagar</strong><p>${esc(o.instructions).replace(/\n/g, '<br>')}</p></div>` : ''}
-        ${o.payUrl ? `<p><a class="wk-btn wk-btn--luz" href="${esc(o.payUrl)}">Pagar ahora ${flecha}</a></p>` : ''}
+        <div id="pago-web" class="wk-pedido__pago"></div>
+        ${o.payUrl ? `<p id="pago-link"><a class="wk-btn wk-btn--luz" href="${esc(o.payUrl)}">Pagar ahora ${flecha}</a></p>` : ''}
         ${o.expiresAt && !pagado && !cancelado ? `<p class="wk-nota">Tenés tiempo para pagar hasta el ${new Date(o.expiresAt).toLocaleString('es-UY', { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' })}. Después el pedido se cancela solo.</p>` : ''}
         <div class="wk-pedido__caja">
           ${o.lines.map((l) => `<div class="wk-pedido__linea"><span>${l.quantity} × ${esc(l.title)}${l.variantTitle ? ` <small>${esc(l.variantTitle)}</small>` : ''}</span><strong>${dinero(l.totalCents, o.currency)}</strong></div>`).join('')}
@@ -275,4 +278,13 @@ export async function pedido(token) {
         <p><a class="wk-btn wk-btn--linea" href="/tienda" data-link>Seguir mirando ${flecha}</a></p>
       </div>
     </section>`;
+  // Pagar sin salir de la web: el formulario oficial de Mercado Pago (tarjeta de crédito, débito, Abitab, Redpagos).
+  // Si no se puede mostrar, queda el botón "Pagar ahora", que lleva a Mercado Pago como siempre.
+  if (o.embedded && !pagado && !cancelado && typeof tienda.checkout.pagarEnLaWeb === 'function') {
+    try {
+      await tienda.checkout.pagarEnLaWeb('#pago-web', { token, alAprobar: () => pedido(token) });
+      const link = document.querySelector('#pago-link a');
+      if (link) { link.textContent = 'Prefiero pagar en la página de Mercado Pago'; link.className = 'wk-btn wk-btn--linea'; }
+    } catch { /* queda el botón Pagar ahora */ }
+  }
 }
