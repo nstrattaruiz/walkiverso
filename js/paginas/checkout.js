@@ -9,6 +9,8 @@ import { PAIS_ENVIOS } from '../config.js';
 const dinero = (c, moneda) => tienda.formatear(c, moneda);
 const DETALLE_PAGO = { mercadopago: 'Tarjetas de crédito y débito, Abitab y Redpagos. Con cuotas.', paypal: 'Para cursos y e-books, desde cualquier país.' };
 const NOMBRES = { datos: 'Tus datos', entrega: 'Entrega', pago: 'Pago' };
+const DEPARTAMENTOS = ['Montevideo', 'Artigas', 'Canelones', 'Cerro Largo', 'Colonia', 'Durazno', 'Flores', 'Florida', 'Lavalleja', 'Maldonado',
+  'Paysandú', 'Río Negro', 'Rivera', 'Rocha', 'Salto', 'San José', 'Soriano', 'Tacuarembó', 'Treinta y Tres'];
 
 const pantalla = (titulo, texto, boton) => { app.innerHTML = `<section class="wk-papel wk-pagina wk-seccion"><div class="wk-cont wk-vacio"><h1 class="wk-titulo wk-titulo--m">${titulo}</h1>${texto ? `<p class="wk-bajada">${texto}</p>` : ''}${boton}</div></section>`; };
 
@@ -75,7 +77,7 @@ export async function checkout() {
                 <label class="wk-campo">Dirección<input name="direccion" autocomplete="street-address" placeholder="Calle, número y apartamento" value="${esc(cliente?.address ?? '')}"></label>
                 <div class="wk-fila">
                   <label class="wk-campo">Ciudad<input name="ciudad" autocomplete="address-level2" value="${esc(cliente?.city ?? '')}"></label>
-                  <label class="wk-campo">Departamento<input name="departamento" autocomplete="address-level1"></label>
+                  <label class="wk-campo">Departamento<select name="departamento" autocomplete="address-level1"><option value="">Elegí</option>${DEPARTAMENTOS.map((x) => `<option>${x}</option>`).join('')}</select></label>
                 </div>
               </div>
               <label class="wk-campo">Nota para el pedido <small>(opcional)</small><textarea name="nota" rows="2"></textarea></label>
@@ -126,6 +128,7 @@ export async function checkout() {
     const d = datos();
     return tienda.checkout.confirmar({
       metodoPago: d.pago, envio: hayEntrega ? d.envio : null, cupon: cupon || null, tarjetaRegalo: tarjeta || null,
+      departamento: conDireccion() ? d.departamento || null : null, // envío por zona (módulo)
       direccion: conDireccion() ? [d.direccion, d.ciudad, d.departamento, d.pais].filter(Boolean).join(', ') : d.pais,
       nota: d.nota,
       cliente: { nombre: d.nombre, email: d.email, telefono: d.telefono, nacimiento: d.nacimiento || null }, volver: '/pedido',
@@ -172,12 +175,12 @@ export async function checkout() {
   async function cotizar() {
     const d = datos();
     try {
-      const t = await tienda.checkout.cotizar({ metodoPago: d.pago, envio: hayEntrega ? d.envio : null, cupon: cupon || null, tarjetaRegalo: tarjeta || null });
+      const t = await tienda.checkout.cotizar({ metodoPago: d.pago, envio: hayEntrega ? d.envio : null, cupon: cupon || null, tarjetaRegalo: tarjeta || null, departamento: conDireccion() ? d.departamento || null : null });
       $('#totales').innerHTML = `
         <div><dt>Subtotal</dt><dd>${dinero(t.subtotalCents, t.currency)}</dd></div>
         ${(t.promotions ?? []).map((p) => `<div><dt>${esc(p.name)}</dt><dd>− ${dinero(p.cents, t.currency)}</dd></div>`).join('')}
         ${t.discountCents ? `<div><dt>Cupón ${esc(t.coupon ?? '')}</dt><dd>− ${dinero(t.discountCents, t.currency)}</dd></div>` : ''}
-        ${t.shippingMethod ? `<div><dt>${esc(t.shippingMethod)}</dt><dd>${t.shippingCents ? dinero(t.shippingCents, t.currency) : 'Gratis'}</dd></div>` : ''}
+        ${t.shippingMethod ? `<div><dt>${esc(t.shippingMethod)}</dt><dd>${t.shippingPending ? '<small>Elegí el departamento</small>' : t.shippingCents ? dinero(t.shippingCents, t.currency) : 'Gratis'}</dd></div>` : ''}
         ${t.paymentAdjustCents ? `<div><dt>${esc(t.paymentAdjustLabel || 'Ajuste por medio de pago')}</dt><dd>${t.paymentAdjustCents < 0 ? '− ' : ''}${dinero(Math.abs(t.paymentAdjustCents), t.currency)}</dd></div>` : ''}
         <div class="wk-totales__total"><dt>Total</dt><dd>${dinero(t.totalCents, t.currency)}</dd></div>
         ${t.giftCardCents ? `<div><dt>Tarjeta de regalo</dt><dd>− ${dinero(t.giftCardCents, t.currency)}</dd></div><div class="wk-totales__total"><dt>A pagar</dt><dd>${dinero(t.amountDueCents, t.currency)}</dd></div>` : ''}`;
@@ -250,6 +253,7 @@ export async function checkout() {
   });
   form.addEventListener('change', (e) => {
     if (e.target.name === 'envio') { $('#direccion-caja').hidden = !conDireccion(); cotizar(); }
+    if (e.target.name === 'departamento') cotizar(); // el envío puede costar distinto según el departamento
     if (e.target.name === 'pago') cotizar();
   });
   // Enter en un campo avanza al paso siguiente en vez de confirmar antes de tiempo
