@@ -91,6 +91,7 @@ export async function checkout() {
               ${acciones('pago')}
             </fieldset>
           </form>
+          <div id="pago-paso" class="wk-compra__pago"></div>
         </div>
 
         <details class="wk-resumen" id="resumen-caja">
@@ -117,6 +118,53 @@ export async function checkout() {
   let actual = 'datos';
   let alcanzado = 0;
 
+  const pedir = () => {
+    const d = datos();
+    return tienda.checkout.confirmar({
+      metodoPago: d.pago, envio: hayEntrega ? d.envio : null, cupon: cupon || null,
+      direccion: conDireccion() ? [d.direccion, d.ciudad, d.departamento, d.pais].filter(Boolean).join(', ') : d.pais,
+      nota: d.nota,
+      cliente: { nombre: d.nombre, email: d.email, telefono: d.telefono, nacimiento: d.nacimiento || null }, volver: '/pedido',
+    });
+  };
+  // Tarjeta en el paso de pago (módulo "Tarjeta dentro de la web" del panel): al elegir Mercado Pago, el formulario
+  // oficial aparece acá mismo en lugar de "Confirmar pedido". El pedido se crea recién al apretar "Pagar".
+  // Sin el módulo, o si el formulario no se puede mostrar, queda el botón de siempre (lleva a Mercado Pago).
+  const enLaWeb = (m) => m === 'mercadopago_wallet' && !!op.payments.find((p) => p.method === m)?.embedded && typeof tienda.checkout.pagarEnLaWeb === 'function';
+  let total = 0;
+  let pago = null;
+  let montando = false;
+  let creado = false;
+  let sinFormulario = false;
+  async function pasoPago() {
+    if (montando || sinFormulario || creado) return;
+    if (actual !== 'pago' || !enLaWeb(datos().pago) || !total) {
+      pago?.destruir();
+      pago = null;
+      $('#confirmar').hidden = false;
+      return;
+    }
+    if (pago) { pago.actualizar({ totalCents: total }); return; }
+    montando = true;
+    try {
+      pago = await tienda.checkout.pagarEnLaWeb('#pago-paso', {
+        totalCents: total, email: datos().email || null, crearPedido: pedir,
+        // Pedido creado: la colección ya quedó vacía, así que los pasos anteriores no se pueden cambiar más
+        alCrear: () => {
+          creado = true;
+          olvidarCatalogo();
+          $$('fieldset', form).forEach((f) => { f.disabled = true; });
+          $$('[data-escalon]').forEach((b) => { b.disabled = true; });
+        },
+        alAprobar: ({ token }) => ir(`/pedido?pedido=${encodeURIComponent(token)}`),
+        alPendiente: ({ token }) => ir(`/pedido?pedido=${encodeURIComponent(token)}`),
+      });
+      $('#confirmar').hidden = true;
+    } catch { pago = null; sinFormulario = true; $('#confirmar').hidden = false; } // no se pudo mostrar: queda el botón de siempre
+    montando = false;
+    pasoPago(); // por si eligió otro medio, volvió un paso o cambió el total mientras cargaba
+  }
+
   async function cotizar() {
     const d = datos();
     try {
@@ -128,6 +176,8 @@ export async function checkout() {
         ${t.paymentAdjustCents ? `<div><dt>${esc(t.paymentAdjustLabel || 'Ajuste por medio de pago')}</dt><dd>${t.paymentAdjustCents < 0 ? '− ' : ''}${dinero(Math.abs(t.paymentAdjustCents), t.currency)}</dd></div>` : ''}
         <div class="wk-totales__total"><dt>Total</dt><dd>${dinero(t.totalCents, t.currency)}</dd></div>`;
       $('#resumen-total').textContent = dinero(t.totalCents, t.currency);
+      total = t.totalCents;
+      pasoPago();
       return true;
     } catch (e) {
       if (cupon) { cupon = ''; form.cupon.value = ''; }
@@ -177,11 +227,13 @@ export async function checkout() {
   }
   /** Para avanzar hay que completar los pasos anteriores; volver atrás siempre se puede. */
   function irA(paso) {
+    if (creado) return;
     const destino = pasos.indexOf(paso);
     for (let i = pasos.indexOf(actual); i < destino; i++) {
       if (!valido(pasos[i])) { if (pasos[i] !== actual) mostrar(pasos[i]); return; }
     }
     mostrar(paso);
+    pasoPago();
     cotizar();
   }
 
@@ -214,22 +266,17 @@ export async function checkout() {
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     if (actual !== 'pago') { irA('pago'); return; }
+    if (pago || creado) return; // con el formulario de Mercado Pago a la vista, el pedido se crea al apretar "Pagar"
     if (!pasos.every(valido)) return;
-    const d = datos();
     const aviso = $('[data-paso="pago"] [data-error]');
     const boton = $('#confirmar');
     boton.disabled = true;
     aviso.textContent = '';
     try {
-      const r = await tienda.checkout.confirmar({
-        metodoPago: d.pago, envio: hayEntrega ? d.envio : null, cupon: cupon || null,
-        direccion: conDireccion() ? [d.direccion, d.ciudad, d.departamento, d.pais].filter(Boolean).join(', ') : d.pais,
-        nota: d.nota,
-        cliente: { nombre: d.nombre, email: d.email, telefono: d.telefono, nacimiento: d.nacimiento || null }, volver: '/pedido',
-      });
+      const r = await pedir();
       olvidarCatalogo();   // la pieza ya encontró hogar
-      // Mercado Pago dentro de la web (tarjeta, débito, Abitab, Redpagos): se paga en la página del pedido.
-      // PayPal, o una plataforma que todavía no lo trae: a pagar en la pasarela, como siempre.
+      // Mercado Pago con el módulo "Tarjeta dentro de la web" (si el formulario no se pudo mostrar acá): se paga en la página del pedido.
+      // PayPal, o Mercado Pago sin el módulo: a pagar en la pasarela, como siempre.
       // Si no, al pedido con las instrucciones.
       if (r.payUrl && !(r.embedded && typeof tienda.checkout.pagarEnLaWeb === 'function')) { location.href = r.payUrl; return; }
       ir(`/pedido?pedido=${encodeURIComponent(r.token)}`);

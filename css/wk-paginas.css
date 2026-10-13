@@ -48,6 +48,7 @@
 .wk-radio > span { flex: 1; display: grid; }
 .wk-radio small { color: var(--fg-2); font-size: 0.86rem; }
 .wk-radio > b { font-weight: 600; white-space: nowrap; }
+.wk-compra__pago:not(:empty) { margin-top: 20px; }
 .wk-compra__acciones { display: flex; flex-wrap: wrap-reverse; align-items: center; justify-content: space-between; gap: 12px; margin-top: 6px; }
 .wk-compra [data-error]:empty { display: none; }
 .wk-repaso { display: grid; border: 1px solid var(--linea); border-radius: 16px; background: var(--sup); }
