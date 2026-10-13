@@ -171,6 +171,7 @@ export async function checkout() {
       const t = await tienda.checkout.cotizar({ metodoPago: d.pago, envio: hayEntrega ? d.envio : null, cupon: cupon || null });
       $('#totales').innerHTML = `
         <div><dt>Subtotal</dt><dd>${dinero(t.subtotalCents, t.currency)}</dd></div>
+        ${(t.promotions ?? []).map((p) => `<div><dt>${esc(p.name)}</dt><dd>− ${dinero(p.cents, t.currency)}</dd></div>`).join('')}
         ${t.discountCents ? `<div><dt>Cupón ${esc(t.coupon ?? '')}</dt><dd>− ${dinero(t.discountCents, t.currency)}</dd></div>` : ''}
         ${t.shippingMethod ? `<div><dt>${esc(t.shippingMethod)}</dt><dd>${t.shippingCents ? dinero(t.shippingCents, t.currency) : 'Gratis'}</dd></div>` : ''}
         ${t.paymentAdjustCents ? `<div><dt>${esc(t.paymentAdjustLabel || 'Ajuste por medio de pago')}</dt><dd>${t.paymentAdjustCents < 0 ? '− ' : ''}${dinero(Math.abs(t.paymentAdjustCents), t.currency)}</dd></div>` : ''}
@@ -314,6 +315,7 @@ export async function pedido(token) {
           ${o.lines.map((l) => `<div class="wk-pedido__linea"><span>${l.quantity} × ${esc(l.title)}${l.variantTitle ? ` <small>${esc(l.variantTitle)}</small>` : ''}</span><strong>${dinero(l.totalCents, o.currency)}</strong></div>`).join('')}
           <dl class="wk-totales">
             ${o.shippingMethod ? `<div><dt>${esc(o.shippingMethod)}</dt><dd>${o.shippingCents ? dinero(o.shippingCents, o.currency) : 'Gratis'}</dd></div>` : ''}
+            ${o.promotionCents ? `<div><dt>${esc(o.promotionLabel || 'Promoción')}</dt><dd>− ${dinero(o.promotionCents, o.currency)}</dd></div>` : ''}
             ${o.discountCents ? `<div><dt>Descuento</dt><dd>− ${dinero(o.discountCents, o.currency)}</dd></div>` : ''}
             <div class="wk-totales__total"><dt>Total</dt><dd>${dinero(o.totalCents, o.currency)}</dd></div>
           </dl>
