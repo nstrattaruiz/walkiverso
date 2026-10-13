@@ -88,6 +88,8 @@ export async function checkout() {
               <div class="wk-radios">${pagos.map((p, i) => radio('pago', p.method, p.label, DETALLE_PAGO[p.method] ?? (p.online ? 'Pagás online de forma segura.' : ''), i === 0)).join('')}</div>
               <label class="wk-campo">Código de descuento <small>(opcional)</small>
                 <span class="wk-pegado"><input name="cupon" autocomplete="off" autocapitalize="characters"><button type="button" class="wk-btn wk-btn--linea" id="aplicar">Aplicar</button></span></label>
+              ${info.modules?.giftCards ? `<label class="wk-campo">Tarjeta de regalo <small>(opcional)</small>
+                <span class="wk-pegado"><input name="tarjeta" autocomplete="off" autocapitalize="characters" placeholder="REGALO-..."><button type="button" class="wk-btn wk-btn--linea" id="aplicar-tarjeta">Usar</button></span></label>` : ''}
               ${acciones('pago')}
             </fieldset>
           </form>
@@ -115,13 +117,15 @@ export async function checkout() {
   const envioDe = (id) => op.shipping.find((e) => e.id === id);
   const conDireccion = () => hayEntrega && !envioDe(datos().envio)?.pickup;
   let cupon = '';
+  // Tarjeta de regalo (módulo): paga todo o parte; lo que falta se paga con el medio elegido
+  let tarjeta = '';
   let actual = 'datos';
   let alcanzado = 0;
 
   const pedir = () => {
     const d = datos();
     return tienda.checkout.confirmar({
-      metodoPago: d.pago, envio: hayEntrega ? d.envio : null, cupon: cupon || null,
+      metodoPago: d.pago, envio: hayEntrega ? d.envio : null, cupon: cupon || null, tarjetaRegalo: tarjeta || null,
       direccion: conDireccion() ? [d.direccion, d.ciudad, d.departamento, d.pais].filter(Boolean).join(', ') : d.pais,
       nota: d.nota,
       cliente: { nombre: d.nombre, email: d.email, telefono: d.telefono, nacimiento: d.nacimiento || null }, volver: '/pedido',
@@ -168,20 +172,22 @@ export async function checkout() {
   async function cotizar() {
     const d = datos();
     try {
-      const t = await tienda.checkout.cotizar({ metodoPago: d.pago, envio: hayEntrega ? d.envio : null, cupon: cupon || null });
+      const t = await tienda.checkout.cotizar({ metodoPago: d.pago, envio: hayEntrega ? d.envio : null, cupon: cupon || null, tarjetaRegalo: tarjeta || null });
       $('#totales').innerHTML = `
         <div><dt>Subtotal</dt><dd>${dinero(t.subtotalCents, t.currency)}</dd></div>
         ${(t.promotions ?? []).map((p) => `<div><dt>${esc(p.name)}</dt><dd>− ${dinero(p.cents, t.currency)}</dd></div>`).join('')}
         ${t.discountCents ? `<div><dt>Cupón ${esc(t.coupon ?? '')}</dt><dd>− ${dinero(t.discountCents, t.currency)}</dd></div>` : ''}
         ${t.shippingMethod ? `<div><dt>${esc(t.shippingMethod)}</dt><dd>${t.shippingCents ? dinero(t.shippingCents, t.currency) : 'Gratis'}</dd></div>` : ''}
         ${t.paymentAdjustCents ? `<div><dt>${esc(t.paymentAdjustLabel || 'Ajuste por medio de pago')}</dt><dd>${t.paymentAdjustCents < 0 ? '− ' : ''}${dinero(Math.abs(t.paymentAdjustCents), t.currency)}</dd></div>` : ''}
-        <div class="wk-totales__total"><dt>Total</dt><dd>${dinero(t.totalCents, t.currency)}</dd></div>`;
-      $('#resumen-total').textContent = dinero(t.totalCents, t.currency);
-      total = t.totalCents;
+        <div class="wk-totales__total"><dt>Total</dt><dd>${dinero(t.totalCents, t.currency)}</dd></div>
+        ${t.giftCardCents ? `<div><dt>Tarjeta de regalo</dt><dd>− ${dinero(t.giftCardCents, t.currency)}</dd></div><div class="wk-totales__total"><dt>A pagar</dt><dd>${dinero(t.amountDueCents, t.currency)}</dd></div>` : ''}`;
+      $('#resumen-total').textContent = dinero(t.amountDueCents ?? t.totalCents, t.currency);
+      total = t.amountDueCents ?? t.totalCents; // con tarjeta de regalo, se cobra lo que falta
       pasoPago();
       return true;
     } catch (e) {
       if (cupon) { cupon = ''; form.cupon.value = ''; }
+      if (tarjeta) { tarjeta = ''; form.tarjeta.value = ''; }
       $(`[data-paso="${actual}"] [data-error]`).textContent = e.message;
       return false;
     }
@@ -257,6 +263,11 @@ export async function checkout() {
     $('[data-paso="pago"] [data-error]').textContent = '';
     await cotizar();
   });
+  $('#aplicar-tarjeta')?.addEventListener('click', async () => {
+    tarjeta = form.tarjeta.value.trim();
+    $('[data-paso="pago"] [data-error]').textContent = '';
+    await cotizar();
+  });
   // Carritos abandonados (módulo): al salir del campo de email se avisa a la tienda. Con el módulo apagado no hace nada.
   if (info.modules?.abandonedCarts) {
     form.email.addEventListener('blur', () => {
@@ -318,6 +329,7 @@ export async function pedido(token) {
             ${o.promotionCents ? `<div><dt>${esc(o.promotionLabel || 'Promoción')}</dt><dd>− ${dinero(o.promotionCents, o.currency)}</dd></div>` : ''}
             ${o.discountCents ? `<div><dt>Descuento</dt><dd>− ${dinero(o.discountCents, o.currency)}</dd></div>` : ''}
             <div class="wk-totales__total"><dt>Total</dt><dd>${dinero(o.totalCents, o.currency)}</dd></div>
+            ${o.giftCardCents ? `<div><dt>Tarjeta de regalo ${esc(o.giftCardCode || '')}</dt><dd>− ${dinero(o.giftCardCents, o.currency)}</dd></div><div class="wk-totales__total"><dt>${pagado ? 'Pagado' : 'A pagar'}</dt><dd>${dinero(o.amountDueCents, o.currency)}</dd></div>` : ''}
           </dl>
         </div>
         ${o.shipments?.length ? `<div class="wk-pedido__caja"><strong>Tu envío</strong>${o.shipments.map((s) => `
