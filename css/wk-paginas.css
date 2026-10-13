@@ -134,6 +134,9 @@
 
 /* ---- Cuenta ---- */
 .wk-cuenta { display: grid; gap: 22px; }
+/* "Mi cuenta" de la plataforma (tienda.cuenta.panel): toma la tipografía y los colores de esta web; acá solo se afina */
+.wk-cuenta--panel .tc { --tc-radio: var(--wk-radio, 18px); }
+.wk-cuenta--panel .tc__hola { font-family: var(--wk-display); font-weight: 600; letter-spacing: -0.03em; }
 .wk-cuenta__dos { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(20px, 4vw, 48px); align-items: start; }
 .wk-cuenta .wk-form { padding: 24px; border: 1px solid var(--linea); border-radius: var(--wk-radio); background: var(--white); }
 .wk-cuenta .wk-form .wk-btn { justify-self: start; }

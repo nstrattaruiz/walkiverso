@@ -4,6 +4,7 @@
 import { $, app, esc, estado, ir, titular, url } from '../ui/util.js';
 import { tienda } from '../datos/tienda.js';
 import { abrirAcceso } from '../ui/acceso.js';
+import { abrirCarrito } from '../ui/carrito.js';
 
 const dinero = (c, moneda) => tienda.formatear(c, moneda);
 const ESTADO_PEDIDO = (o) => (o.status === 'cancelled' ? 'Cancelado' : o.paymentStatus !== 'paid' ? 'Pendiente de pago'
@@ -12,6 +13,18 @@ const ESTADO_PEDIDO = (o) => (o.status === 'cancelled' ? 'Cancelado' : o.payment
 export async function cuenta() {
   titular('Mi cuenta');
   const { info } = estado;
+  // La cuenta completa (ingreso, pedidos, cursos, e-books, datos, contraseña) la dibuja la plataforma con el diseño de
+  // esta web: tipografía y colores salen de acá. Si la plataforma todavía no la trae (o es la demostración local),
+  // sigue la cuenta de abajo.
+  if (typeof tienda.cuenta.panel === 'function') {
+    app.innerHTML = '<section class="wk-papel wk-pagina wk-seccion"><div class="wk-cont wk-cuenta wk-cuenta--panel"><div id="wk-cuenta-panel"></div></div></section>';
+    await tienda.cuenta.panel($('#wk-cuenta-panel'), {
+      navegar: (href) => ir(href),
+      alCarrito: abrirCarrito,
+      alCambiar: (c) => { estado.cliente = c; if (!c) ir('/'); },   // al salir vuelve a la portada
+    });
+    return;
+  }
   const codigo = new URLSearchParams(location.search).get('codigo');
   const marco = (html) => { app.innerHTML = `<section class="wk-papel wk-pagina wk-seccion"><div class="wk-cont wk-cont--angosto wk-cuenta">${html}</div></section>`; };
   const enviar = (form, fn) => form.addEventListener('submit', async (e) => {
