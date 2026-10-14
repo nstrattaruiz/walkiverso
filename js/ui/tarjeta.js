@@ -60,7 +60,7 @@ export function tarjeta(pz, i = 0) {
       <div class="wk-card__marco">
         ${arte(pz)}
         <span class="wk-card__brillo" aria-hidden="true"></span>
-        <div class="wk-card__insignias">${insignia(pz)}${pz.available ? '' : '<span class="wk-insignia wk-insignia--hogar">Ya encontró hogar</span>'}</div>
+        <div class="wk-card__insignias">${insignia(pz)}${pz.available && pz.promos?.length ? `<span class="wk-insignia wk-insignia--promo" title="${esc(pz.promos[0].name)}">${esc(pz.promos[0].badge)}</span>` : ''}${pz.available ? '' : '<span class="wk-insignia wk-insignia--hogar">Ya encontró hogar</span>'}</div>
       </div>
       <div class="wk-card__info">
         <h3 class="wk-card__nombre">${esc(pz.name)}</h3>

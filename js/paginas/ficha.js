@@ -59,6 +59,7 @@ export async function ficha(handle) {
           ${pz.available ? `
             <div class="wk-ficha__cabeza">
               <p class="wk-ficha__precio" id="precio"></p>
+              ${pz.promos?.length ? `<p class="wk-ficha__promo">${pz.promos.map((x) => (x.name.toLowerCase().includes(x.badge.toLowerCase()) ? `<strong>${esc(x.name)}</strong>` : `<strong>${esc(x.badge)}</strong> ${esc(x.name)}`)).join(' · ')}</p>` : ''}
               <p class="wk-ficha__estado"><i aria-hidden="true"></i><span id="estado"></span></p>
             </div>
             ${p.options.map((o, i) => `<div class="wk-opcion"><strong>${esc(o.name)}</strong>

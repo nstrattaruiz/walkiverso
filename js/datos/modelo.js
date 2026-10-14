@@ -67,6 +67,8 @@ export function pieza(p) {
     buscada: conMarca(p, MARCAS.buscada),
     categories: p.categories ?? [],
     createdAt: p.createdAt ?? null,
+    // Promociones automáticas que alcanzan a la pieza (módulo del panel): [{ name, badge: '2x1' }]
+    promos: p.promotions ?? [],
     crudo: p,
   };
 }

@@ -227,6 +227,9 @@ main { display: block; min-height: 70svh; outline: none; }
   box-shadow: 0 6px 18px -8px rgb(4 15 38 / 0.6);
 }
 .wk-insignia::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--blue-mid); box-shadow: 0 0 0 3px rgb(76 142 217 / 0.25); }
+.wk-insignia--promo { background: var(--acento); color: var(--sobre-acento, #fff); }
+.wk-insignia--promo::before { background: currentColor; box-shadow: none; }
+.wk-ficha__promo { flex-basis: 100%; margin: 4px 0 0; font-size: 0.9rem; }
 .wk-insignia--wk { background: rgb(7 26 61 / 0.72); color: var(--white); border: 1px solid rgb(143 197 255 / 0.4); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
 .wk-insignia--wk::before { background: var(--blue-glow); }
 .wk-insignia--hogar { background: rgb(4 15 38 / 0.78); color: var(--white-muted); }
