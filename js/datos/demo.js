@@ -48,7 +48,7 @@ function tope(p, cantidad) {
 // ---------------------------------------------------------------- checkout
 function totales({ metodoPago, envio, cupon }) {
   const c = carritoActual();
-  if (!c.lines.length) throw fallo('Tu colección está vacía.');
+  if (!c.lines.length) throw fallo('Tu carrito está vacío.');
   const codigo = (cupon ?? '').trim().toUpperCase();
   if (codigo && !CHECKOUT.cupones[codigo]) throw fallo('Ese código de descuento no existe.');
   const discountCents = codigo ? Math.round((c.subtotal * CHECKOUT.cupones[codigo]) / 100) : 0;

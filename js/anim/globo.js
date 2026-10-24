@@ -100,7 +100,7 @@ export function globo(lienzo) {
       renderer.setSize(ancho, alto, false);
       camara.aspect = ancho / alto;
       // Que entren el planeta y las órbitas de las lunas, con aire alrededor
-      const radio = 1.72, distancia = radio / Math.sin(THREE.MathUtils.degToRad(camara.fov / 2) * Math.min(1, camara.aspect));
+      const radio = 1.5, distancia = radio / Math.sin(THREE.MathUtils.degToRad(camara.fov / 2) * Math.min(1, camara.aspect));
       camara.position.setLength(distancia);
       camara.updateProjectionMatrix();
     };

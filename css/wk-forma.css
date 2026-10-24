@@ -1092,3 +1092,174 @@ html.wk-sin-carga .wk-carga { display: none; }
 .wk-universo__pista { position: absolute; left: 50%; bottom: 2%; translate: -50% 0; white-space: nowrap; font-size: 0.74rem; letter-spacing: 0.08em; color: var(--fg-2); opacity: 0; transition: opacity 0.4s ease; }
 .wk-universo__mundo:hover .wk-universo__pista, .wk-universo__mundo:focus-visible .wk-universo__pista { opacity: 1; }
 @media (max-width: 899px) { .wk-universo__mundo { aspect-ratio: 1 / 0.95; margin-top: -10px; } .wk-universo__pista { opacity: 1; } }
+
+/* =========================================================
+   Ajustes octubre 2026 (PDF "LOGO")
+   ========================================================= */
+/* La tipografía del logo (Sansita Swashed) para los títulos con magia: el hero y "cobran vida" */
+:root { --wk-magia: 'Sansita Swashed', 'Bricolage Grotesque', serif; }
+.wk-hero--foto .wk-hero__texto { padding-left: clamp(0px, 7vw, 120px); }
+/* Sansita viene inclinada; el logo es derecho: se endereza (inline-block para no pelear con la animación de entrada) */
+.wk-magia { display: inline-block; font-family: var(--wk-magia); font-weight: 600; letter-spacing: 0; transform: skewX(10deg); transform-origin: 0 100%; }
+.wk-hero--foto .wk-hero__titulo { max-width: 6.9em; font-family: var(--wk-magia); font-weight: 600; font-size: clamp(3rem, 7.4vw, 7rem); line-height: 1.04; letter-spacing: 0; text-shadow: 0 2px 30px rgb(4 15 38 / 0.5); }
+.wk-hero__titulo em { font-family: inherit; font-style: normal; font-weight: inherit; color: inherit; letter-spacing: inherit; padding: 0; }
+@media (max-width: 749px) { .wk-hero--foto .wk-hero__texto { padding-left: 0; } .wk-hero--foto .wk-hero__titulo { font-size: clamp(2.8rem, 13vw, 4rem); } }
+.wk-cinta--fija { display: flex; justify-content: space-evenly; align-items: center; gap: 14px; list-style: none; padding: 16px clamp(16px, 3vw, 40px); font-family: var(--wk-display); font-weight: 600; font-size: clamp(0.9rem, 1.2vw, 1.08rem); letter-spacing: 0.01em; }
+.wk-cinta--fija li { margin: 0; white-space: nowrap; }
+.wk-cinta__sep { font-size: 0.75em; opacity: 0.6; }
+@media (max-width: 749px) {
+  .wk-cinta--fija { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 12px; border-radius: 24px; text-align: center; font-size: 0.86rem; }
+  .wk-cinta__sep { display: none; }
+}
+/* Títulos de sección en mayúsculas (Las creaciones, Criaturas, Artefactos, Academia), con la bajada en una línea */
+.wk-cab--mayus .wk-titulo { text-transform: uppercase; letter-spacing: 0.01em; }
+@media (min-width: 900px) { .wk-cab--mayus .wk-bajada { max-width: none; } }
+/* La mano del logo como ícono (en lugar del ojo) */
+.wk-mano { display: inline-block; flex: none; width: 1em; height: 1em; background: currentColor; -webkit-mask: url('../img/mano.png') center / contain no-repeat; mask: url('../img/mano.png') center / contain no-repeat; }
+.wk-carrito__ojo .wk-mano { width: 36px; height: 36px; }
+.wk-mano--lista { width: 24px; height: 24px; color: var(--acento); }
+
+/* =========================================================
+   Tarjeta de pieza (PDF: lo mejor de la 1 y la 2)
+   Una tarjeta entera (foto, tipo, nombre y precio), foto 3:4, el tipo en mayúsculas arriba del nombre,
+   las acciones (favorito, carrito, vista rápida) aparecen al pasar el mouse y un borde que brilla y gira.
+   ========================================================= */
+@property --wk-giro { syntax: '<angle>'; initial-value: 0deg; inherits: false; }
+.wk-card { --fondo-card: var(--white); padding: 10px; border-radius: 22px; background: var(--fondo-card); box-shadow: 0 0 0 1px var(--linea), 0 18px 40px -32px rgb(7 26 61 / 0.45); transition: box-shadow 0.4s ease, translate 0.4s var(--wk-ease); isolation: isolate; }
+:is(.wk-noche, .wk-azul) .wk-card { --fondo-card: rgb(255 255 255 / 0.05); box-shadow: 0 0 0 1px rgb(143 197 255 / 0.16); }
+.wk-card__enlace { gap: 12px; }
+.wk-card__marco { aspect-ratio: 3 / 4; border-radius: 16px; }
+.wk-card__info { gap: 3px; padding: 0 6px 6px; }
+.wk-card__meta { order: 0; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--acento); }
+:is(.wk-noche, .wk-azul) .wk-card__meta { color: var(--blue-glow); }
+.wk-card__pie { margin-top: 6px; padding-top: 10px; }
+.wk-card__cta { display: none; }
+/* El borde que brilla y gira (degradé), solo al pasar el mouse */
+.wk-card::before { content: ''; position: absolute; inset: -1.5px; z-index: -1; border-radius: 23.5px; padding: 1.5px; background: conic-gradient(from var(--wk-giro), transparent 0 55%, var(--blue-glow) 70%, var(--blue-mid) 80%, transparent 92%); -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0); opacity: 0; transition: opacity 0.4s ease; }
+@keyframes wk-borde-gira { to { --wk-giro: 360deg; } }
+/* Acciones: en columna arriba a la derecha, discretas */
+.wk-card__acciones { position: absolute; top: 20px; right: 20px; z-index: 3; display: grid; gap: 8px; }
+.wk-card__acciones > * { position: static; width: 36px; height: 36px; margin: 0; border: 0; border-radius: 50%; background: rgb(255 255 255 / 0.82); color: var(--blue-deep); box-shadow: 0 6px 16px -8px rgb(4 15 38 / 0.6); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+.wk-card__acciones svg { width: 17px; height: 17px; }
+.wk-card__ver { display: grid; place-items: center; padding: 0; cursor: pointer; transition: transform 0.35s var(--wk-ease), background-color 0.25s, color 0.25s; }
+.wk-card__ver:hover { transform: scale(1.1); background: var(--blue-deep); color: var(--white); }
+.wk-card__acciones .wk-al-carrito b { right: 4px; bottom: 4px; width: 12px; height: 12px; font-size: 10px; }
+@media (hover: hover) {
+  .wk-card:hover { translate: 0 -4px; box-shadow: 0 0 0 1px transparent, 0 30px 50px -30px rgb(7 26 61 / 0.6); }
+  .wk-card:hover::before { opacity: 1; animation: wk-borde-gira 3s linear infinite; }
+  .wk-card__acciones > * { opacity: 0; translate: 8px 0; transition: opacity 0.3s ease, translate 0.35s var(--wk-ease), transform 0.35s var(--wk-ease), background-color 0.25s, color 0.25s; }
+  .wk-card__acciones > :nth-child(2) { transition-delay: 0.04s; }
+  .wk-card__acciones > :nth-child(3) { transition-delay: 0.08s; }
+  .wk-card:is(:hover, :focus-within) .wk-card__acciones > * { opacity: 1; translate: 0 0; }
+  /* Un favorito ya marcado se ve siempre */
+  .wk-card__acciones > .wk-fav[aria-pressed='true'] { opacity: 1; translate: 0 0; }
+}
+@media (prefers-reduced-motion: reduce) { .wk-card:hover::before { animation: none; } }
+@media (max-width: 749px) {
+  .wk-card { padding: 7px; border-radius: 18px; }
+  .wk-card__marco { border-radius: 13px; }
+  .wk-card__acciones { top: 14px; right: 14px; gap: 6px; }
+  .wk-card__acciones > * { width: 32px; height: 32px; }
+}
+/* Tarjetas anchas (1 o 2 piezas): las acciones a la izquierda, sobre la foto */
+@media (min-width: 750px) {
+  .wk-grilla:is([data-n='1'], [data-n='2']) .wk-card { padding: 0; background: none; box-shadow: none; }
+  .wk-grilla:is([data-n='1'], [data-n='2']) .wk-card::before { border-radius: var(--wk-bloque); }
+  .wk-grilla:is([data-n='1'], [data-n='2']) .wk-card__acciones { top: 26px; right: auto; left: 26px; }
+}
+/* Vista rápida */
+.wk-modal__caja:has(.wk-vista) { width: min(820px, 100%); }
+.wk-vista { display: grid; grid-template-columns: minmax(0, 0.85fr) minmax(0, 1fr); gap: clamp(18px, 3vw, 34px); align-items: center; }
+.wk-vista__arte { aspect-ratio: 3 / 4; overflow: hidden; border-radius: 18px; background: var(--blue-dark); }
+.wk-vista__arte .wk-arte { width: 100%; height: 100%; object-fit: cover; }
+.wk-vista__info { display: grid; gap: 10px; align-content: center; }
+.wk-vista__precio { font-weight: 600; font-size: 1.25rem; }
+.wk-vista__texto { color: var(--fg-2); line-height: 1.55; }
+@media (max-width: 599px) { .wk-vista { grid-template-columns: 1fr; } .wk-vista__arte { max-height: 46svh; } }
+
+/* =========================================================
+   Duendes de Milarko: un recuadro propio (a propósito no se ve como el resto del Walkiverso),
+   con el logo de Milarko en el círculo, letra con serifa y un carrusel con todos los duendes adentro
+   ========================================================= */
+.wk-milarko { --serifa: 'Cormorant Garamond', Georgia, serif; position: relative; display: grid; grid-template-columns: minmax(250px, 0.62fr) minmax(0, 1.6fr); gap: clamp(24px, 4vw, 56px); align-items: center; padding: clamp(22px, 3.4vw, 46px); border: 1.5px solid color-mix(in srgb, var(--blue-deep) 70%, transparent); border-radius: 28px; background: radial-gradient(80% 90% at 0% 0%, #fff, transparent 60%), linear-gradient(160deg, #fbfdff, #eef4fb); box-shadow: 0 30px 70px -50px rgb(7 26 61 / 0.5); }
+.wk-milarko__punto { position: absolute; display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: var(--blue-deep); color: var(--white); font-size: 0.6rem; }
+.wk-milarko__punto--a { top: -13px; left: 32px; }
+.wk-milarko__punto--b { bottom: -13px; right: 32px; }
+.wk-milarko__texto { display: grid; gap: 14px; justify-items: start; }
+.wk-milarko__logo { display: grid; place-items: center; width: clamp(96px, 9vw, 124px); aspect-ratio: 1; overflow: hidden; border-radius: 50%; background: #fff; box-shadow: 0 0 0 1px var(--linea), 0 18px 40px -20px rgb(28 90 166 / 0.5); color: var(--blue-mid); font-size: 1.7rem; }
+.wk-milarko__logo img { width: 100%; height: 100%; object-fit: cover; }
+.wk-milarko__sobre { display: inline-flex; align-items: center; gap: 10px; font-family: var(--serifa); font-weight: 600; font-size: 0.85rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--blue-mid); }
+.wk-milarko__sobre::before { content: ''; width: 22px; height: 1px; background: currentColor; }
+.wk-milarko__titulo { margin: 0; font-family: var(--serifa); font-weight: 600; font-size: clamp(2rem, 3vw, 2.8rem); line-height: 1.05; letter-spacing: 0; color: var(--blue-deep); }
+.wk-milarko__bajada { margin: 0; max-width: 34ch; font-family: var(--serifa); font-size: 1.12rem; line-height: 1.45; color: var(--fg-2); }
+.wk-milarko__quedan { display: inline-flex; align-items: center; gap: 8px; margin: 0; padding: 7px 14px; border-radius: 999px; border: 1px solid var(--linea); background: #fff; font-family: var(--serifa); font-weight: 600; font-size: 0.95rem; color: var(--blue-deep); }
+.wk-milarko__quedan i { width: 7px; height: 7px; border-radius: 50%; background: var(--blue-mid); }
+.wk-milarko .wk-duendes__elegido { font-family: var(--serifa); font-size: 1.3rem; }
+.wk-milarko__vitrina { display: grid; gap: 16px; min-width: 0; }
+.wk-duendes__lista { display: flex; gap: 16px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; padding: 6px 4px 10px; margin: -6px -4px -10px; }
+.wk-duendes__lista::-webkit-scrollbar { display: none; }
+.wk-duendes__lista .wk-card { flex: 0 0 calc((100% - 32px) / 3); scroll-snap-align: start; }
+.wk-milarko__control { display: flex; align-items: center; justify-content: center; gap: 14px; }
+.wk-milarko__flecha { display: grid; place-items: center; width: 38px; height: 38px; padding: 0; border: 1px solid var(--linea); border-radius: 50%; background: #fff; color: var(--blue-deep); font-size: 1.3rem; line-height: 1; cursor: pointer; transition: background-color 0.25s, color 0.25s; }
+.wk-milarko__flecha:hover { background: var(--blue-deep); color: var(--white); }
+.wk-milarko__barra { width: min(180px, 40%); height: 2px; border-radius: 2px; background: var(--linea); overflow: hidden; }
+.wk-milarko__barra i { display: block; height: 100%; width: 30%; border-radius: 2px; background: var(--blue-deep); transition: margin-left 0.2s ease-out; }
+@media (max-width: 999px) {
+  .wk-milarko { grid-template-columns: minmax(0, 1fr); }
+  .wk-duendes__lista .wk-card { flex-basis: calc((100% - 16px) / 2); }
+}
+@media (max-width: 599px) { .wk-duendes__lista .wk-card { flex-basis: 72%; } }
+/* "Dónde las criaturas / cobran vida": el acento en su propio renglón, grande, con la letra del logo; el planeta más grande */
+.wk-universo .wk-titulo em { display: block; width: max-content; max-width: 100%; margin-top: 0.08em; padding-left: 0.12em; white-space: nowrap; font-family: var(--wk-magia); font-style: normal; font-weight: 600; font-size: clamp(2.8rem, 6.4vw, 6.4rem); line-height: 1; letter-spacing: 0; color: var(--blue-deep); transform: skewX(10deg); transform-origin: 0 100%; }
+@media (min-width: 900px) { .wk-universo__grilla { grid-template-columns: 1fr 1.35fr; } }
+.wk-titulo--mayus { text-transform: uppercase; letter-spacing: 0.01em; }
+/* Cursos por llegar: el mismo formato, más apagado */
+.wk-curso--pronto { opacity: 0.72; }
+.wk-curso--pronto > div { display: grid; grid-template-rows: auto 1fr; height: 100%; overflow: hidden; border: 1px dashed var(--linea); border-radius: var(--wk-radio); background: var(--sup); }
+@media (max-width: 749px) { .wk-curso--pronto > div { grid-template-rows: none; grid-template-columns: 34% 1fr; } }
+.wk-curso--pronto .wk-curso__datos span { border-style: dashed; }
+/* Contacto: el taller, email, WhatsApp y redes en tarjetitas debajo del texto */
+.wk-contacto__datos { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 18px; }
+.wk-contacto__datos > .wk-contacto__tarjeta { display: flex; align-items: flex-start; gap: 12px; padding: 14px 16px; border: 1px solid var(--linea); border-radius: 16px; background: var(--sup, #fff); color: inherit; text-decoration: none; font-size: 0.92rem; line-height: 1.35; transition: border-color 0.25s, transform 0.3s var(--wk-ease); }
+a.wk-contacto__tarjeta:hover { border-color: var(--acento); transform: translateY(-2px); }
+.wk-contacto__tarjeta small { display: block; margin-bottom: 3px; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--acento); }
+.wk-contacto__icono { display: grid; place-items: center; flex: none; width: 34px; height: 34px; border-radius: 50%; background: color-mix(in srgb, var(--blue-glow) 22%, transparent); color: var(--acento); font-size: 0.8rem; }
+.wk-contacto__icono svg { width: 17px; height: 17px; }
+.wk-contacto__redes { display: flex; gap: 8px; margin-top: 4px; }
+.wk-contacto__redes a { display: grid; place-items: center; width: 30px; height: 30px; border: 1px solid var(--linea); border-radius: 50%; color: var(--acento); }
+.wk-contacto__redes a:hover { background: var(--acento); color: var(--white); }
+.wk-contacto__redes svg { width: 15px; height: 15px; }
+@media (max-width: 499px) { .wk-contacto__datos { grid-template-columns: 1fr; } }
+
+/* =========================================================
+   Menú grande de la Tienda: Criaturas / Artefactos, especies con foto y cantidad, y la pieza más nueva
+   ========================================================= */
+.wk-mega { position: absolute; top: calc(100% + var(--mega-y, 18px)); left: var(--mega-x, 0); width: var(--mega-w, 900px); z-index: 6; display: grid; grid-template-columns: 170px minmax(0, 1fr) minmax(220px, 300px); gap: 0; padding: 22px; border-radius: 26px; background: color-mix(in srgb, var(--blue-night) 96%, transparent); border: 1px solid rgb(143 197 255 / 0.12); box-shadow: 0 30px 60px -30px rgb(1 6 15 / 0.7); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); color: var(--white); text-transform: none; letter-spacing: 0; opacity: 0; visibility: hidden; translate: 0 -6px; transition: opacity 0.25s ease, translate 0.3s var(--wk-ease), visibility 0s linear 0.3s; }
+.wk-mega::before { content: ''; position: absolute; left: 0; right: 0; top: -20px; height: 20px; }
+.wk-nav-item--mega:hover .wk-mega, .wk-nav-item--mega:focus-within .wk-mega, .wk-nav-item--mega.is-abierto .wk-mega { opacity: 1; visibility: visible; translate: 0 0; transition-delay: 0s; }
+.wk-mega:empty { display: none; }
+.ns-nav .wk-mega a::after { display: none; }
+.wk-mega__tipos { display: grid; align-content: start; gap: 4px; padding-right: 18px; border-right: 1px solid rgb(143 197 255 / 0.14); }
+.wk-mega__tipos button { padding: 8px 0; border: 0; background: none; color: rgb(255 255 255 / 0.6); font: 600 1.05rem/1.2 var(--wk-display); text-align: left; cursor: pointer; transition: color 0.2s; }
+.wk-mega__tipos button[aria-selected='true'] { color: var(--white); text-decoration: underline; text-decoration-color: var(--blue-glow); text-underline-offset: 6px; }
+.ns-nav .wk-mega__todo { margin-top: auto; padding-top: 70px; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--blue-glow); }
+.wk-mega__especies { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-content: start; gap: 6px 14px; padding: 0 22px; }
+.ns-nav .wk-mega__especies a { display: flex; align-items: center; gap: 12px; padding: 8px 10px; border-radius: 14px; color: var(--white); font-size: 0.95rem; letter-spacing: 0; text-transform: none; transition: background-color 0.2s; }
+.ns-nav .wk-mega__especies a:hover { background: rgb(255 255 255 / 0.07); }
+.wk-mega__foto { flex: none; width: 44px; height: 44px; overflow: hidden; border-radius: 50%; border: 1px solid rgb(143 197 255 / 0.3); background: var(--blue-dark); }
+.wk-mega__foto .wk-arte { width: 100%; height: 100%; object-fit: cover; }
+.wk-mega__especies b { display: block; font-weight: 600; }
+.wk-mega__especies small { display: block; margin-top: 2px; font-size: 0.66rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: rgb(255 255 255 / 0.5); }
+.ns-nav .wk-mega__ver { grid-column: 1 / -1; padding: 10px; font-size: 0.8rem; color: var(--blue-glow); }
+.ns-nav .wk-mega__nueva { position: relative; display: block; min-height: 190px; overflow: hidden; border-radius: 18px; color: var(--white); }
+.wk-mega__nueva-foto { position: absolute; inset: 0; }
+.wk-mega__nueva-foto .wk-arte { width: 100%; height: 100%; object-fit: cover; transition: transform 1s var(--wk-ease); }
+.wk-mega__nueva:hover .wk-arte { transform: scale(1.06); }
+.wk-mega__nueva-texto { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: flex-end; gap: 4px; padding: 18px; background: linear-gradient(180deg, transparent 30%, rgb(4 15 38 / 0.9)); }
+.wk-mega__nueva-texto small { font-size: 0.64rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--blue-glow); }
+.wk-mega__nueva-texto b { font: 600 1.25rem/1.15 var(--wk-display); }
+.wk-mega__nueva-texto em { font-style: normal; font-size: 0.82rem; font-weight: 600; }
+@media (max-width: 1099px) { .wk-mega { display: none; } }
+.ns-nav .wk-mega a, .wk-mega b, .wk-mega em { text-transform: none; letter-spacing: 0; }
+.ns-nav .wk-mega__todo { white-space: nowrap; letter-spacing: 0.14em; text-transform: uppercase; }
+.wk-mega__nueva-texto b { text-transform: none; letter-spacing: -0.01em; }

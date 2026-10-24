@@ -9,6 +9,7 @@ import { iniciarBuscador } from './ui/buscador.js';
 import { iniciarFavoritos, favoritos } from './ui/favoritos.js';
 import { abrirAcceso } from './ui/acceso.js';
 import { iniciarTarjetas } from './anim/efectos.js';
+import { iniciarVistaRapida } from './ui/tarjeta.js';
 import { polvoDeHadas } from './anim/polvo.js';
 import { aplicarTextos } from './datos/textos.js';
 import { inicio } from './paginas/inicio.js';
@@ -77,6 +78,7 @@ async function arrancar() {
   iniciarBuscador();
   iniciarFavoritos();
   iniciarTarjetas();
+  iniciarVistaRapida();
   polvoDeHadas();
   await iniciarCarrito();
 

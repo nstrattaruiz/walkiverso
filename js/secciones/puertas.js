@@ -23,7 +23,6 @@ function puerta(clave, tipo, piezas, i) {
     </div>
     ${muestra.length && !t.imagen ? `<p class="wk-puerta__ahora" aria-hidden="true"><i></i><span data-ahora>${esc(muestra[0].name)}</span></p>` : ''}
     <div class="wk-puerta__cuerpo">
-      ${libres.length ? `<span class="wk-sobre">${libres.length} disponible${libres.length === 1 ? '' : 's'}</span>` : ''}
       <h3 class="wk-puerta__titulo">${esc(t.titulo)}</h3>
       <p class="wk-puerta__bajada">${esc(t.texto)}</p>
       <div class="wk-puerta__mas">

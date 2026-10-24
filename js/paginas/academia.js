@@ -32,6 +32,21 @@ export function tarjetaCurso(c, piezas, i = 0) {
   </article>`;
 }
 
+/** Lugar para un curso que todavía no salió: completa la fila hasta 3 ("Curso 02 · Próximamente"). */
+export const cursoPronto = (n, i = 0) => `
+  <article class="wk-curso wk-curso--pronto" data-ver style="--d:${i % 3}">
+    <div>
+      <div class="wk-curso__imagen"><span class="wk-arte wk-arte--espera" style="--t:${(0.3 + n * 0.2).toFixed(2)}" role="img" aria-label="Curso por llegar"><span class="wk-arte__glifo"></span></span></div>
+      <div class="wk-curso__info">
+        <p class="wk-curso__datos"><span>Próximamente</span></p>
+        <h3 class="wk-titulo wk-titulo--s">Curso ${String(n).padStart(2, '0')}</h3>
+        <p class="wk-curso__texto">Un nuevo curso del taller está en preparación.</p>
+      </div>
+    </div>
+  </article>`;
+/** Los cursos y, si son menos de 3, los lugares de los que vienen. */
+export const filaCursos = (lista, piezas) => `<div class="wk-cursos">${lista.map((c, i) => tarjetaCurso(c, piezas, i)).join('')}${Array.from({ length: Math.max(0, 3 - lista.length) }, (_, k) => cursoPronto(lista.length + k + 1, lista.length + k)).join('')}</div>`;
+
 export async function academia() {
   titular(ACADEMIA.titulo);
   const [lista, piezas] = await Promise.all([
@@ -43,18 +58,15 @@ export async function academia() {
     <section class="wk-academia wk-cielo wk-pagina">
       <span class="wk-ramas wk-academia__rama" aria-hidden="true"></span>
       <div class="wk-cont wk-academia__cab">
-        <span class="wk-sobre" data-ver>${esc(ACADEMIA.titulo)}</span>
-        <h1 class="wk-titulo" data-ver style="--d:1">${esc(ACADEMIA.subtitulo)}</h1>
-        <p class="wk-bajada" data-ver style="--d:2">${esc(ACADEMIA.texto)}</p>
+        <span class="wk-sobre" data-ver>${esc(ACADEMIA.texto.endsWith('.') ? ACADEMIA.texto.slice(0, -1) : ACADEMIA.texto)}</span>
+        <h1 class="wk-titulo wk-titulo--mayus" data-ver style="--d:1">${esc(ACADEMIA.titulo)}</h1>
+        <p class="wk-bajada" data-ver style="--d:2">${esc(ACADEMIA.subtitulo)}</p>
       </div>
     </section>
     <section class="wk-seccion wk-blanco wk-con-raices" id="cursos">
       ${raices()}
       <div class="wk-cont">
-        <header class="wk-cab" data-ver><span class="wk-sobre">Cursos</span><h2 class="wk-titulo wk-titulo--m">Aprendé a tu ritmo</h2></header>
-        ${lista.length
-          ? `<div class="wk-cursos">${lista.map((c, i) => tarjetaCurso(c, piezas, i)).join('')}</div>`
-          : '<p class="wk-bajada">Muy pronto: los primeros cursos del taller están en preparación.</p>'}
+        ${filaCursos(lista, piezas)}
       </div>
     </section>
     ${ebooks.length ? `

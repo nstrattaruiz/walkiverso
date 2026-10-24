@@ -1,6 +1,6 @@
-// Cart · "Tu colección": carrito deslizable con fondo desenfocado (firma NS 4). Se abre solo al sumar una pieza.
+// Cart · "Tu carrito": carrito deslizable con fondo desenfocado (firma NS 4). Se abre solo al sumar una pieza.
 // Los totales y los topes de cantidad vienen siempre de la plataforma.
-import { $, esc, ir, flecha, icono, atraparFoco } from './util.js';
+import { $, esc, ir, flecha, icono, mano, atraparFoco } from './util.js';
 import { tienda } from '../datos/tienda.js';
 
 const panel = $('#carrito');
@@ -64,7 +64,7 @@ function pintar(c) {
   }
   $('#carrito-lineas').innerHTML = c.lines.length
     ? c.lines.map((l) => linea(l, c.currency)).join('')
-    : `<div class="wk-carrito__vacio"><span class="wk-carrito__ojo">${icono('i-ojo')}</span><p>Tu colección todavía está vacía.</p><a class="wk-enlace" href="/tienda" data-link>Explorar tienda ${flecha}</a></div>`;
+    : `<div class="wk-carrito__vacio"><span class="wk-carrito__ojo">${mano()}</span><p>Tu carrito todavía está vacío.</p><a class="wk-enlace" href="/tienda" data-link>Explorar tienda ${flecha}</a></div>`;
   $('#carrito-pie').innerHTML = c.lines.length ? `
     <p class="wk-error" id="carrito-error" role="alert"></p>
     <div class="wk-carrito__total"><span>Subtotal</span><strong>${tienda.formatear(c.subtotal ?? c.total, c.currency)}</strong></div>

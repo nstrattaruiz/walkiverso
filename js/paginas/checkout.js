@@ -18,7 +18,7 @@ export async function checkout() {
   titular('Finalizar compra');
   const { info, cliente } = estado;
   const [carro, op, piezas] = await Promise.all([tienda.carrito.ver(), tienda.checkout.opciones(), catalogo().catch(() => [])]);
-  if (!carro.lines.length) return pantalla('Tu colección está vacía', '', `<a class="wk-btn wk-btn--tinta" href="/tienda" data-link>Explorar tienda ${flecha}</a>`);
+  if (!carro.lines.length) return pantalla('Tu carrito está vacío', '', `<a class="wk-btn wk-btn--tinta" href="/tienda" data-link>Explorar tienda ${flecha}</a>`);
   if (!op.payments.length) return pantalla('Todavía no se puede comprar online', 'Escribinos y coordinamos tu pedido.', `<a class="wk-btn wk-btn--tinta" href="/contacto" data-link>Contacto ${flecha}</a>`);
 
   // ¿Hay piezas físicas? Cursos y e-books no llevan envío y se pueden comprar desde cualquier país.

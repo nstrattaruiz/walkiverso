@@ -48,12 +48,42 @@ export const fila = (piezas, clase = 'wk-grilla--carril') => `<div class="wk-gri
 const alCarrito = (pz, solo) => {
   const variantes = pz.crudo?.variants ?? [];
   if (!pz.available || pz.priceHidden || !pz.variantId || variantes.filter((v) => v.available).length > 1) return '';
-  return `<button type="button" class="wk-al-carrito${solo ? ' wk-al-carrito--solo' : ''}" data-al-carrito="${esc(pz.variantId)}" data-cant="${pz.crudo?.multiple > 1 ? pz.crudo.multiple : 1}" aria-label="${esc(`Agregar ${pz.name} al carrito`)}">${icono('i-bag')}<b aria-hidden="true">+</b></button>`;
+  return `<button type="button" class="wk-al-carrito" data-al-carrito="${esc(pz.variantId)}" data-cant="${pz.crudo?.multiple > 1 ? pz.crudo.multiple : 1}" aria-label="${esc(`Agregar ${pz.name} al carrito`)}">${icono('i-bag')}<b aria-hidden="true">+</b></button>`;
 };
+
+/** Vista rápida (el ojito): la pieza en una ventana, sin salir de la página. Se conecta una vez (js/app.js). */
+export function iniciarVistaRapida() {
+  document.addEventListener('click', async (e) => {
+    const b = e.target.closest('[data-vista]');
+    if (!b) return;
+    e.preventDefault();
+    const [{ catalogo }, { abrirModal }] = await Promise.all([import('../datos/modelo.js'), import('./piezas.js')]);
+    const pz = (await catalogo()).find((x) => x.handle === b.dataset.vista);
+    if (!pz) return;
+    const n = NOMBRE[pz.tipo];
+    abrirModal(`<div class="wk-vista">
+      <div class="wk-vista__arte">${arte(pz, { ancho: 640, sizes: '320px' })}</div>
+      <div class="wk-vista__info">
+        ${pz.especieTexto || pz.type ? `<p class="wk-card__meta">${esc(pz.especieTexto || pz.type)}</p>` : ''}
+        <h2 class="wk-titulo wk-titulo--s">${esc(pz.name)}</h2>
+        <p class="wk-vista__precio">${pz.available ? precio(pz) : 'Ya encontró hogar'}</p>
+        ${pz.description ? `<p class="wk-vista__texto">${esc(resumen(pz, 260))}</p>` : ''}
+        <div class="wk-botones">
+          ${alCarrito(pz) ? `<button type="button" class="wk-btn wk-btn--tinta" data-cerrar data-al-carrito="${esc(pz.variantId)}" data-cant="${pz.crudo?.multiple > 1 ? pz.crudo.multiple : 1}">Agregar al carrito</button>` : ''}
+          <a class="wk-btn wk-btn--linea" href="${hrefPieza(pz)}" data-link data-cerrar>${n.ver} ${flecha}</a>
+        </div>
+      </div>
+    </div>`, { titulo: pz.name });
+  });
+}
+
+/** Vista rápida (el ojito): la pieza en una ventana, sin salir de la página. */
+const ojito = (pz) => (pz.tipo === 'curso' ? '' : `<button type="button" class="wk-card__ver" data-vista="${esc(pz.handle)}" aria-label="${esc(`Vista rápida de ${pz.name}`)}">${icono('i-ojo-abierto')}</button>`);
 
 export function tarjeta(pz, i = 0) {
   const n = NOMBRE[pz.tipo];
-  const meta = [pz.especieTexto, pz.technique].filter(Boolean).map(esc).join('<i aria-hidden="true"> · </i>');
+  // El tipo va arriba del nombre, en mayúsculas (Mandrágora, Bitácora, Duende del Amor…). La técnica ya no se muestra.
+  const meta = esc(pz.especieTexto || pz.type || '');
   return `
   <article class="wk-card${pz.available ? '' : ' wk-card--hogar'}" data-handle="${esc(pz.handle)}" data-ver style="--d:${i % 4}">
     <a class="wk-card__enlace" href="${hrefPieza(pz)}" data-link aria-label="${esc(`${n.ver}: ${pz.name}`)}">
@@ -63,8 +93,8 @@ export function tarjeta(pz, i = 0) {
         <div class="wk-card__insignias">${insignia(pz)}${pz.available && pz.promos?.length ? `<span class="wk-insignia wk-insignia--promo" title="${esc(pz.promos[0].name)}">${esc(pz.promos[0].badge)}</span>` : ''}${pz.available ? '' : '<span class="wk-insignia wk-insignia--hogar">Ya encontró hogar</span>'}</div>
       </div>
       <div class="wk-card__info">
-        <h3 class="wk-card__nombre">${esc(pz.name)}</h3>
         ${meta ? `<p class="wk-card__meta">${meta}</p>` : ''}
+        <h3 class="wk-card__nombre">${esc(pz.name)}</h3>
         ${pz.description ? `<p class="wk-card__resumen">${esc(resumen(pz))}</p>` : ''}
         <div class="wk-card__pie">
           <span class="wk-card__precio">${pz.available ? precio(pz) : '—'}</span>
@@ -72,7 +102,7 @@ export function tarjeta(pz, i = 0) {
         </div>
       </div>
     </a>
-    ${pz.tipo === 'criatura' || pz.tipo === 'artefacto' ? corazon(pz) + alCarrito(pz) : alCarrito(pz, true)}
+    <div class="wk-card__acciones">${pz.tipo === 'criatura' || pz.tipo === 'artefacto' ? corazon(pz) : ''}${alCarrito(pz)}${ojito(pz)}</div>
   </article>`;
 }
 

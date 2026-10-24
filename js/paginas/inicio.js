@@ -15,7 +15,7 @@ import { particulas } from '../anim/particulas.js';
 import { globo } from '../anim/globo.js';
 import { WALKURIO_PUBLICADO } from '../config.js';
 import { escena, aparecer } from '../anim/efectos.js';
-import { tarjetaCurso } from './academia.js';
+import { filaCursos } from './academia.js';
 import * as T from '../contenido.js';
 import { secciones } from '../secciones/reglas.js';
 
@@ -99,7 +99,7 @@ const hero = () => `
       <span class="wk-hero__luz" data-luz></span>
     </div>
     <div class="wk-cont wk-hero__texto">
-      <h1 class="wk-hero__titulo" id="hero-titulo">${T.HERO.titulo}</h1>
+      <h1 class="wk-hero__titulo" id="hero-titulo"><span class="wk-magia">${T.HERO.titulo}</span></h1>
       <p class="wk-hero__bajada">${esc(T.HERO.texto)}</p>
       <a class="wk-btn wk-btn--luz" href="/tienda" data-link>${esc(T.HERO.cta)} ${flecha}</a>
     </div>
@@ -121,8 +121,8 @@ function activarFotosHero() {
 }
 
 /** Cabecera de sección: etiqueta, título y bajada, siempre centrados. */
-const cabecera = ({ sobre, titulo, texto }) => `
-  <header class="wk-cab wk-cab--centro" data-ver>
+const cabecera = ({ sobre, titulo, texto, mayus }) => `
+  <header class="wk-cab wk-cab--centro${mayus ? ' wk-cab--mayus' : ''}" data-ver>
     ${sobre ? `<span class="wk-sobre">${esc(sobre)}</span>` : ''}
     <h2 class="wk-titulo">${titulo}</h2>
     ${texto ? `<p class="wk-bajada">${esc(texto)}</p>` : ''}
@@ -131,8 +131,8 @@ const verMas = (enlace) => (enlace ? `<p class="wk-seccion__mas" data-ver><a cla
 
 /** Cinta en movimiento entre el hero y la tienda: separa los bloques y repite las ideas de la marca. */
 const cinta = () => {
-  const tira = T.CINTA.map((t) => `<span>${esc(t)}</span><i aria-hidden="true">✦</i>`).join('');
-  return `<div class="wk-cinta" aria-hidden="true"><div class="wk-cinta__tira">${tira}${tira}${tira}${tira}</div></div>`;
+  // Fija (ya no corre): las frases repartidas a lo ancho, con un destello entre una y otra
+  return `<ul class="wk-cinta wk-cinta--fija">${T.CINTA.map((t, i) => `${i ? '<li class="wk-cinta__sep" aria-hidden="true">✦</li>' : ''}<li>${esc(t)}</li>`).join('')}</ul>`;
 };
 
 /** Sección con una fila de piezas. En celular la fila se desliza con el dedo para no alargar la página. */
@@ -195,12 +195,14 @@ function activarProceso() {
         ? `<img src="${esc(p.imagen)}" alt="${esc(`${p.nombre}: paso ${i + 1} del proceso`)}" loading="lazy">`
         : `<span class="wk-arte wk-arte--espera" style="--t:${(i / pasos.length).toFixed(2)}" role="img" aria-label="${esc(p.nombre)}: imagen pendiente"><span class="wk-arte__glifo"></span></span>`}</div>
       <div><span class="wk-pasos__n">${String(i + 1).padStart(2, '0')}</span><h3 class="wk-titulo wk-titulo--s">${esc(p.nombre)}</h3><p>${esc(p.texto)}</p></div>`;
-    // El orbe se llena con cada paso recorrido: al completarlos, la criatura abre los ojos
-    orbe.style.setProperty('--luz', (vistos.size / pasos.length).toFixed(3));
-    $('#orbe-n').textContent = vistos.size;
-    if (vistos.size === pasos.length && !orbe.classList.contains('is-despierta')) {
-      orbe.classList.add('is-despierta');
-      $('#orbe-texto').textContent = T.PROCESO.despierta;
+    // El orbe sigue al paso en el que estás (no a los ya vistos): en el último, la criatura abre los ojos; si volvés
+    // atrás, los cierra y vuelve el texto del principio
+    orbe.style.setProperty('--luz', ((i + 1) / pasos.length).toFixed(3));
+    $('#orbe-n').textContent = i + 1;
+    const despierta = i === pasos.length - 1;
+    if (despierta !== orbe.classList.contains('is-despierta')) {
+      orbe.classList.toggle('is-despierta', despierta);
+      $('#orbe-texto').textContent = despierta ? T.PROCESO.despierta : T.PROCESO.orbe;
     }
   };
   botones.forEach((b, i) => {
@@ -317,39 +319,62 @@ function formularioVoz() {
 
 // ---------------------------------------------------------------- duendes: cuántos quedan y "que uno te elija"
 /** Unidades disponibles de una lista de piezas (una pieza única cuenta 1). */
-const unidades = (piezas) => piezas.filter((x) => x.available).reduce((n, x) => n + (x.isUnique ? 1 : x.stock ?? 1), 0);
 
 const duendes = (lista) => {
   const D = T.DUENDES;
   const libres = lista.filter((x) => x.available);
   if (!lista.length) return '';
-  const quedan = unidades(lista);
   return `
   <section class="wk-seccion wk-papel wk-duendes wk-con-raices" id="duendes">
     ${raices()}
-    <div class="wk-cont wk-duendes__grilla">
-      <div class="wk-duendes__texto" data-ver>
-        <span class="wk-sobre">${esc(D.sobre)}</span>
-        <h2 class="wk-titulo">${esc(D.titulo)}</h2>
-        <p class="wk-duendes__quedan"><b>${quedan}</b><span>${esc(quedan === 1 ? D.queda : D.quedan)}</span></p>
-        <p class="wk-bajada">${esc(D.texto)}</p>
-        <div class="wk-botones">
-          ${libres.length > 1 ? `<button type="button" class="wk-btn wk-btn--tinta wk-duendes__azar" id="duende-azar"><span class="wk-duendes__chispa" aria-hidden="true">✦</span><span>${esc(D.azar)}</span></button>` : ''}
-          <a class="wk-btn wk-btn--linea" href="/tienda?especie=${encodeURIComponent(D.especie)}" data-link>${esc(D.verTodos)} ${flecha}</a>
+    <div class="wk-cont">
+      <div class="wk-milarko" data-ver>
+        <span class="wk-milarko__punto wk-milarko__punto--a" aria-hidden="true">✦</span><span class="wk-milarko__punto wk-milarko__punto--b" aria-hidden="true">✦</span>
+        <div class="wk-milarko__texto">
+          <span class="wk-milarko__logo">${D.imagen ? `<img src="${esc(D.imagen)}" alt="Milarko" loading="lazy">` : '<span aria-hidden="true">✦</span>'}</span>
+          <span class="wk-milarko__sobre">${esc(D.sobre)}</span>
+          <h2 class="wk-milarko__titulo">${esc(D.titulo)}</h2>
+          <p class="wk-milarko__bajada">${esc(D.texto)}</p>
+          ${libres.length ? `<p class="wk-milarko__quedan"><i aria-hidden="true"></i>${libres.length} ${esc(libres.length === 1 ? D.queda : D.quedan)}</p>` : ''}
+          <div class="wk-botones">
+            ${libres.length > 1 ? `<button type="button" class="wk-btn wk-btn--tinta wk-duendes__azar" id="duende-azar"><span class="wk-duendes__chispa" aria-hidden="true">✦</span><span>${esc(D.azar)}</span></button>` : ''}
+            <a class="wk-btn wk-btn--linea" href="/tienda?especie=${encodeURIComponent(D.especie)}" data-link>${esc(D.verTodos)} ${flecha}</a>
+          </div>
+          <p class="wk-duendes__elegido" id="duende-elegido" aria-live="polite"></p>
         </div>
-        <p class="wk-duendes__elegido" id="duende-elegido" aria-live="polite"></p>
+        <div class="wk-milarko__vitrina">
+          <div class="wk-duendes__lista" id="duendes-lista" tabindex="0" aria-label="Duendes">${lista.map(tarjeta).join('')}</div>
+          <div class="wk-milarko__control">
+            <button type="button" class="wk-milarko__flecha" data-mover="-1" aria-label="Duendes anteriores">‹</button>
+            <span class="wk-milarko__barra" aria-hidden="true"><i id="duendes-barra"></i></span>
+            <button type="button" class="wk-milarko__flecha" data-mover="1" aria-label="Más duendes">›</button>
+          </div>
+        </div>
       </div>
-      <div class="wk-grilla wk-grilla--carril wk-duendes__lista" id="duendes-lista">${lista.slice(0, 6).map(tarjeta).join('')}</div>
     </div>
   </section>`;
 };
-
 /** El sorteo: la luz salta de duende en duende, cada vez más lento, hasta quedarse con uno. */
 function activarDuendes(lista) {
+  const carril = $('#duendes-lista');
+  if (!carril) return;
+  // El carrusel: flechas que pasan de a una tarjeta y una barra que muestra por dónde vas
+  const barra = $('#duendes-barra');
+  const marcar = () => {
+    const max = carril.scrollWidth - carril.clientWidth;
+    barra.style.width = `${Math.max(14, (carril.clientWidth / carril.scrollWidth) * 100)}%`;
+    barra.style.marginLeft = `${max > 0 ? (carril.scrollLeft / max) * (100 - parseFloat(barra.style.width)) : 0}%`;
+  };
+  carril.addEventListener('scroll', marcar, { passive: true });
+  addEventListener('resize', marcar);
+  marcar();
+  $$('[data-mover]', $('#duendes')).forEach((b) => b.addEventListener('click', () => {
+    const paso = (carril.querySelector('.wk-card')?.offsetWidth ?? 240) + 16;
+    carril.scrollBy({ left: paso * Number(b.dataset.mover), behavior: reducido() ? 'auto' : 'smooth' });
+  }));
   const boton = $('#duende-azar');
   if (!boton) return;
   const salida = $('#duende-elegido');
-  const carril = $('#duendes-lista');
   const tarjetas = $$('.wk-card', carril).filter((c) => lista.some((x) => x.available && x.handle === c.dataset.handle));
   boton.addEventListener('click', async () => {
     if (boton.disabled || tarjetas.length < 2) return;
@@ -359,11 +384,12 @@ function activarDuendes(lista) {
     tarjetas.forEach((c) => c.classList.remove('is-elegido', 'is-candidato'));
     const destino = Math.floor(Math.random() * tarjetas.length);
     // Dos vueltas completas y después hasta el elegido; sin animaciones, va directo
-    const saltos = reducido() ? 0 : tarjetas.length * 2 + destino;
+    const saltos = reducido() ? 0 : tarjetas.length + destino;
     for (let i = 0; i <= saltos; i++) {
       const actual = tarjetas[i % tarjetas.length];
       tarjetas.forEach((c) => c.classList.toggle('is-candidato', c === actual));
-      await new Promise((r) => setTimeout(r, 70 + (i / Math.max(saltos, 1)) ** 2.4 * 360));
+      carril.scrollTo({ left: actual.offsetLeft - (carril.clientWidth - actual.offsetWidth) / 2, behavior: reducido() ? 'auto' : 'smooth' });
+      await new Promise((r) => setTimeout(r, 120 + (i / Math.max(saltos, 1)) ** 2.4 * 420));
     }
     const elegida = tarjetas[destino];
     const pz = lista.find((x) => x.handle === elegida.dataset.handle);
@@ -382,7 +408,7 @@ function activarDuendes(lista) {
         <span class="wk-sobre">${esc(T.DUENDES.eligio)}</span>
         <div class="wk-elegido__arte">${arte(pz, { ancho: 640, sizes: '320px' })}<div class="wk-card__insignias">${insignia(pz)}</div></div>
         <h2 class="wk-titulo wk-titulo--m">${esc(pz.name)}</h2>
-        <p class="wk-card__meta">${[pz.especieTexto, pz.technique].filter(Boolean).map(esc).join(' · ')}</p>
+        <p class="wk-card__meta">${esc(pz.especieTexto || '')}</p>
         <p class="wk-elegido__precio">${precio(pz)}</p>
         <div class="wk-botones">
           <a class="wk-btn wk-btn--tinta" href="/producto/${encodeURIComponent(pz.handle)}" data-link data-cerrar>${esc(NOMBRE.criatura.ver)} ${flecha}</a>
@@ -415,13 +441,13 @@ export async function inicio() {
     ${cinta()}
     <section class="wk-seccion wk-blanco wk-creaciones" id="creaciones">
       <div class="wk-cont">
-        ${cabecera({ sobre: T.CREACIONES.sobre, titulo: esc(T.CREACIONES.titulo), texto: T.CREACIONES.texto })}
+        ${cabecera({ sobre: T.CREACIONES.sobre, titulo: esc(T.CREACIONES.titulo), texto: T.CREACIONES.texto, mayus: true })}
       </div>
       <div class="wk-cont wk-cont--ancho">${puertas(criaturas, artefactos)}</div>
     </section>
 
-    ${vitrina({ id: 'criaturas', tema: 'wk-cielo', raiz: true, piezas: filaCriaturas, sobre: S.criaturas.sobre, titulo: esc(S.criaturas.titulo), texto: S.criaturas.texto, enlace: { href: '/tienda?tipo=criatura', texto: S.criaturas.cta } })}
-    ${vitrina({ id: 'artefactos', tema: 'wk-blanco', raiz: true, piezas: filaArtefactos, sobre: S.artefactos.sobre, titulo: esc(S.artefactos.titulo), texto: S.artefactos.texto, enlace: { href: '/tienda?tipo=artefacto', texto: S.artefactos.cta } })}
+    ${vitrina({ id: 'criaturas', tema: 'wk-cielo', raiz: true, piezas: filaCriaturas, mayus: true, sobre: S.criaturas.sobre, titulo: esc(S.criaturas.titulo), texto: S.criaturas.texto, enlace: { href: '/tienda?tipo=criatura', texto: S.criaturas.cta } })}
+    ${vitrina({ id: 'artefactos', tema: 'wk-blanco', raiz: true, piezas: filaArtefactos, mayus: true, sobre: S.artefactos.sobre, titulo: esc(S.artefactos.titulo), texto: S.artefactos.texto, enlace: { href: '/tienda?tipo=artefacto', texto: S.artefactos.cta } })}
     ${duendes(losDuendes)}
     ${vitrina({ id: 'destacadas', tema: 'wk-noche wk-isla', clase: 'wk-destacadas', raiz: true, piezas: destacadas, sobre: S.destacadas.sobre, titulo: S.destacadas.titulo, texto: S.destacadas.texto })}
 
@@ -437,7 +463,7 @@ export async function inicio() {
     </section>
 
     ${proceso()}
-    ${vitrina({ id: 'buscados', tema: 'wk-blanco', raiz: true, clase: sonUltimas ? '' : 'wk-buscados', piezas: buscadas, sobre: B.sobre, titulo: esc(B.titulo), enlace: { href: '/tienda', texto: B.cta } })}
+    ${sonUltimas ? '' : vitrina({ id: 'buscados', tema: 'wk-blanco', raiz: true, clase: 'wk-buscados', piezas: buscadas, sobre: B.sobre, titulo: esc(B.titulo), enlace: { href: '/tienda', texto: B.cta } })}
     ${reels()}
     ${universo()}
     ${voces()}
@@ -465,8 +491,8 @@ export async function inicio() {
     <section class="wk-seccion wk-papel wk-academia-franja wk-con-raices" id="academia">
       ${raices()}
       <div class="wk-cont">
-        ${cabecera({ sobre: T.ACADEMIA.sobre, titulo: esc(T.ACADEMIA.titulo), texto: `${T.ACADEMIA.subtitulo} ${T.ACADEMIA.texto}` })}
-        ${cursos.length ? `<div class="wk-cursos">${cursos.slice(0, 3).map((c, i) => tarjetaCurso(c, todo, i)).join('')}</div>` : ''}
+        ${cabecera({ sobre: T.ACADEMIA.sobre, titulo: esc(T.ACADEMIA.titulo), texto: `${T.ACADEMIA.subtitulo} ${T.ACADEMIA.texto}`, mayus: true })}
+        ${filaCursos(cursos.slice(0, 3), todo)}
         ${verMas({ href: '/cursos', texto: T.ACADEMIA.cta })}
       </div>
     </section>

@@ -25,6 +25,8 @@ export function ir(href, { reemplazar = false } = {}) {
 
 export const flecha = '<span class="wk-flecha" aria-hidden="true">→</span>';
 export const icono = (id) => `<svg aria-hidden="true" focusable="false"><use href="#${id}"/></svg>`;
+/** La mano del logo, como ícono: toma el color del texto (img/mano.png es la silueta). */
+export const mano = (clase = '') => `<span class="wk-mano ${clase}" aria-hidden="true"></span>`;
 export const esExterno = (u) => /^(https?:|mailto:|tel:)/i.test(u);
 export const reducido = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 export const punteroFino = () => window.matchMedia('(hover: hover) and (pointer: fine)').matches;

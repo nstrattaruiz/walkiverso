@@ -1,5 +1,5 @@
 // Product Detail · la ficha de una pieza: se entra como a la ficha de una criatura.
-import { $, $$, app, esc, estado, flecha, icono, ir, reducido, titular } from '../ui/util.js';
+import { $, $$, app, esc, estado, flecha, icono, ir, mano, reducido, titular } from '../ui/util.js';
 import { tienda } from '../datos/tienda.js';
 import { pieza, obras, NOMBRE, porDisponibilidad } from '../datos/modelo.js';
 import { arte, insignia, fila } from '../ui/tarjeta.js';
@@ -85,7 +85,7 @@ export async function ficha(handle) {
             ${esObra ? `<ul class="wk-ficha__garantias">
               <li>${icono('i-pin')}<span>${esc(FICHA.envios)}</span></li>
               <li>${icono('i-bag')}<span>${esc(FICHA.pagos)}</span></li>
-              <li>${icono('i-ojo')}<span>${esc(FICHA.taller)}</span></li>
+              <li>${mano('wk-mano--lista')}<span>${esc(FICHA.taller)}</span></li>
             </ul>` : ''}
           </div>
 

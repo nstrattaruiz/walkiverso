@@ -28,7 +28,7 @@ export function secciones(todo) {
   destacadas = destacadas.slice(0, POR_FILA);
 
   // LOS MÁS BUSCADOS · las piezas marcadas como más buscadas que sigan disponibles.
-  // Respaldo: la sección pasa a ser "Las últimas en llegar" (las más nuevas, sin repetir las de arriba si alcanza).
+  // Sin piezas marcadas, la sección no aparece ("Las últimas en llegar" se sacó: ya está "No las dejes escapar").
   let buscadas = libres.filter((x) => x.buscada).sort(masNuevas);
   const sonUltimas = !buscadas.length;
   if (sonUltimas) {

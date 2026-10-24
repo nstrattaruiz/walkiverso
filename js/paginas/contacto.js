@@ -1,13 +1,14 @@
 // Contacto (el mensaje llega al panel → Mensajes) y páginas legales del panel.
 import { $, app, esc, estado, flecha, titular } from '../ui/util.js';
 import { tienda } from '../datos/tienda.js';
-import { contactoHtml } from '../ui/marco.js';
+import { tarjetasContacto } from '../ui/marco.js';
+import { PAIS_ENVIOS } from '../config.js';
 import { aparecer } from '../anim/efectos.js';
 import { raices } from '../ui/piezas.js';
 
 export function contacto() {
   titular('Contacto');
-  const datos = contactoHtml();
+  const datos = tarjetasContacto(estado.info.contact ?? {}, PAIS_ENVIOS);
   app.innerHTML = `
     <section class="wk-cielo wk-pagina wk-seccion wk-contacto wk-con-raices">
       ${raices()}

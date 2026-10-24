@@ -1,6 +1,6 @@
 // Tienda · Product Grid + Filters. Una galería que también vende: categorías arriba, filtros al costado.
 // Los filtros viven en la dirección (/tienda?tipo=criatura&especie=Troll): se pueden compartir y volver atrás.
-import { $, $$, app, esc, flecha, icono, plano, titular, url } from '../ui/util.js';
+import { $, $$, app, esc, flecha, icono, mano, plano, titular, url } from '../ui/util.js';
 import { tienda as sdk } from '../datos/tienda.js';
 import { obras, buscar, porDisponibilidad } from '../datos/modelo.js';
 import { tarjeta } from '../ui/tarjeta.js';
@@ -155,7 +155,7 @@ export async function catalogoPagina(categoria = '') {
       <button type="button" class="wk-activos__limpiar" data-quitar="todo">Limpiar filtros</button>` : '';
     $('#grilla').innerHTML = n
       ? `<div class="wk-grilla wk-grilla--tienda">${lista.map(tarjeta).join('')}</div>`
-      : `<div class="wk-vacio"><span class="wk-carrito__ojo">${icono('i-ojo')}</span><h2 class="wk-titulo wk-titulo--s">Ninguna pieza coincide con esos filtros</h2><button type="button" class="wk-btn wk-btn--tinta" data-quitar="todo">Ver toda la tienda ${flecha}</button></div>`;
+      : `<div class="wk-vacio"><span class="wk-carrito__ojo">${mano()}</span><h2 class="wk-titulo wk-titulo--s">Ninguna pieza coincide con esos filtros</h2><button type="button" class="wk-btn wk-btn--tinta" data-quitar="todo">Ver toda la tienda ${flecha}</button></div>`;
     aparecer($('#grilla'));
   }
   const cambiar = (cambios) => { Object.assign(f, cambios); escribir(f); pintar(); };

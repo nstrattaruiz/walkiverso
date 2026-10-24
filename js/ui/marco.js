@@ -23,6 +23,10 @@ export function pintarMenus() {
   // Barra del medio: lo que tiene ramificaciones (por ejemplo, las categorías de la tienda) se despliega debajo
   $('#nav').innerHTML = base.filter((l) => l.url !== '/cuenta').map((l, i) => {
     const hijos = l.children?.filter(publicado) ?? [];
+    // La Tienda despliega su menú grande (especies agrupadas, con foto y cantidad, y la pieza más nueva)
+    if (hrefDe(l) === '/tienda') return `<div class="wk-nav-item wk-nav-item--mega">${enlace(l)}${esc(l.label)}</a>
+      <button type="button" class="wk-nav-abrir" aria-expanded="false" aria-controls="nav-mega" aria-label="Ver lo que hay en ${esc(l.label)}">${CHEVRON}</button>
+      <div class="wk-mega" id="nav-mega"></div></div>`;
     if (!hijos.length) return `${enlace(l)}${esc(l.label)}</a>`;
     return `<div class="wk-nav-item">${enlace(l)}${esc(l.label)}</a>
       <button type="button" class="wk-nav-abrir" aria-expanded="false" aria-controls="nav-sub-${i}" aria-label="Ver lo que hay en ${esc(l.label)}">${CHEVRON}</button>
@@ -41,6 +45,54 @@ export function pintarMenus() {
       <div class="ns-panel__sub" id="panel-sub-${i}" inert><div>${hijos.map((c) => `${enlace(c)}${esc(c.label)}</a>`).join('')}</div></div></div>`;
   }).join('');
   marcarActivo();
+  pintarMega();
+}
+
+const plural = (t) => (/[sz]$/i.test(t) ? t : `${t}s`);
+/** El menú grande de la Tienda: sale del catálogo (no hay que cargar nada en el panel). */
+async function pintarMega() {
+  const caja = $('#nav-mega');
+  if (!caja) return;
+  const [{ catalogo }, { arte }] = await Promise.all([import('../datos/modelo.js'), import('./tarjeta.js')]);
+  const todo = await catalogo().catch(() => []);
+  if (!todo.length || !caja.isConnected) return;
+  const grupos = [['criatura', 'Criaturas'], ['artefacto', 'Artefactos']].map(([tipo, nombre]) => {
+    const piezas = todo.filter((x) => x.tipo === tipo);
+    const especies = [...new Set(piezas.map((x) => x.species).filter(Boolean))].map((e) => {
+      const de = piezas.filter((x) => x.species === e);
+      return { nombre: tipo === 'criatura' ? plural(e) : plural(e), especie: e, cuantas: de.length, muestra: de.find((x) => x.image) ?? de[0] };
+    }).sort((a, b) => b.cuantas - a.cuantas);
+    return { tipo, nombre, especies };
+  }).filter((g) => g.especies.length);
+  const nueva = todo.filter((x) => x.available && x.image && (x.tipo === 'criatura' || x.tipo === 'artefacto')).sort((a, b) => String(b.createdAt ?? '').localeCompare(String(a.createdAt ?? '')))[0];
+  caja.innerHTML = `
+    <div class="wk-mega__tipos" role="tablist" aria-label="Tipo de pieza">
+      ${grupos.map((g, i) => `<button type="button" role="tab" data-mega="${i}" aria-selected="${i === 0}">${esc(g.nombre)}</button>`).join('')}
+      <a class="wk-mega__todo" href="/tienda" data-link>Ver toda la tienda →</a>
+    </div>
+    ${grupos.map((g, i) => `<div class="wk-mega__especies" role="tabpanel" data-panel="${i}"${i ? ' hidden' : ''}>
+      ${g.especies.map((e) => `<a href="/tienda?especie=${encodeURIComponent(e.especie)}" data-link><span class="wk-mega__foto">${e.muestra ? arte(e.muestra, { ancho: 320, sizes: '44px' }) : ''}</span><span><b>${esc(e.nombre)}</b><small>${e.cuantas} pieza${e.cuantas === 1 ? '' : 's'}</small></span></a>`).join('')}
+      <a class="wk-mega__ver" href="/tienda?tipo=${g.tipo}" data-link>${g.tipo === 'criatura' ? 'Ver todas las criaturas' : 'Ver todos los artefactos'} →</a>
+    </div>`).join('')}
+    ${nueva ? `<a class="wk-mega__nueva" href="/producto/${encodeURIComponent(nueva.handle)}" data-link>
+      <span class="wk-mega__nueva-foto">${arte(nueva, { ancho: 640, sizes: '320px' })}</span>
+      <span class="wk-mega__nueva-texto"><small>Recién salida del taller</small><b>${esc(nueva.name)}</b><em>Conocela →</em></span></a>` : ''}`;
+  // Ocupa el ancho de la barra: se ubica respecto de su enlace cada vez que se va a abrir
+  const item = caja.closest('.wk-nav-item');
+  const ubicar = () => {
+    const barra = document.querySelector('.ns-bar')?.getBoundingClientRect(), ri = item.getBoundingClientRect();
+    if (!barra) return;
+    caja.style.setProperty('--mega-x', `${barra.left - ri.left}px`);
+    caja.style.setProperty('--mega-w', `${barra.width}px`);
+    caja.style.setProperty('--mega-y', `${barra.bottom - ri.bottom + 10}px`);
+  };
+  item.addEventListener('pointerenter', ubicar);
+  item.addEventListener('focusin', ubicar);
+  item.querySelector('.wk-nav-abrir').addEventListener('click', ubicar);
+  ubicar();
+  const tabs = [...caja.querySelectorAll('[data-mega]')];
+  const elegir = (k) => { tabs.forEach((t, i) => t.setAttribute('aria-selected', String(i === k))); caja.querySelectorAll('[data-panel]').forEach((p, i) => { p.hidden = i !== k; }); };
+  tabs.forEach((t, k) => { t.addEventListener('mouseenter', () => elegir(k)); t.addEventListener('click', () => elegir(k)); t.addEventListener('focus', () => elegir(k)); });
 }
 
 const CHEVRON = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m6 9 6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
@@ -54,7 +106,7 @@ export function conectarSubmenus() {
   });
   document.addEventListener('click', (e) => {
     const b = e.target.closest('.wk-nav-abrir, .wk-panel-abrir');
-    if (!b) { if (!e.target.closest('.wk-nav-sub')) cerrarBarra(); return; }
+    if (!b) { if (!e.target.closest('.wk-nav-sub, .wk-mega') || e.target.closest('.wk-mega a')) cerrarBarra(); return; }
     const item = b.parentElement, abierto = !item.classList.contains('is-abierto');
     if (b.classList.contains('wk-nav-abrir')) cerrarBarra(item);
     item.classList.toggle('is-abierto', abierto);
@@ -85,6 +137,21 @@ const whatsapp = (c) => {
   const wa = (c.whatsapp || '').replace(/\D/g, '').replace(/^0/, '598');
   return wa ? `https://wa.me/${wa}${c.whatsappMessage ? `?text=${encodeURIComponent(c.whatsappMessage)}` : ''}` : '';
 };
+
+/**
+ * Tarjetitas de contacto de la página de Contacto: el taller (país y envíos), email, WhatsApp y redes.
+ * Solo aparece lo que está cargado en el panel (Contacto); el país sale de js/config.js.
+ */
+export function tarjetasContacto(c = estado.info.contact ?? {}, pais = 'Uruguay') {
+  const wa = whatsapp(c), red = redes(c, 'wk-contacto__redes');
+  const tarjeta = (ic, titulo, cuerpo, href) => `<${href ? `a href="${href}"${/^https?:/.test(href) ? ' target="_blank" rel="noopener"' : ''}` : 'div'} class="wk-contacto__tarjeta"><span class="wk-contacto__icono">${ic}</span><span><small>${titulo}</small>${cuerpo}</span></${href ? 'a' : 'div'}>`;
+  return [
+    tarjeta(icono('i-pin'), 'El taller', `${esc(c.location || pais)}<br>Envíos a todo el país`),
+    c.email && tarjeta(icono('i-mail'), 'Email', esc(c.email), `mailto:${esc(c.email)}`),
+    wa && tarjeta(icono('i-wa'), 'WhatsApp', esc(c.hours || c.phone || 'Escribinos'), wa),
+    red && `<div class="wk-contacto__tarjeta"><span class="wk-contacto__icono">✦</span><span><small>Seguinos</small>${red}</span></div>`,
+  ].filter(Boolean).join('');
+}
 
 /** Datos de contacto del panel, listos para mostrar (los usa también la página de contacto). */
 export function contactoHtml(c = estado.info.contact ?? {}) {

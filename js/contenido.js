@@ -16,8 +16,8 @@ export const HERO = {
   ],
 };
 
-/** Cinta en movimiento debajo del hero. */
-export const CINTA = ['Arte', 'Magia', 'Folklore', 'Criaturas con nombre', 'Artefactos con carácter', 'Piezas únicas', 'Certificado de autenticidad'];
+/** Banda debajo del hero: frases fijas, repartidas a lo ancho. */
+export const CINTA = ['Criaturas con identidad', 'Artefactos misteriosos', 'Técnicas mixtas', 'Universo fantástico'];
 
 export const CREACIONES = {
   sobre: 'Walkiverso',
@@ -28,13 +28,14 @@ export const CREACIONES = {
   artefactos: { titulo: 'Artefactos', texto: 'Artefactos misteriosos con mucho carácter.', cta: 'Ver artefactos disponibles', imagen: 'img/fondo artefactos.webp' },
 };
 
-/** Sección de duendes: cuántos quedan y el sorteo. Los textos son PROVISORIOS. */
+/** Sección de duendes (del proyecto Milarko: a propósito se ve distinta del resto del Walkiverso) y el sorteo. */
 export const DUENDES = {
   especie: 'Duende',            // la especie que muestra la sección (como está cargada en el panel)
-  sobre: 'Buscan hogar',
-  titulo: 'Duendes',
-  quedan: 'duendes disponibles',
-  queda: 'duende disponible',
+  imagen: '',                   // el logo de Milarko, en el círculo (vacío: un destello)
+  sobre: 'Del bosque de Milarko',
+  titulo: 'Los duendes buscan hogar',
+  quedan: 'duendes buscan hogar',
+  queda: 'duende busca hogar',
   texto: 'Dicen que no elegís a tu duende: es él quien te elige. ¿Te animás a probar?',
   azar: 'Que un duende me elija',
   otraVez: 'Probar otra vez',
@@ -104,7 +105,7 @@ export const PROCESO = {
 export const REELS = {
   sobre: 'Desde el taller',
   titulo: 'Magia en movimiento',
-  texto: 'Así nacen las criaturas: del cartón reciclado a su primera mirada.',
+  texto: 'Así nacen las obras Walkiverso: desde la imaginación a su primera mirada.',
   items: [
     { titulo: 'Nace una mandrágora', etiqueta: 'Asomate al espejo', video: '', enlace: '', poster: '' },
     { titulo: 'Pintando a Sadybud', etiqueta: '', video: '', enlace: '', poster: '' },
