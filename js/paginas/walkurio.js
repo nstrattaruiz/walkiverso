@@ -119,7 +119,7 @@ export async function walkurio() {
       caja.innerHTML = `<h2 class="wk-mundo__sub">Piezas de esta zona</h2>
         <ul class="wk-mundo__piezas">${ps.map((p) => `<li><a href="/producto/${encodeURIComponent(p.handle)}" data-link>
           <span class="wk-mundo__pieza-foto">${arte(p, { ancho: 160, sizes: '64px' })}</span>
-          <span><b>${esc(p.name)}</b><small>${p.available ? precio(p) : 'Ya tiene hogar'}</small></span></a></li>`).join('')}</ul>`;
+          <span><b>${esc(p.name)}</b><small>${p.available ? precio(p) : 'Vendida'}</small></span></a></li>`).join('')}</ul>`;
     });
     marcas.innerHTML = lista.map((h) => `
       <button type="button" class="wk-mundo__marca${h.lat === null ? ' wk-mundo__marca--cuerpo' : ''}" data-zona="${esc(h.id)}" aria-label="Entrar a ${esc(h.nombre)}" tabindex="-1">

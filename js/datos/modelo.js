@@ -75,8 +75,8 @@ export function pieza(p) {
 
 /** Palabras con las que el visitante nombra cada cosa (para llegar a la ficha o a la tienda). */
 export const NOMBRE = {
-  criatura: { una: 'criatura', esta: 'esta criatura', otras: 'otras criaturas', ver: 'Ver criatura', adquirir: 'Adoptar esta criatura', hogar: 'Esta criatura ya encontró hogar.' },
-  artefacto: { una: 'artefacto', esta: 'este artefacto', otras: 'otros artefactos', ver: 'Ver artefacto', adquirir: 'Adquirir artefacto', hogar: 'Este artefacto ya encontró hogar.' },
+  criatura: { una: 'criatura', esta: 'esta criatura', otras: 'otras criaturas', ver: 'Ver criatura', adquirir: 'Adoptar esta criatura', hogar: 'Esta criatura ya fue vendida.' },
+  artefacto: { una: 'artefacto', esta: 'este artefacto', otras: 'otros artefactos', ver: 'Ver artefacto', adquirir: 'Adquirir artefacto', hogar: 'Este artefacto ya fue vendido.' },
   ebook: { una: 'e-book', esta: 'este e-book', otras: 'otros e-books', ver: 'Ver e-book', adquirir: 'Adquirir e-book', hogar: 'Este e-book no está disponible por ahora.' },
   curso: { una: 'curso', esta: 'este curso', otras: 'otros cursos', ver: 'Ver curso', adquirir: 'Sumarme al curso', hogar: 'Este curso no está disponible por ahora.' },
 };

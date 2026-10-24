@@ -1229,3 +1229,8 @@ a.wk-contacto__tarjeta:hover { border-color: var(--acento); transform: translate
 .wk-panel-nuevas__puntos button { width: 22px; height: 4px; padding: 0; border: 0; border-radius: 2px; background: rgb(255 255 255 / 0.22); cursor: pointer; transition: background-color 0.3s, width 0.3s; }
 .wk-panel-nuevas__puntos button[aria-current] { width: 36px; background: var(--blue-glow); }
 @media (max-width: 749px) { .wk-panel-nuevas__pila { aspect-ratio: 16 / 10; } }
+/* Las creaciones en el celular: cada puerta solo con su título, texto y botón (las especies y piezas, en la tienda) */
+@media (max-width: 899px) {
+  .wk-puerta .wk-puerta__mas, .wk-puerta:is(:hover, :focus-within, .is-activa) .wk-puerta__mas { display: none; }
+  .wk-puerta .wk-puerta__cuerpo { padding-top: clamp(150px, 46vw, 230px); }
+}

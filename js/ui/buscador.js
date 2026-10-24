@@ -19,7 +19,7 @@ function resultados(lista, texto) {
       <li><a href="${hrefPieza(pz)}" data-link>
         <span class="wk-buscador__arte">${arte(pz, { ancho: 320, sizes: '64px' })}</span>
         <span><strong>${esc(pz.name)}</strong><small>${esc([pz.type, pz.especieTexto, pz.isUnique ? 'Pieza única' : ''].filter(Boolean).join(' · '))}</small></span>
-        <em>${pz.available ? precio(pz) : 'Ya encontró hogar'}</em>
+        <em>${pz.available ? precio(pz) : 'Vendida'}</em>
       </a></li>`).join('')}</ul>
     ${hallados.length > 6 ? `<a class="wk-enlace" href="/tienda?q=${encodeURIComponent(texto)}" data-link>Ver los ${hallados.length} resultados ${flecha}</a>` : ''}`;
 }

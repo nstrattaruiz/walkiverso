@@ -66,7 +66,7 @@ export function iniciarVistaRapida() {
       <div class="wk-vista__info">
         <h2 class="wk-titulo wk-titulo--s">${esc(pz.name)}</h2>
         ${pz.especieTexto || pz.type ? `<p class="wk-card__meta">${esc(pz.especieTexto || pz.type)}</p>` : ''}
-        <p class="wk-vista__precio">${pz.available ? precio(pz) : 'Ya encontró hogar'}</p>
+        <p class="wk-vista__precio">${pz.available ? precio(pz) : 'Vendida'}</p>
         ${pz.description ? `<p class="wk-vista__texto">${esc(resumen(pz, 260))}</p>` : ''}
         <div class="wk-botones">
           ${alCarrito(pz) ? `<button type="button" class="wk-btn wk-btn--tinta" data-cerrar data-al-carrito="${esc(pz.variantId)}" data-cant="${pz.crudo?.multiple > 1 ? pz.crudo.multiple : 1}">Agregar al carrito</button>` : ''}
@@ -89,7 +89,7 @@ export function tarjeta(pz, i = 0) {
       <div class="wk-card__marco">
         ${arte(pz)}
         <span class="wk-card__brillo" aria-hidden="true"></span>
-        <div class="wk-card__insignias">${insignia(pz)}${pz.available && pz.promos?.length ? `<span class="wk-insignia wk-insignia--promo" title="${esc(pz.promos[0].name)}">${esc(pz.promos[0].badge)}</span>` : ''}${pz.available ? '' : '<span class="wk-insignia wk-insignia--hogar">Ya encontró hogar</span>'}</div>
+        <div class="wk-card__insignias">${insignia(pz)}${pz.available && pz.promos?.length ? `<span class="wk-insignia wk-insignia--promo" title="${esc(pz.promos[0].name)}">${esc(pz.promos[0].badge)}</span>` : ''}${pz.available ? '' : '<span class="wk-insignia wk-insignia--hogar">Vendida</span>'}</div>
       </div>
       <div class="wk-card__info">
         <h3 class="wk-card__nombre">${esc(pz.name)}</h3>
