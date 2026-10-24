@@ -165,6 +165,39 @@ export function contactoHtml(c = estado.info.contact ?? {}) {
   ].filter(Boolean).join('');
 }
 
+/**
+ * Menú grande (☰), a la derecha: las últimas piezas que salieron del taller. Van pasando solas mientras el menú está
+ * abierto (una cada 4,5 s, con un fundido y un zoom lento); los puntitos permiten elegir.
+ */
+export async function pintarNuevas() {
+  const caja = $('#panel-nuevas');
+  if (!caja) return;
+  const [{ catalogo, precio }, { arte }] = await Promise.all([import('../datos/modelo.js'), import('./tarjeta.js')]);
+  const nuevas = (await catalogo().catch(() => []))
+    .filter((x) => x.available && x.image && (x.tipo === 'criatura' || x.tipo === 'artefacto'))
+    .sort((a, b) => String(b.createdAt ?? '').localeCompare(String(a.createdAt ?? ''))).slice(0, 3);
+  if (!nuevas.length) return;
+  caja.innerHTML = `<p class="ns-panel__label">Recién salidas del taller</p>
+    <div class="wk-panel-nuevas__pila">${nuevas.map((pz, i) => `<a class="wk-panel-nuevas__pieza${i ? '' : ' is-activa'}" href="/producto/${encodeURIComponent(pz.handle)}" data-link${i ? ' tabindex="-1" aria-hidden="true"' : ''}>
+      ${arte(pz, { ancho: 640, sizes: '420px' })}
+      <span class="wk-panel-nuevas__texto"><small>${esc(pz.especieTexto || pz.type || '')}</small><b>${esc(pz.name)}</b><span>${precio(pz)} · Conocela →</span></span>
+    </a>`).join('')}</div>
+    ${nuevas.length > 1 ? `<div class="wk-panel-nuevas__puntos">${nuevas.map((_, i) => `<button type="button" data-nueva="${i}" aria-label="Ver la pieza ${i + 1}"${i ? '' : ' aria-current="true"'}></button>`).join('')}</div>` : ''}`;
+  caja.hidden = false;
+  const piezas = [...caja.querySelectorAll('.wk-panel-nuevas__pieza')], puntos = [...caja.querySelectorAll('[data-nueva]')];
+  let actual = 0;
+  const mostrar = (k) => {
+    actual = k;
+    piezas.forEach((p, i) => { p.classList.toggle('is-activa', i === k); p.tabIndex = i === k ? 0 : -1; p.setAttribute('aria-hidden', String(i !== k)); });
+    puntos.forEach((b, i) => b.toggleAttribute('aria-current', i === k));
+  };
+  puntos.forEach((b, i) => b.addEventListener('click', () => mostrar(i)));
+  // Pasan solas solo con el menú abierto (y sin "reducir movimiento")
+  if (piezas.length > 1 && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    setInterval(() => { if (document.documentElement.classList.contains('ns-menu-open') && !caja.matches(':hover')) mostrar((actual + 1) % piezas.length); }, 4500);
+  }
+}
+
 export function pintarHablemos() {
   const caja = $('#hablemos');
   caja.insertAdjacentHTML('beforeend', contactoHtml() + redes(estado.info.contact ?? {}, 'ns-panel__social'));

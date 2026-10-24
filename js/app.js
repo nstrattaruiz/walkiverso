@@ -3,7 +3,7 @@
 //        /favoritos  ·  /checkout  ·  /pedido  ·  /legal/:tipo  ·  /cuenta (módulo Cuentas de clientes)  ·  /walkurio (oculta: ver config.js)
 import { tienda, esDemo } from './datos/tienda.js';
 import { $, app, esc, estado, flecha, ir, titular, rutaWeb, url } from './ui/util.js';
-import { pintarMenus, conectarSubmenus, pintarHablemos, pintarPie, pintarAviso, pintarCookies, marcarActivo } from './ui/marco.js';
+import { pintarMenus, conectarSubmenus, pintarHablemos, pintarNuevas, pintarPie, pintarAviso, pintarCookies, marcarActivo } from './ui/marco.js';
 import { iniciarCarrito, abrirCarrito } from './ui/carrito.js';
 import { iniciarBuscador } from './ui/buscador.js';
 import { iniciarFavoritos, favoritos } from './ui/favoritos.js';
@@ -72,6 +72,7 @@ async function arrancar() {
   pintarMenus();
   conectarSubmenus();
   pintarHablemos();
+  pintarNuevas();
   pintarPie();
   pintarAviso();
   pintarCookies();

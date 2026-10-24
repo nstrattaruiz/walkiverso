@@ -1209,3 +1209,23 @@ a.wk-contacto__tarjeta:hover { border-color: var(--acento); transform: translate
 .ns-nav .wk-mega a, .wk-mega b, .wk-mega em { text-transform: none; letter-spacing: 0; }
 .ns-nav .wk-mega__todo { white-space: nowrap; letter-spacing: 0.14em; text-transform: uppercase; }
 .wk-mega__nueva-texto b { text-transform: none; letter-spacing: -0.01em; }
+
+/* Menú grande (☰), a la derecha: las piezas recién salidas del taller, que van pasando solas, y "Hablemos" debajo */
+.wk-panel-lado { display: flex; flex-direction: column; justify-content: space-between; gap: 28px; min-width: 0; }
+.wk-panel-lado .ns-panel__info { align-self: stretch; }
+.wk-panel-nuevas { display: grid; gap: 12px; opacity: 0; transform: translateY(10px); transition: opacity 0.5s ease 0.25s, transform 0.6s var(--ns-ease) 0.25s; }
+.ns-header.is-open .wk-panel-nuevas { opacity: 1; transform: none; }
+.wk-panel-nuevas__pila { position: relative; aspect-ratio: 16 / 11; overflow: hidden; border-radius: 22px; background: var(--blue-dark); box-shadow: 0 0 0 1px rgb(143 197 255 / 0.14); }
+.wk-panel-nuevas__pieza { position: absolute; inset: 0; color: var(--white); text-decoration: none; opacity: 0; visibility: hidden; transition: opacity 0.9s ease, visibility 0s linear 0.9s; }
+.wk-panel-nuevas__pieza.is-activa { opacity: 1; visibility: visible; transition-delay: 0s; }
+.wk-panel-nuevas__pieza .wk-arte { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transform: scale(1.02); transition: transform 6s ease-out; }
+.wk-panel-nuevas__pieza.is-activa .wk-arte { transform: scale(1.12); }
+.wk-panel-nuevas__texto { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: flex-end; gap: 4px; padding: clamp(16px, 2vw, 24px); background: linear-gradient(180deg, transparent 35%, rgb(4 15 38 / 0.92)); }
+.wk-panel-nuevas__texto small { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--blue-glow); }
+.wk-panel-nuevas__texto b { font-family: var(--wk-display); font-weight: 600; font-size: clamp(1.4rem, 2vw, 1.9rem); line-height: 1.05; }
+.wk-panel-nuevas__texto span { font-size: 0.88rem; color: var(--white-muted); }
+.wk-panel-nuevas__pieza:hover .wk-panel-nuevas__texto span { color: var(--white); }
+.wk-panel-nuevas__puntos { display: flex; gap: 8px; }
+.wk-panel-nuevas__puntos button { width: 22px; height: 4px; padding: 0; border: 0; border-radius: 2px; background: rgb(255 255 255 / 0.22); cursor: pointer; transition: background-color 0.3s, width 0.3s; }
+.wk-panel-nuevas__puntos button[aria-current] { width: 36px; background: var(--blue-glow); }
+@media (max-width: 749px) { .wk-panel-nuevas__pila { aspect-ratio: 16 / 10; } }
