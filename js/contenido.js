@@ -16,7 +16,7 @@ export const HERO = {
   ],
 };
 
-/** Banda debajo del hero: frases fijas, repartidas a lo ancho. */
+/** Cinta en movimiento debajo del hero. */
 export const CINTA = ['Criaturas con identidad', 'Artefactos misteriosos', 'Técnicas mixtas', 'Universo fantástico'];
 
 export const CREACIONES = {
@@ -28,7 +28,7 @@ export const CREACIONES = {
   artefactos: { titulo: 'Artefactos', texto: 'Artefactos misteriosos con mucho carácter.', cta: 'Ver artefactos disponibles', imagen: 'img/fondo artefactos.webp' },
 };
 
-/** Sección de duendes (del proyecto Milarko: a propósito se ve distinta del resto del Walkiverso) y el sorteo. */
+/** Sección de duendes (del proyecto Milarko) y el sorteo. */
 export const DUENDES = {
   especie: 'Duende',            // la especie que muestra la sección (como está cargada en el panel)
   imagen: '',                   // el logo de Milarko, en el círculo (vacío: un destello)

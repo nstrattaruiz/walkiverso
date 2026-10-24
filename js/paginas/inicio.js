@@ -131,8 +131,8 @@ const verMas = (enlace) => (enlace ? `<p class="wk-seccion__mas" data-ver><a cla
 
 /** Cinta en movimiento entre el hero y la tienda: separa los bloques y repite las ideas de la marca. */
 const cinta = () => {
-  // Fija (ya no corre): las frases repartidas a lo ancho, con un destello entre una y otra
-  return `<ul class="wk-cinta wk-cinta--fija">${T.CINTA.map((t, i) => `${i ? '<li class="wk-cinta__sep" aria-hidden="true">✦</li>' : ''}<li>${esc(t)}</li>`).join('')}</ul>`;
+  const tira = T.CINTA.map((t) => `<span>${esc(t)}</span><i aria-hidden="true">✦</i>`).join('');
+  return `<div class="wk-cinta" aria-hidden="true"><div class="wk-cinta__tira">${tira}${tira}${tira}${tira}</div></div>`;
 };
 
 /** Sección con una fila de piezas. En celular la fila se desliza con el dedo para no alargar la página. */
@@ -327,28 +327,25 @@ const duendes = (lista) => {
   return `
   <section class="wk-seccion wk-papel wk-duendes wk-con-raices" id="duendes">
     ${raices()}
-    <div class="wk-cont">
-      <div class="wk-milarko" data-ver>
-        <span class="wk-milarko__punto wk-milarko__punto--a" aria-hidden="true">✦</span><span class="wk-milarko__punto wk-milarko__punto--b" aria-hidden="true">✦</span>
-        <div class="wk-milarko__texto">
-          <span class="wk-milarko__logo">${D.imagen ? `<img src="${esc(D.imagen)}" alt="Milarko" loading="lazy">` : '<span aria-hidden="true">✦</span>'}</span>
-          <span class="wk-milarko__sobre">${esc(D.sobre)}</span>
-          <h2 class="wk-milarko__titulo">${esc(D.titulo)}</h2>
-          <p class="wk-milarko__bajada">${esc(D.texto)}</p>
-          ${libres.length ? `<p class="wk-milarko__quedan"><i aria-hidden="true"></i>${libres.length} ${esc(libres.length === 1 ? D.queda : D.quedan)}</p>` : ''}
-          <div class="wk-botones">
-            ${libres.length > 1 ? `<button type="button" class="wk-btn wk-btn--tinta wk-duendes__azar" id="duende-azar"><span class="wk-duendes__chispa" aria-hidden="true">✦</span><span>${esc(D.azar)}</span></button>` : ''}
-            <a class="wk-btn wk-btn--linea" href="/tienda?especie=${encodeURIComponent(D.especie)}" data-link>${esc(D.verTodos)} ${flecha}</a>
-          </div>
-          <p class="wk-duendes__elegido" id="duende-elegido" aria-live="polite"></p>
+    <div class="wk-cont wk-duendes__grilla">
+      <div class="wk-duendes__texto" data-ver>
+        <span class="wk-duendes__logo">${D.imagen ? `<img src="${esc(D.imagen)}" alt="Milarko" loading="lazy">` : '<span aria-hidden="true">✦</span>'}</span>
+        <span class="wk-sobre">${esc(D.sobre)}</span>
+        <h2 class="wk-titulo">${esc(D.titulo)}</h2>
+        ${libres.length ? `<p class="wk-duendes__chip"><i aria-hidden="true"></i>${libres.length} ${esc(libres.length === 1 ? D.queda : D.quedan)}</p>` : ''}
+        <p class="wk-bajada">${esc(D.texto)}</p>
+        <div class="wk-botones">
+          ${libres.length > 1 ? `<button type="button" class="wk-btn wk-btn--tinta wk-duendes__azar" id="duende-azar"><span class="wk-duendes__chispa" aria-hidden="true">✦</span><span>${esc(D.azar)}</span></button>` : ''}
+          <a class="wk-btn wk-btn--linea" href="/tienda?especie=${encodeURIComponent(D.especie)}" data-link>${esc(D.verTodos)} ${flecha}</a>
         </div>
-        <div class="wk-milarko__vitrina">
-          <div class="wk-duendes__lista" id="duendes-lista" tabindex="0" aria-label="Duendes">${lista.map(tarjeta).join('')}</div>
-          <div class="wk-milarko__control">
-            <button type="button" class="wk-milarko__flecha" data-mover="-1" aria-label="Duendes anteriores">‹</button>
-            <span class="wk-milarko__barra" aria-hidden="true"><i id="duendes-barra"></i></span>
-            <button type="button" class="wk-milarko__flecha" data-mover="1" aria-label="Más duendes">›</button>
-          </div>
+        <p class="wk-duendes__elegido" id="duende-elegido" aria-live="polite"></p>
+      </div>
+      <div class="wk-duendes__vitrina">
+        <div class="wk-duendes__lista" id="duendes-lista" tabindex="0" aria-label="Duendes">${lista.map(tarjeta).join('')}</div>
+        <div class="wk-duendes__control">
+          <button type="button" class="wk-duendes__flecha" data-mover="-1" aria-label="Duendes anteriores">←</button>
+          <span class="wk-duendes__barra" aria-hidden="true"><i id="duendes-barra"></i></span>
+          <button type="button" class="wk-duendes__flecha" data-mover="1" aria-label="Más duendes">→</button>
         </div>
       </div>
     </div>
@@ -408,7 +405,7 @@ function activarDuendes(lista) {
         <span class="wk-sobre">${esc(T.DUENDES.eligio)}</span>
         <div class="wk-elegido__arte">${arte(pz, { ancho: 640, sizes: '320px' })}<div class="wk-card__insignias">${insignia(pz)}</div></div>
         <h2 class="wk-titulo wk-titulo--m">${esc(pz.name)}</h2>
-        <p class="wk-card__meta">${esc(pz.especieTexto || '')}</p>
+        <p class="wk-card__meta">${[pz.especieTexto, pz.technique].filter(Boolean).map(esc).join(' · ')}</p>
         <p class="wk-elegido__precio">${precio(pz)}</p>
         <div class="wk-botones">
           <a class="wk-btn wk-btn--tinta" href="/producto/${encodeURIComponent(pz.handle)}" data-link data-cerrar>${esc(NOMBRE.criatura.ver)} ${flecha}</a>

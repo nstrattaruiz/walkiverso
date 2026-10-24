@@ -64,8 +64,8 @@ export function iniciarVistaRapida() {
     abrirModal(`<div class="wk-vista">
       <div class="wk-vista__arte">${arte(pz, { ancho: 640, sizes: '320px' })}</div>
       <div class="wk-vista__info">
-        ${pz.especieTexto || pz.type ? `<p class="wk-card__meta">${esc(pz.especieTexto || pz.type)}</p>` : ''}
         <h2 class="wk-titulo wk-titulo--s">${esc(pz.name)}</h2>
+        ${pz.especieTexto || pz.type ? `<p class="wk-card__meta">${esc(pz.especieTexto || pz.type)}</p>` : ''}
         <p class="wk-vista__precio">${pz.available ? precio(pz) : 'Ya encontró hogar'}</p>
         ${pz.description ? `<p class="wk-vista__texto">${esc(resumen(pz, 260))}</p>` : ''}
         <div class="wk-botones">
@@ -82,8 +82,7 @@ const ojito = (pz) => (pz.tipo === 'curso' ? '' : `<button type="button" class="
 
 export function tarjeta(pz, i = 0) {
   const n = NOMBRE[pz.tipo];
-  // El tipo va arriba del nombre, en mayúsculas (Mandrágora, Bitácora, Duende del Amor…). La técnica ya no se muestra.
-  const meta = esc(pz.especieTexto || pz.type || '');
+  const meta = [pz.especieTexto, pz.technique].filter(Boolean).map(esc).join('<i aria-hidden="true"> · </i>');
   return `
   <article class="wk-card${pz.available ? '' : ' wk-card--hogar'}" data-handle="${esc(pz.handle)}" data-ver style="--d:${i % 4}">
     <a class="wk-card__enlace" href="${hrefPieza(pz)}" data-link aria-label="${esc(`${n.ver}: ${pz.name}`)}">
@@ -93,8 +92,8 @@ export function tarjeta(pz, i = 0) {
         <div class="wk-card__insignias">${insignia(pz)}${pz.available && pz.promos?.length ? `<span class="wk-insignia wk-insignia--promo" title="${esc(pz.promos[0].name)}">${esc(pz.promos[0].badge)}</span>` : ''}${pz.available ? '' : '<span class="wk-insignia wk-insignia--hogar">Ya encontró hogar</span>'}</div>
       </div>
       <div class="wk-card__info">
-        ${meta ? `<p class="wk-card__meta">${meta}</p>` : ''}
         <h3 class="wk-card__nombre">${esc(pz.name)}</h3>
+        ${meta ? `<p class="wk-card__meta">${meta}</p>` : ''}
         ${pz.description ? `<p class="wk-card__resumen">${esc(resumen(pz))}</p>` : ''}
         <div class="wk-card__pie">
           <span class="wk-card__precio">${pz.available ? precio(pz) : '—'}</span>
